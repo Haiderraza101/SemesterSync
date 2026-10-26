@@ -1,7 +1,5 @@
+import PageHeader from "../components/ui/PageHeader.jsx";
+
 export default function Register() {
-  return (
-    <section>
-      <h2>Register</h2>
-    </section>
-  );
+  return <PageHeader title="Create an account" />;
 }

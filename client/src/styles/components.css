@@ -734,3 +734,31 @@
   background: transparent;
   color: inherit;
 }
+
+.page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  overflow: hidden;
+  background: var(--color-primary-soft);
+  z-index: 70;
+}
+
+.page-loader__bar {
+  display: block;
+  width: 30%;
+  height: 100%;
+  background: var(--color-primary);
+  animation: page-loader-slide 1s ease-in-out infinite;
+}
+
+@keyframes page-loader-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}

@@ -1,7 +1,5 @@
+import PageHeader from "../components/ui/PageHeader.jsx";
+
 export default function Login() {
-  return (
-    <section>
-      <h2>Login</h2>
-    </section>
-  );
+  return <PageHeader title="Log in" />;
 }

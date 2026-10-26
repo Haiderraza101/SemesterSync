@@ -2,9 +2,9 @@ import { Link } from "react-router-dom";
 
 export default function NotFound() {
   return (
-    <section>
-      <h2>Page not found</h2>
-      <Link to="/">Go home</Link>
-    </section>
+    <main className="not-found">
+      <h1>Page not found</h1>
+      <Link to="/">Go to home page</Link>
+    </main>
   );
 }
