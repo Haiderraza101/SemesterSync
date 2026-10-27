@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout.jsx";
+import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
+import GuestRoute from "./components/routing/GuestRoute.jsx";
 import PageLoader from "./components/ui/PageLoader.jsx";
 
 const Landing = lazy(() => import("./pages/Landing.jsx"));
@@ -23,20 +25,24 @@ export default function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/app" element={<AppLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="timetable" element={<Timetable />} />
-          <Route path="datesheets" element={<DateSheets />} />
-          <Route path="tasks" element={<Tasks />} />
-          <Route path="attendance" element={<Attendance />} />
-          <Route path="share" element={<Share />} />
-          <Route path="export" element={<Export />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="*" element={<Navigate to="/app" replace />} />
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+        </Route>
+        <Route path="/app" element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="timetable" element={<Timetable />} />
+            <Route path="datesheets" element={<DateSheets />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="share" element={<Share />} />
+            <Route path="export" element={<Export />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/app" replace />} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
