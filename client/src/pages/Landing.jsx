@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Button from "../components/ui/Button.jsx";
 import Logo from "../components/ui/Logo.jsx";
 import { useAuth } from "../hooks/useAuth.js";
@@ -110,7 +111,7 @@ export default function Landing() {
               </Button>
             ) : (
               <>
-                <a href="/login">Log in</a>
+                <Link to="/login">Log in</Link>
                 <Button to="/register" variant="primary">
                   Sign up
                 </Button>
