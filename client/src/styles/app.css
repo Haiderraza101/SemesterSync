@@ -223,3 +223,61 @@
     transition: none;
   }
 }
+
+.stat-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  margin: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.stat-group__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 18px var(--space-5);
+  box-shadow: 1px 0 0 var(--color-border);
+}
+
+.stat-group__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.stat-group__value {
+  margin: 0;
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.stat-group__value--warning {
+  color: var(--color-warning-text);
+}
+
+.stat-group__detail {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.progress {
+  height: 4px;
+  background: var(--color-divider);
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--color-primary);
+}
+
+.progress--warning .progress__bar {
+  background: var(--color-warning-accent);
+}
+
+.progress--critical .progress__bar {
+  background: var(--color-danger-text);
+}
