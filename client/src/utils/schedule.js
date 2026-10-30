@@ -5,25 +5,24 @@ export function getCourseIndex(catalog) {
   return new Map((catalog?.courses || []).map((course) => [course.code, course]));
 }
 
+export function toSelectedCourse(course, section) {
+  const details = course?.sections[section];
+  if (!details) return null;
+  return {
+    code: course.code,
+    name: course.name,
+    shortName: course.shortName,
+    color: course.color,
+    section,
+    room: details.room,
+    instructor: details.instructor,
+    slots: details.slots,
+  };
+}
+
 export function getSelectedCourses(schedule) {
   const index = getCourseIndex(schedule.catalog);
-  return schedule.selections
-    .map(({ code, section }) => {
-      const course = index.get(code);
-      const details = course?.sections[section];
-      if (!details) return null;
-      return {
-        code,
-        name: course.name,
-        shortName: course.shortName,
-        color: course.color,
-        section,
-        room: details.room,
-        instructor: details.instructor,
-        slots: details.slots,
-      };
-    })
-    .filter(Boolean);
+  return schedule.selections.map(({ code, section }) => toSelectedCourse(index.get(code), section)).filter(Boolean);
 }
 
 export function getInstanceId(code, dateKey, start) {
