@@ -23,6 +23,7 @@ import {
   formatTime,
   formatTimeRange,
   getGreeting,
+  toTimeKey,
 } from "../utils/date.js";
 import { getClassesOnDate, getExams, getSelectedCourses, getTasksWithCourses, getUpcomingItems } from "../utils/schedule.js";
 import "../styles/pages/dashboard.css";
@@ -112,7 +113,7 @@ function UpcomingList({ items }) {
           <div className="upcoming-list__text">
             <span className="upcoming-list__title">{item.title}</span>
             <span className="upcoming-list__detail">
-              {item.detail}, {formatTime(`${item.date.getHours()}:${item.date.getMinutes()}`)}
+              {item.detail}, {formatTime(toTimeKey(item.date))}
             </span>
           </div>
         </li>
