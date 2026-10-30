@@ -371,3 +371,29 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
+
+.stepper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-7);
+}
+
+.stepper__step {
+  padding: 8px 0 12px;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.stepper__step--done::after {
+  content: "✓";
+  margin-left: 6px;
+  color: var(--color-primary);
+}
+
+.stepper__step--current {
+  color: var(--color-primary-text);
+  border-bottom-color: var(--color-primary);
+}

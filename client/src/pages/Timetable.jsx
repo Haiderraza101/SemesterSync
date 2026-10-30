@@ -1,19 +1,24 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FileDropzone from "../components/app/FileDropzone.jsx";
 import FileSummary from "../components/app/FileSummary.jsx";
 import SectionTable from "../components/app/SectionTable.jsx";
+import Stepper from "../components/app/Stepper.jsx";
 import Button from "../components/ui/Button.jsx";
 import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
+import { useToast } from "../hooks/useToast.js";
 import { scheduleService } from "../services/scheduleService.js";
 import { describeClash, findClashes, getClashingSlotKeys } from "../utils/clashes.js";
 import { getErrorMessage } from "../utils/errors.js";
 import { formatFileSize, validateSpreadsheet } from "../utils/files.js";
 import { toSelectedCourse } from "../utils/schedule.js";
 import "../styles/pages/timetable.css";
+
+const STEPS = ["Upload file", "Select sections", "Add to calendar"];
 
 function createDraft(catalog, selections) {
   const selected = new Map(selections.map((selection) => [selection.code, selection.section]));
@@ -28,7 +33,7 @@ function createDraft(catalog, selections) {
   );
 }
 
-function SectionPicker({ catalog, selections }) {
+function SectionPicker({ catalog, selections, onSave }) {
   const [draft, setDraft] = useState(() => createDraft(catalog, selections));
   const [query, setQuery] = useState("");
 
@@ -56,6 +61,10 @@ function SectionPicker({ catalog, selections }) {
     setDraft((current) => ({ ...current, [code]: { ...current[code], ...changes } }));
   };
 
+  const handleSave = () => {
+    onSave(draftCourses.map((course) => ({ code: course.code, section: course.section })));
+  };
+
   return (
     <>
       {clashes.length > 0 ? (
@@ -73,7 +82,20 @@ function SectionPicker({ catalog, selections }) {
         draftCourses.length > 0 && <Notice variant="success" title="No clashes between the selected sections." />
       )}
 
-      <Panel flush>
+      <Panel
+        flush
+        footer={
+          <>
+            <span className="toolbar__meta">Classes repeat weekly until the last teaching day of the semester.</span>
+            <div className="page-header__actions">
+              <Button onClick={() => setDraft(createDraft(catalog, selections))}>Reset</Button>
+              <Button variant="primary" disabled={draftCourses.length === 0} onClick={handleSave}>
+                Add {draftCourses.length} {draftCourses.length === 1 ? "course" : "courses"} to calendar
+              </Button>
+            </div>
+          </>
+        }
+      >
         <div className="toolbar">
           <div className="toolbar__search">
             <Icon name="search" size={14} className="toolbar__search-icon" />
@@ -103,7 +125,9 @@ function SectionPicker({ catalog, selections }) {
 }
 
 export default function Timetable() {
-  const { schedule, setCatalog } = useSchedule();
+  const { schedule, setCatalog, setSelections } = useSchedule();
+  const { notify } = useToast();
+  const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
   const [replacing, setReplacing] = useState(false);
   const [error, setError] = useState("");
@@ -130,9 +154,17 @@ export default function Timetable() {
 
   const showUpload = !catalog || replacing;
 
+  const handleSave = (selections) => {
+    setSelections(selections);
+    notify(`${selections.length} ${selections.length === 1 ? "course" : "courses"} added to your calendar.`);
+    navigate("/app/calendar");
+  };
+
   return (
     <>
-      <PageHeader title="Timetable" description="Upload the university timetable, then select your courses and sections." />
+      <PageHeader title="Timetable" description="Upload the university timetable, then select your courses and sections.">
+        <Stepper steps={STEPS} current={showUpload ? 0 : 1} />
+      </PageHeader>
       {error && <Notice variant="danger" title={error} />}
       {showUpload ? (
         <FileDropzone
@@ -153,7 +185,7 @@ export default function Timetable() {
               </Button>
             }
           />
-          <SectionPicker key={catalog.uploadedAt} catalog={catalog} selections={schedule.selections} />
+          <SectionPicker key={catalog.uploadedAt} catalog={catalog} selections={schedule.selections} onSave={handleSave} />
         </>
       )}
     </>
