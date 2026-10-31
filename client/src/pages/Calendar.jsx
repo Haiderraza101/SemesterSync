@@ -4,21 +4,25 @@ import CalendarToolbar from "../components/calendar/CalendarToolbar.jsx";
 import CalendarView from "../components/calendar/CalendarView.jsx";
 import CourseFilter from "../components/calendar/CourseFilter.jsx";
 import EventDetails from "../components/calendar/EventDetails.jsx";
+import MakeupModal from "../components/calendar/MakeupModal.jsx";
 import Button from "../components/ui/Button.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
+import { useToast } from "../hooks/useToast.js";
 import { buildCalendarEvents } from "../utils/calendarEvents.js";
 import { findClashes, getClashingSlotKeys } from "../utils/clashes.js";
 import { getSelectedCourses } from "../utils/schedule.js";
 import "../styles/pages/calendar.css";
 
 export default function Calendar() {
-  const { schedule } = useSchedule();
+  const { schedule, toggleCancelled, markAttendance, addMakeup, removeMakeup } = useSchedule();
+  const { notify } = useToast();
   const calendarRef = useRef(null);
   const [range, setRange] = useState(null);
   const [title, setTitle] = useState("");
   const [view, setView] = useState(schedule.settings.defaultView);
   const [selectedId, setSelectedId] = useState(null);
   const [hiddenCodes, setHiddenCodes] = useState(() => new Set());
+  const [makeupFor, setMakeupFor] = useState(null);
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const clashingSlots = useMemo(() => getClashingSlotKeys(findClashes(courses)), [courses]);
@@ -54,6 +58,25 @@ export default function Calendar() {
     info.jsEvent.preventDefault();
     setSelectedId(info.event.id);
   }, []);
+
+  const handleToggleCancel = (id) => {
+    const wasCancelled = schedule.cancelled.includes(id);
+    toggleCancelled(id);
+    notify(wasCancelled ? "Class restored." : "Class cancelled for this week.");
+  };
+
+  const handleMakeupSubmit = (makeup) => {
+    addMakeup(makeup);
+    setMakeupFor(null);
+    setSelectedId(makeup.id);
+    notify("Makeup class added.");
+  };
+
+  const handleRemoveMakeup = (id) => {
+    removeMakeup(id);
+    setSelectedId(null);
+    notify("Makeup class removed.");
+  };
 
   const toggleCourse = (code) => {
     setHiddenCodes((current) => {
@@ -91,11 +114,19 @@ export default function Calendar() {
           />
         </div>
         <aside className="calendar-layout__side" aria-label="Calendar details">
-          <EventDetails event={selectedEvent} />
+          <EventDetails
+            event={selectedEvent}
+            attendance={selectedEvent ? schedule.attendance.marks[selectedEvent.id] : undefined}
+            onToggleCancel={handleToggleCancel}
+            onMarkAttendance={markAttendance}
+            onAddMakeup={setMakeupFor}
+            onRemoveMakeup={handleRemoveMakeup}
+          />
           {courses.length > 0 && <CourseFilter courses={courses} hiddenCodes={hiddenCodes} onToggle={toggleCourse} />}
           <CalendarLegend />
         </aside>
       </div>
+      <MakeupModal instance={makeupFor} onSubmit={handleMakeupSubmit} onClose={() => setMakeupFor(null)} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import Button from "../ui/Button.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
-import { formatShortDate, formatTimeRange, toTimeKey } from "../../utils/date.js";
+import { formatShortDate, formatTime, formatTimeRange, parseDateKey, toTimeKey } from "../../utils/date.js";
 
 function DetailRow({ label, value }) {
   return (
@@ -29,7 +29,7 @@ function ClassDetails({ instance, variant, attendance, onToggleCancel, onMarkAtt
         <h2 className="event-details__title">{instance.course.name}</h2>
       </div>
       <dl className="detail-list">
-        <DetailRow label="When" value={`${formatShortDate(new Date(`${instance.dateKey}T00:00`))}, ${formatTimeRange(instance.start, instance.end)}`} />
+        <DetailRow label="When" value={`${formatShortDate(parseDateKey(instance.dateKey))}, ${formatTimeRange(instance.start, instance.end)}`} />
         <DetailRow label="Room" value={instance.room} />
         <DetailRow label="Section" value={instance.course.section} />
         <DetailRow label="Status" value={VARIANT_STATUS[variant]} />
@@ -84,7 +84,7 @@ function TaskDetails({ task }) {
       </div>
       <dl className="detail-list">
         <DetailRow label="Course" value={task.course?.name || "General"} />
-        <DetailRow label="Due" value={`${formatShortDate(task.dueAt)}, ${formatTimeRange(toTimeKey(task.dueAt), toTimeKey(task.dueAt)).split(" – ")[0]}`} />
+        <DetailRow label="Due" value={`${formatShortDate(task.dueAt)}, ${formatTime(toTimeKey(task.dueAt))}`} />
       </dl>
     </>
   );
