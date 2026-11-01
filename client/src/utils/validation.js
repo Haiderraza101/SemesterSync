@@ -35,3 +35,12 @@ export function validateRegister(values) {
   else if (values.confirmPassword !== values.password) errors.confirmPassword = "Passwords do not match.";
   return errors;
 }
+
+export function validateTask(values) {
+  const errors = {};
+  if (!values.title.trim()) errors.title = "Enter a title.";
+  if (!values.courseCode) errors.courseCode = "Choose a course.";
+  if (!values.date) errors.date = "Choose a due date.";
+  if (!values.time) errors.time = "Choose a time.";
+  return errors;
+}
