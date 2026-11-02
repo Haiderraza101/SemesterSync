@@ -1,0 +1,99 @@
+.export-stage {
+  padding: var(--space-6);
+  overflow-x: auto;
+  background: #e9ecf0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.export-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 620px;
+  padding: var(--space-7);
+  background: #ffffff;
+  border: 1px solid #d5dbe2;
+  color: var(--color-text);
+}
+
+.export-sheet__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-text);
+}
+
+.export-sheet__header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.export-sheet__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.export-sheet__meta,
+.export-sheet__brand {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.export-sheet__table {
+  table-layout: fixed;
+  font-size: 0.6875rem;
+}
+
+.export-sheet__table th,
+.export-sheet__table td {
+  padding: 8px 6px;
+  border: 1px solid #d5dbe2;
+  text-align: left;
+  vertical-align: top;
+}
+
+.export-sheet__table thead th {
+  background: var(--color-bg);
+  font-weight: 600;
+}
+
+.export-sheet__table tbody th {
+  width: 84px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.export-sheet__table td {
+  height: 40px;
+}
+
+.export-sheet__cell--filled {
+  background: var(--color-primary-soft);
+}
+
+.export-sheet__entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.export-sheet__entry + .export-sheet__entry {
+  margin-top: 6px;
+}
+
+.export-sheet__entry strong {
+  font-weight: 600;
+}
+
+.export-sheet__entry span {
+  color: var(--color-text-secondary);
+}
+
+.export-options__legend {
+  display: block;
+  margin-bottom: var(--space-2);
+}

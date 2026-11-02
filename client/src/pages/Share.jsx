@@ -83,7 +83,7 @@ function ShareCodePanel() {
 
         <fieldset className="share-panel__options">
           <legend className="field__label">Included in the code</legend>
-          <Checkbox label={`Courses and sections (${schedule.selections.length})`} checked disabled />
+          <Checkbox label={`Courses and sections (${schedule.selections.length})`} checked readOnly disabled />
           <Checkbox
             label={`Exams (${examCount})`}
             checked={include.exams}
