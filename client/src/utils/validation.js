@@ -44,3 +44,22 @@ export function validateTask(values) {
   if (!values.time) errors.time = "Choose a time.";
   return errors;
 }
+
+export function validateProfile(values) {
+  const errors = {};
+  if (!values.name.trim()) errors.name = "Enter your full name.";
+  if (!values.email.trim()) errors.email = "Enter your email.";
+  else if (!isValidEmail(values.email)) errors.email = "Enter a valid email address.";
+  if (!ROLL_NUMBER_PATTERN.test(values.rollNumber.trim())) errors.rollNumber = "Use the format 23L-0634.";
+  if (!values.section.trim()) errors.section = "Enter your section.";
+  return errors;
+}
+
+export function validatePasswordChange(values) {
+  const errors = {};
+  if (!values.currentPassword) errors.currentPassword = "Enter your current password.";
+  const passwordError = validatePassword(values.newPassword);
+  if (passwordError) errors.newPassword = passwordError;
+  if (values.confirmPassword !== values.newPassword) errors.confirmPassword = "Passwords do not match.";
+  return errors;
+}

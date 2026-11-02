@@ -37,6 +37,17 @@ export const mockAuth = {
     return { ok: true };
   },
 
+  async changePassword({ currentPassword }) {
+    await delay(400);
+    if (!currentPassword || currentPassword.length < 6) throw new Error("Your current password is incorrect.");
+    return { ok: true };
+  },
+
+  async deleteAccount() {
+    await delay(400);
+    return { ok: true };
+  },
+
   async updateProfile(profile) {
     await delay(300);
     const current = readJson(STORAGE_KEYS.user) || DEMO_USER;

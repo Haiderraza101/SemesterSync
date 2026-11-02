@@ -1,9 +1,19 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ChangePasswordModal from "../components/settings/ChangePasswordModal.jsx";
+import ProfileForm from "../components/settings/ProfileForm.jsx";
 import SettingRow from "../components/settings/SettingRow.jsx";
+import Button from "../components/ui/Button.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
+import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import Switch from "../components/ui/Switch.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
+import { useToast } from "../hooks/useToast.js";
+import { authService } from "../services/authService.js";
+import { getErrorMessage } from "../utils/errors.js";
 import { CLASS_REMINDER_OPTIONS, EXAM_REMINDER_OPTIONS } from "../utils/reminders.js";
 import "../styles/pages/settings.css";
 
@@ -66,14 +76,68 @@ function CalendarSettings({ settings, onChange }) {
   );
 }
 
+function AccountSettings() {
+  const { logout } = useAuth();
+  const { resetSchedule } = useSchedule();
+  const { notify } = useToast();
+  const navigate = useNavigate();
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handlePasswordChanged = () => {
+    setPasswordOpen(false);
+    notify("Password updated.");
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await authService.deleteAccount();
+      resetSchedule();
+      logout();
+      navigate("/", { replace: true });
+    } catch (error) {
+      notify(getErrorMessage(error), "danger");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
+
+  return (
+    <Panel title="Account" flush>
+      <SettingRow label="Password" description="Change the password you use to log in.">
+        <Button onClick={() => setPasswordOpen(true)}>Change password</Button>
+      </SettingRow>
+      <SettingRow label="Delete account" description="Permanently removes your schedule, attendance and settings.">
+        <Button variant="danger" disabled={deleting} onClick={() => setConfirmDelete(true)}>
+          Delete account
+        </Button>
+      </SettingRow>
+      <ChangePasswordModal open={passwordOpen} onDone={handlePasswordChanged} onClose={() => setPasswordOpen(false)} />
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete your account?"
+        description="This cannot be undone. Your schedule, attendance records and settings will be removed."
+        confirmLabel="Delete account"
+        destructive
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmDelete(false)}
+      />
+    </Panel>
+  );
+}
+
 export default function Settings() {
   const { schedule, updateSettings } = useSchedule();
 
   return (
     <div className="settings-page">
       <PageHeader title="Settings" description="Manage your profile, notifications and calendar preferences." />
+      <ProfileForm />
       <NotificationSettings settings={schedule.settings} onChange={updateSettings} />
       <CalendarSettings settings={schedule.settings} onChange={updateSettings} />
+      <AccountSettings />
     </div>
   );
 }

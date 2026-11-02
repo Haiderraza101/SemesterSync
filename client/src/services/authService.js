@@ -21,6 +21,18 @@ export const authService = {
     return data;
   },
 
+  async changePassword(payload) {
+    if (USE_MOCK_API) return mockAuth.changePassword(payload);
+    const { data } = await api.put("/users/me/password", payload);
+    return data;
+  },
+
+  async deleteAccount() {
+    if (USE_MOCK_API) return mockAuth.deleteAccount();
+    const { data } = await api.delete("/users/me");
+    return data;
+  },
+
   async updateProfile(profile) {
     if (USE_MOCK_API) return mockAuth.updateProfile(profile);
     const { data } = await api.put("/users/me", profile);
