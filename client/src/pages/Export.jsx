@@ -142,7 +142,7 @@ export default function Export() {
                     onChange={(event) => setOrientation(event.target.value)}
                   />
                 )}
-                <fieldset className="share-panel__options">
+                <fieldset className="option-group">
                   <legend className="field__label export-options__legend">Include</legend>
                   <Checkbox label="Room numbers" checked={showRooms} onChange={() => setShowRooms((value) => !value)} />
                   <Checkbox label="Shade class cells" checked={shaded} onChange={() => setShaded((value) => !value)} />

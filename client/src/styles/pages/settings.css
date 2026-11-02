@@ -1,0 +1,48 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 880px;
+}
+
+.setting-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 14px var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.setting-row:last-child {
+  border-bottom: 0;
+}
+
+.setting-row__text {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.setting-row__label {
+  font-size: var(--text-md);
+  font-weight: 500;
+}
+
+.setting-row__description {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.setting-row__control .select {
+  width: auto;
+  min-width: 180px;
+}
+
+.profile-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
