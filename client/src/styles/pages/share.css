@@ -1,0 +1,120 @@
+.share-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+.share-layout__panel {
+  flex: 1 1 400px;
+}
+
+.share-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.share-code {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.share-code__value {
+  flex: 1 1 200px;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.share-code .btn {
+  height: 44px;
+}
+
+.share-panel__link {
+  font-size: var(--text-sm);
+  word-break: break-all;
+}
+
+.share-panel__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.share-panel__options legend {
+  margin-bottom: var(--space-2);
+}
+
+.share-panel__note {
+  font-size: var(--text-xs);
+}
+
+.share-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font-size: inherit;
+  text-align: left;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.share-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.share-lookup__row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.share-lookup__input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.share-preview {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.share-preview__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+  font-size: var(--text-sm);
+}
+
+.share-preview .data-table td {
+  padding: 8px 12px;
+  font-size: var(--text-sm);
+}
