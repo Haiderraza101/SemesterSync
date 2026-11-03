@@ -18,6 +18,7 @@ const Attendance = lazy(() => import("./pages/Attendance.jsx"));
 const Share = lazy(() => import("./pages/Share.jsx"));
 const Export = lazy(() => import("./pages/Export.jsx"));
 const Settings = lazy(() => import("./pages/Settings.jsx"));
+const JoinCode = lazy(() => import("./pages/JoinCode.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="*" element={<Navigate to="/app" replace />} />
           </Route>
         </Route>
+        <Route path="/join/:code" element={<JoinCode />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
