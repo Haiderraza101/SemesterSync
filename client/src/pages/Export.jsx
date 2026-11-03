@@ -85,7 +85,10 @@ export default function Export() {
   const [exporting, setExporting] = useState(false);
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
-  const days = useMemo(() => (schedule.settings.showSaturday ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5]), [schedule.settings.showSaturday]);
+  const days = useMemo(
+    () => (schedule.settings.showSaturday ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5]),
+    [schedule.settings.showSaturday]
+  );
   const rows = useMemo(() => buildTimetableGrid(courses, days), [courses, days]);
 
   const handleDownload = async () => {
@@ -107,7 +110,10 @@ export default function Export() {
 
   return (
     <>
-      <PageHeader title="Export timetable" description="Download your weekly timetable to print or keep on your phone." />
+      <PageHeader
+        title="Export timetable"
+        description="Download your weekly timetable to print or keep on your phone."
+      />
 
       {courses.length === 0 ? (
         <Panel>
@@ -125,7 +131,14 @@ export default function Export() {
       ) : (
         <div className="page-grid">
           <div className="page-grid__main export-stage">
-            <TimetablePreview previewRef={previewRef} user={user} rows={rows} days={days} showRooms={showRooms} shaded={shaded} />
+            <TimetablePreview
+              previewRef={previewRef}
+              user={user}
+              rows={rows}
+              days={days}
+              showRooms={showRooms}
+              shaded={shaded}
+            />
           </div>
           <div className="page-grid__side">
             <Panel as="div" title="Options">

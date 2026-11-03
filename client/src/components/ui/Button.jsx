@@ -6,13 +6,7 @@ const Button = forwardRef(function Button(
   { variant = "secondary", size = "md", block = false, to, type = "button", className, children, ...props },
   ref
 ) {
-  const classes = cx(
-    "btn",
-    `btn--${variant}`,
-    size !== "md" && `btn--${size}`,
-    block && "btn--block",
-    className
-  );
+  const classes = cx("btn", `btn--${variant}`, size !== "md" && `btn--${size}`, block && "btn--block", className);
 
   if (to) {
     return (

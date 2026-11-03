@@ -44,7 +44,9 @@ export function createDemoSchedule() {
     dateSheets: {
       midterm: {
         fileName: midterm.fileName,
-        exams: midterm.exams.filter((exam) => selectedCodes.has(exam.code)).map((exam) => ({ ...exam, reminder: "1d" })),
+        exams: midterm.exams
+          .filter((exam) => selectedCodes.has(exam.code))
+          .map((exam) => ({ ...exam, reminder: "1d" })),
       },
       final: null,
     },

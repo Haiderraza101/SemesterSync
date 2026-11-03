@@ -65,7 +65,10 @@ export default function SectionTable({ courses, draft, clashingSlots, onToggle, 
                     {details.slots.map((slot) => {
                       const clashing = entry.included && clashingSlots.has(getSlotKey(course.code, slot));
                       return (
-                        <span key={`${slot.day}-${slot.start}`} className={cx("slot-chip", clashing && "slot-chip--clash")}>
+                        <span
+                          key={`${slot.day}-${slot.start}`}
+                          className={cx("slot-chip", clashing && "slot-chip--clash")}
+                        >
                           {SHORT_DAY_NAMES[slot.day]} {formatTime(slot.start).replace(/ (AM|PM)$/, "")}
                         </span>
                       );

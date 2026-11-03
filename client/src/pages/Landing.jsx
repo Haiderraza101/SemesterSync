@@ -166,7 +166,10 @@ export default function Landing() {
             <h2 className="landing-section__title">How it works</h2>
             <ol className="landing-steps">
               {STEPS.map((step, index) => (
-                <li key={step.title} className={cx("landing-steps__item", index === 0 && "landing-steps__item--active")}>
+                <li
+                  key={step.title}
+                  className={cx("landing-steps__item", index === 0 && "landing-steps__item--active")}
+                >
                   <span className="landing-steps__label">Step {index + 1}</span>
                   <h3 className="landing-steps__title">{step.title}</h3>
                   <p className="landing-steps__text">{step.text}</p>

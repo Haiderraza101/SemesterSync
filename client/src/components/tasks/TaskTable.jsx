@@ -14,7 +14,13 @@ function getStatus(task, now) {
 
 export default function TaskTable({ tasks, now, onToggle, onDelete }) {
   if (tasks.length === 0) {
-    return <EmptyState icon="tasks" title="Nothing here yet" description="Add assignments and quizzes with the form to track them." />;
+    return (
+      <EmptyState
+        icon="tasks"
+        title="Nothing here yet"
+        description="Add assignments and quizzes with the form to track them."
+      />
+    );
   }
 
   return (
@@ -40,11 +46,18 @@ export default function TaskTable({ tasks, now, onToggle, onDelete }) {
             return (
               <tr key={task.id}>
                 <td>
-                  <Checkbox label={`Mark ${task.title} as done`} hideLabel checked={task.done} onChange={() => onToggle(task.id)} />
+                  <Checkbox
+                    label={`Mark ${task.title} as done`}
+                    hideLabel
+                    checked={task.done}
+                    onChange={() => onToggle(task.id)}
+                  />
                 </td>
                 <td>
                   <div className="course-cell__text">
-                    <span className={cx("course-cell__name", task.done && "task-table__title--done")}>{task.title}</span>
+                    <span className={cx("course-cell__name", task.done && "task-table__title--done")}>
+                      {task.title}
+                    </span>
                     <span className="task-table__course">
                       {task.course && <CourseMarker color={task.course.color} size={7} />}
                       {task.course?.name || "General"}
@@ -59,7 +72,12 @@ export default function TaskTable({ tasks, now, onToggle, onDelete }) {
                   <Badge variant={status.variant}>{status.label}</Badge>
                 </td>
                 <td className="cell-action">
-                  <button type="button" className="btn btn--ghost btn--icon" aria-label={`Delete ${task.title}`} onClick={() => onDelete(task)}>
+                  <button
+                    type="button"
+                    className="btn btn--ghost btn--icon"
+                    aria-label={`Delete ${task.title}`}
+                    onClick={() => onDelete(task)}
+                  >
                     <Icon name="trash" size={15} />
                   </button>
                 </td>

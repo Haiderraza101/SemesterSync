@@ -98,7 +98,11 @@ function ShareCodePanel() {
         <p className="text-muted share-panel__note">Attendance and personal notes are never shared.</p>
 
         <div className="share-panel__actions">
-          <Button variant={code ? "secondary" : "primary"} disabled={generating || schedule.selections.length === 0} onClick={generate}>
+          <Button
+            variant={code ? "secondary" : "primary"}
+            disabled={generating || schedule.selections.length === 0}
+            onClick={generate}
+          >
             {generating ? "Generating…" : code ? "Generate new code" : "Generate code"}
           </Button>
           {code && (
@@ -208,7 +212,10 @@ function ImportPanel() {
             </div>
 
             {missing > 0 && (
-              <Notice variant="warning" title={`${missing} ${missing === 1 ? "course is" : "courses are"} not in your uploaded timetable and will be skipped.`} />
+              <Notice
+                variant="warning"
+                title={`${missing} ${missing === 1 ? "course is" : "courses are"} not in your uploaded timetable and will be skipped.`}
+              />
             )}
 
             <fieldset className="share-panel__options">
@@ -243,7 +250,10 @@ function ImportPanel() {
 export default function Share() {
   return (
     <>
-      <PageHeader title="Share code" description="Share your schedule with classmates, or copy someone else's into your calendar." />
+      <PageHeader
+        title="Share code"
+        description="Share your schedule with classmates, or copy someone else's into your calendar."
+      />
       <div className="share-layout">
         <ShareCodePanel />
         <ImportPanel />

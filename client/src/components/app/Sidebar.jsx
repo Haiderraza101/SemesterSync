@@ -54,7 +54,12 @@ export default function Sidebar({ id, open = false, onNavigate }) {
               {user.rollNumber} · {user.section}
             </span>
           </div>
-          <button type="button" className="btn btn--ghost btn--icon sidebar__logout" aria-label="Log out" onClick={handleLogout}>
+          <button
+            type="button"
+            className="btn btn--ghost btn--icon sidebar__logout"
+            aria-label="Log out"
+            onClick={handleLogout}
+          >
             <Icon name="logout" />
           </button>
         </div>

@@ -45,19 +45,45 @@ function SettingSelect({ id, options, value, onChange }) {
 function NotificationSettings({ settings, onChange }) {
   return (
     <Panel title="Notifications" flush>
-      <SettingRow label="Morning summary email" description="Today's classes plus upcoming exams and deadlines, sent every morning.">
-        <Switch label="Morning summary email" checked={settings.morningSummary} onChange={(value) => onChange({ morningSummary: value })} />
+      <SettingRow
+        label="Morning summary email"
+        description="Today's classes plus upcoming exams and deadlines, sent every morning."
+      >
+        <Switch
+          label="Morning summary email"
+          checked={settings.morningSummary}
+          onChange={(value) => onChange({ morningSummary: value })}
+        />
       </SettingRow>
       {settings.morningSummary && (
         <SettingRow label="Send at" htmlFor="summary-time">
-          <SettingSelect id="summary-time" options={SUMMARY_TIME_OPTIONS} value={settings.summaryTime} onChange={(value) => onChange({ summaryTime: value })} />
+          <SettingSelect
+            id="summary-time"
+            options={SUMMARY_TIME_OPTIONS}
+            value={settings.summaryTime}
+            onChange={(value) => onChange({ summaryTime: value })}
+          />
         </SettingRow>
       )}
       <SettingRow label="Class reminder" htmlFor="class-reminder">
-        <SettingSelect id="class-reminder" options={CLASS_REMINDER_OPTIONS} value={settings.classReminder} onChange={(value) => onChange({ classReminder: value })} />
+        <SettingSelect
+          id="class-reminder"
+          options={CLASS_REMINDER_OPTIONS}
+          value={settings.classReminder}
+          onChange={(value) => onChange({ classReminder: value })}
+        />
       </SettingRow>
-      <SettingRow label="Exam reminder" description="Used as the default when you upload a date sheet." htmlFor="exam-reminder">
-        <SettingSelect id="exam-reminder" options={EXAM_REMINDER_OPTIONS} value={settings.examReminder} onChange={(value) => onChange({ examReminder: value })} />
+      <SettingRow
+        label="Exam reminder"
+        description="Used as the default when you upload a date sheet."
+        htmlFor="exam-reminder"
+      >
+        <SettingSelect
+          id="exam-reminder"
+          options={EXAM_REMINDER_OPTIONS}
+          value={settings.examReminder}
+          onChange={(value) => onChange({ examReminder: value })}
+        />
       </SettingRow>
     </Panel>
   );
@@ -67,10 +93,20 @@ function CalendarSettings({ settings, onChange }) {
   return (
     <Panel title="Calendar" flush>
       <SettingRow label="Default view" htmlFor="default-view">
-        <SettingSelect id="default-view" options={VIEW_OPTIONS} value={settings.defaultView} onChange={(value) => onChange({ defaultView: value })} />
+        <SettingSelect
+          id="default-view"
+          options={VIEW_OPTIONS}
+          value={settings.defaultView}
+          onChange={(value) => onChange({ defaultView: value })}
+        />
       </SettingRow>
       <SettingRow label="Show Saturday" description="Turn on if you have weekend classes.">
-        <Checkbox label="Show Saturday" hideLabel checked={settings.showSaturday} onChange={() => onChange({ showSaturday: !settings.showSaturday })} />
+        <Checkbox
+          label="Show Saturday"
+          hideLabel
+          checked={settings.showSaturday}
+          onChange={() => onChange({ showSaturday: !settings.showSaturday })}
+        />
       </SettingRow>
     </Panel>
   );

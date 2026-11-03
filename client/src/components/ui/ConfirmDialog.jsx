@@ -1,7 +1,15 @@
 import Button from "./Button.jsx";
 import Modal from "./Modal.jsx";
 
-export default function ConfirmDialog({ open, title, description, confirmLabel = "Confirm", destructive = false, onConfirm, onCancel }) {
+export default function ConfirmDialog({
+  open,
+  title,
+  description,
+  confirmLabel = "Confirm",
+  destructive = false,
+  onConfirm,
+  onCancel,
+}) {
   return (
     <Modal
       open={open}

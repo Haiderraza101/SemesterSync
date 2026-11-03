@@ -49,7 +49,12 @@ function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange })
               <tr key={exam.code}>
                 {editable && (
                   <td>
-                    <Checkbox label={`Include ${course.name}`} hideLabel checked={exam.included} onChange={() => onToggle(exam.code)} />
+                    <Checkbox
+                      label={`Include ${course.name}`}
+                      hideLabel
+                      checked={exam.included}
+                      onChange={() => onToggle(exam.code)}
+                    />
                   </td>
                 )}
                 <td>
@@ -130,7 +135,9 @@ export default function DateSheets() {
 
   const applyDefaultReminder = (value) => {
     setDefaultReminder(value);
-    setDraft((current) => current && { ...current, exams: current.exams.map((exam) => ({ ...exam, reminder: value })) });
+    setDraft(
+      (current) => current && { ...current, exams: current.exams.map((exam) => ({ ...exam, reminder: value })) }
+    );
   };
 
   const handleSave = () => {
@@ -144,7 +151,10 @@ export default function DateSheets() {
 
   return (
     <>
-      <PageHeader title="Date sheets" description="Upload the exam date sheet. Only papers for your registered courses are added.">
+      <PageHeader
+        title="Date sheets"
+        description="Upload the exam date sheet. Only papers for your registered courses are added."
+      >
         <Tabs label="Exam term" tabs={TERMS} value={term} onChange={changeTerm} />
       </PageHeader>
 
@@ -202,13 +212,18 @@ export default function DateSheets() {
               }
             >
               {draft.exams.length === 0 ? (
-                <EmptyState title="No papers match your courses" description="Check that you uploaded the right date sheet." />
+                <EmptyState
+                  title="No papers match your courses"
+                  description="Check that you uploaded the right date sheet."
+                />
               ) : (
                 <ExamTable
                   exams={draft.exams}
                   courseIndex={courseIndex}
                   editable
-                  onToggle={(code) => updateDraftExam(code, { included: !draft.exams.find((exam) => exam.code === code).included })}
+                  onToggle={(code) =>
+                    updateDraftExam(code, { included: !draft.exams.find((exam) => exam.code === code).included })
+                  }
                   onReminderChange={(code, reminder) => updateDraftExam(code, { reminder })}
                 />
               )}
@@ -220,7 +235,16 @@ export default function DateSheets() {
               title={saved.fileName}
               description={`${saved.exams.length} exams on your calendar`}
               action={
-                <Button size="sm" onClick={() => setDraft({ fileName: saved.fileName, totalPapers: saved.exams.length, exams: saved.exams.map((exam) => ({ ...exam, included: true })) })}>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    setDraft({
+                      fileName: saved.fileName,
+                      totalPapers: saved.exams.length,
+                      exams: saved.exams.map((exam) => ({ ...exam, included: true })),
+                    })
+                  }
+                >
                   Edit
                 </Button>
               }

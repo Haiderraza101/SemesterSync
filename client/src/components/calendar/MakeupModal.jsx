@@ -20,7 +20,8 @@ function validate(values) {
   else if (values.date < SEMESTER.start || values.date > SEMESTER.end) errors.date = "Pick a date within the semester.";
   if (!values.start) errors.start = "Choose a start time.";
   if (!values.end) errors.end = "Choose an end time.";
-  else if (values.start && timeToMinutes(values.end) <= timeToMinutes(values.start)) errors.end = "End time must be after the start time.";
+  else if (values.start && timeToMinutes(values.end) <= timeToMinutes(values.start))
+    errors.end = "End time must be after the start time.";
   if (!values.room.trim()) errors.room = "Enter a room.";
   return errors;
 }
@@ -51,10 +52,33 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
 
   return (
     <form className="modal__form" onSubmit={handleSubmit} noValidate>
-      <TextField label="Date" name="date" type="date" min={SEMESTER.start} max={SEMESTER.end} value={values.date} onChange={handleChange} error={errors.date} />
+      <TextField
+        label="Date"
+        name="date"
+        type="date"
+        min={SEMESTER.start}
+        max={SEMESTER.end}
+        value={values.date}
+        onChange={handleChange}
+        error={errors.date}
+      />
       <div className="form-row">
-        <TextField label="Start time" name="start" type="time" value={values.start} onChange={handleChange} error={errors.start} />
-        <TextField label="End time" name="end" type="time" value={values.end} onChange={handleChange} error={errors.end} />
+        <TextField
+          label="Start time"
+          name="start"
+          type="time"
+          value={values.start}
+          onChange={handleChange}
+          error={errors.start}
+        />
+        <TextField
+          label="End time"
+          name="end"
+          type="time"
+          value={values.end}
+          onChange={handleChange}
+          error={errors.end}
+        />
       </div>
       <TextField label="Room" name="room" value={values.room} onChange={handleChange} error={errors.room} />
       <div className="modal__form-actions">
@@ -69,7 +93,12 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
 
 export default function MakeupModal({ instance, onSubmit, onClose }) {
   return (
-    <Modal open={Boolean(instance)} title="Add makeup class" description={instance ? instance.course.name : undefined} onClose={onClose}>
+    <Modal
+      open={Boolean(instance)}
+      title="Add makeup class"
+      description={instance ? instance.course.name : undefined}
+      onClose={onClose}
+    >
       {instance && <MakeupForm key={instance.id} instance={instance} onSubmit={onSubmit} onCancel={onClose} />}
     </Modal>
   );

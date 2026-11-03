@@ -70,7 +70,11 @@ function SectionPicker({ catalog, selections, onSave }) {
       {clashes.length > 0 ? (
         <Notice
           variant="warning"
-          title={clashes.length === 1 ? "1 clash between selected sections" : `${clashes.length} clashes between selected sections`}
+          title={
+            clashes.length === 1
+              ? "1 clash between selected sections"
+              : `${clashes.length} clashes between selected sections`
+          }
         >
           <ul className="clash-list">
             {clashes.map((clash) => (
@@ -162,7 +166,10 @@ export default function Timetable() {
 
   return (
     <>
-      <PageHeader title="Timetable" description="Upload the university timetable, then select your courses and sections.">
+      <PageHeader
+        title="Timetable"
+        description="Upload the university timetable, then select your courses and sections."
+      >
         <Stepper steps={STEPS} current={showUpload ? 0 : 1} />
       </PageHeader>
       {error && <Notice variant="danger" title={error} />}
@@ -185,7 +192,12 @@ export default function Timetable() {
               </Button>
             }
           />
-          <SectionPicker key={catalog.uploadedAt} catalog={catalog} selections={schedule.selections} onSave={handleSave} />
+          <SectionPicker
+            key={catalog.uploadedAt}
+            catalog={catalog}
+            selections={schedule.selections}
+            onSave={handleSave}
+          />
         </>
       )}
     </>

@@ -50,10 +50,37 @@ export default function ProfileForm() {
         }
       >
         <div className="profile-form">
-          <TextField label="Full name" name="name" autoComplete="name" value={values.name} onChange={handleChange} error={errors.name} />
-          <TextField label="Email" name="email" type="email" autoComplete="email" value={values.email} onChange={handleChange} error={errors.email} />
-          <TextField label="Roll number" name="rollNumber" value={values.rollNumber} onChange={handleChange} error={errors.rollNumber} />
-          <TextField label="Section" name="section" value={values.section} onChange={handleChange} error={errors.section} />
+          <TextField
+            label="Full name"
+            name="name"
+            autoComplete="name"
+            value={values.name}
+            onChange={handleChange}
+            error={errors.name}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            autoComplete="email"
+            value={values.email}
+            onChange={handleChange}
+            error={errors.email}
+          />
+          <TextField
+            label="Roll number"
+            name="rollNumber"
+            value={values.rollNumber}
+            onChange={handleChange}
+            error={errors.rollNumber}
+          />
+          <TextField
+            label="Section"
+            name="section"
+            value={values.section}
+            onChange={handleChange}
+            error={errors.section}
+          />
         </div>
       </Panel>
     </form>

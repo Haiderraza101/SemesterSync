@@ -16,7 +16,10 @@ function renderEventContent(arg) {
   );
 }
 
-const CalendarView = forwardRef(function CalendarView({ events, initialView, showSaturday, onDatesSet, onEventClick, renderEvent }, ref) {
+const CalendarView = forwardRef(function CalendarView(
+  { events, initialView, showSaturday, onDatesSet, onEventClick, renderEvent },
+  ref
+) {
   return (
     <div className="calendar-surface">
       <FullCalendar

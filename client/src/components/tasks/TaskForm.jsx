@@ -14,7 +14,14 @@ const TYPE_OPTIONS = [
 
 export default function TaskForm({ courses, onSubmit }) {
   const initialValues = useMemo(
-    () => ({ title: "", courseCode: courses[0]?.code || "", type: "assignment", date: "", time: "23:59", reminder: "1d" }),
+    () => ({
+      title: "",
+      courseCode: courses[0]?.code || "",
+      type: "assignment",
+      date: "",
+      time: "23:59",
+      reminder: "1d",
+    }),
     [courses]
   );
   const { values, errors, handleChange, validate, reset } = useForm(initialValues, validateTask);
@@ -39,8 +46,22 @@ export default function TaskForm({ courses, onSubmit }) {
   return (
     <Panel as="div" title="New item">
       <form className="modal__form" onSubmit={handleSubmit} noValidate>
-        <TextField label="Title" name="title" placeholder="Assignment 5" value={values.title} onChange={handleChange} error={errors.title} />
-        <SelectField label="Course" name="courseCode" options={courseOptions} value={values.courseCode} onChange={handleChange} error={errors.courseCode} />
+        <TextField
+          label="Title"
+          name="title"
+          placeholder="Assignment 5"
+          value={values.title}
+          onChange={handleChange}
+          error={errors.title}
+        />
+        <SelectField
+          label="Course"
+          name="courseCode"
+          options={courseOptions}
+          value={values.courseCode}
+          onChange={handleChange}
+          error={errors.courseCode}
+        />
         <fieldset className="radio-group">
           <legend className="field__label">Type</legend>
           <div className="radio-group__options">
@@ -60,10 +81,30 @@ export default function TaskForm({ courses, onSubmit }) {
           </div>
         </fieldset>
         <div className="form-row">
-          <TextField label="Due date" name="date" type="date" value={values.date} onChange={handleChange} error={errors.date} />
-          <TextField label="Time" name="time" type="time" value={values.time} onChange={handleChange} error={errors.time} />
+          <TextField
+            label="Due date"
+            name="date"
+            type="date"
+            value={values.date}
+            onChange={handleChange}
+            error={errors.date}
+          />
+          <TextField
+            label="Time"
+            name="time"
+            type="time"
+            value={values.time}
+            onChange={handleChange}
+            error={errors.time}
+          />
         </div>
-        <SelectField label="Reminder" name="reminder" options={TASK_REMINDER_OPTIONS} value={values.reminder} onChange={handleChange} />
+        <SelectField
+          label="Reminder"
+          name="reminder"
+          options={TASK_REMINDER_OPTIONS}
+          value={values.reminder}
+          onChange={handleChange}
+        />
         <Button type="submit" variant="primary" block>
           Add item
         </Button>

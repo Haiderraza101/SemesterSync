@@ -1,7 +1,9 @@
 import { DAY_NAMES, formatTime, timeToMinutes } from "./date.js";
 
 export function slotsOverlap(a, b) {
-  return a.day === b.day && timeToMinutes(a.start) < timeToMinutes(b.end) && timeToMinutes(b.start) < timeToMinutes(a.end);
+  return (
+    a.day === b.day && timeToMinutes(a.start) < timeToMinutes(b.end) && timeToMinutes(b.start) < timeToMinutes(a.end)
+  );
 }
 
 export function getSlotKey(code, slot) {
@@ -21,7 +23,8 @@ export function findClashes(courses) {
           clashes.push({
             id: `${getSlotKey(first.code, firstSlot)}~${getSlotKey(second.code, secondSlot)}`,
             day: firstSlot.day,
-            start: timeToMinutes(firstSlot.start) > timeToMinutes(secondSlot.start) ? firstSlot.start : secondSlot.start,
+            start:
+              timeToMinutes(firstSlot.start) > timeToMinutes(secondSlot.start) ? firstSlot.start : secondSlot.start,
             courses: [first, second],
             slotKeys: [getSlotKey(first.code, firstSlot), getSlotKey(second.code, secondSlot)],
           });

@@ -1,6 +1,15 @@
 import { cx } from "../../utils/cx.js";
 
-export default function Panel({ title, description, action, footer, flush = false, as: Element = "section", className, children }) {
+export default function Panel({
+  title,
+  description,
+  action,
+  footer,
+  flush = false,
+  as: Element = "section",
+  className,
+  children,
+}) {
   return (
     <Element className={cx("panel", className)}>
       {(title || action) && (

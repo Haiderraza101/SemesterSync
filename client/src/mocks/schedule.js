@@ -120,12 +120,60 @@ export const SAMPLE_DATE_SHEETS = {
 };
 
 export const SAMPLE_TASKS = [
-  { id: "task-1", title: "Lab task 6", courseCode: "CS4031", type: "assignment", due: "2026-11-08T23:59", reminder: "1d", done: false },
-  { id: "task-2", title: "Quiz 3", courseCode: "AI2002", type: "quiz", due: "2026-11-11T08:30", reminder: "1d", done: false },
-  { id: "task-3", title: "Assignment 4", courseCode: "CS4032", type: "assignment", due: "2026-11-13T23:59", reminder: "1d", done: false },
-  { id: "task-4", title: "Project proposal", courseCode: "SE4002", type: "assignment", due: "2026-11-16T17:00", reminder: "1d", done: false },
-  { id: "task-5", title: "Quiz 2", courseCode: "CY3001", type: "quiz", due: "2026-11-05T11:30", reminder: "3h", done: true },
-  { id: "task-6", title: "Assignment 3", courseCode: "CS4032", type: "assignment", due: "2026-10-30T23:59", reminder: "1d", done: true },
+  {
+    id: "task-1",
+    title: "Lab task 6",
+    courseCode: "CS4031",
+    type: "assignment",
+    due: "2026-11-08T23:59",
+    reminder: "1d",
+    done: false,
+  },
+  {
+    id: "task-2",
+    title: "Quiz 3",
+    courseCode: "AI2002",
+    type: "quiz",
+    due: "2026-11-11T08:30",
+    reminder: "1d",
+    done: false,
+  },
+  {
+    id: "task-3",
+    title: "Assignment 4",
+    courseCode: "CS4032",
+    type: "assignment",
+    due: "2026-11-13T23:59",
+    reminder: "1d",
+    done: false,
+  },
+  {
+    id: "task-4",
+    title: "Project proposal",
+    courseCode: "SE4002",
+    type: "assignment",
+    due: "2026-11-16T17:00",
+    reminder: "1d",
+    done: false,
+  },
+  {
+    id: "task-5",
+    title: "Quiz 2",
+    courseCode: "CY3001",
+    type: "quiz",
+    due: "2026-11-05T11:30",
+    reminder: "3h",
+    done: true,
+  },
+  {
+    id: "task-6",
+    title: "Assignment 3",
+    courseCode: "CS4032",
+    type: "assignment",
+    due: "2026-10-30T23:59",
+    reminder: "1d",
+    done: true,
+  },
 ];
 
 export const SAMPLE_ATTENDANCE_BASELINE = {

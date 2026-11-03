@@ -32,9 +32,34 @@ function PasswordForm({ onDone, onCancel }) {
   return (
     <form className="modal__form" onSubmit={handleSubmit} noValidate>
       {formError && <Notice variant="danger" title={formError} />}
-      <TextField label="Current password" name="currentPassword" type="password" autoComplete="current-password" value={values.currentPassword} onChange={handleChange} error={errors.currentPassword} />
-      <TextField label="New password" name="newPassword" type="password" autoComplete="new-password" value={values.newPassword} onChange={handleChange} error={errors.newPassword} hint="Use 8 or more characters with a number." />
-      <TextField label="Confirm new password" name="confirmPassword" type="password" autoComplete="new-password" value={values.confirmPassword} onChange={handleChange} error={errors.confirmPassword} />
+      <TextField
+        label="Current password"
+        name="currentPassword"
+        type="password"
+        autoComplete="current-password"
+        value={values.currentPassword}
+        onChange={handleChange}
+        error={errors.currentPassword}
+      />
+      <TextField
+        label="New password"
+        name="newPassword"
+        type="password"
+        autoComplete="new-password"
+        value={values.newPassword}
+        onChange={handleChange}
+        error={errors.newPassword}
+        hint="Use 8 or more characters with a number."
+      />
+      <TextField
+        label="Confirm new password"
+        name="confirmPassword"
+        type="password"
+        autoComplete="new-password"
+        value={values.confirmPassword}
+        onChange={handleChange}
+        error={errors.confirmPassword}
+      />
       <div className="modal__form-actions">
         <Button onClick={onCancel}>Cancel</Button>
         <Button type="submit" variant="primary" disabled={saving}>

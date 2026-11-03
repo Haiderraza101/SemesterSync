@@ -53,7 +53,10 @@ export default function Tasks() {
 
   return (
     <>
-      <PageHeader title="Assignments and quizzes" description="Add deadlines by hand. Each one appears on your calendar with a reminder.">
+      <PageHeader
+        title="Assignments and quizzes"
+        description="Add deadlines by hand. Each one appears on your calendar with a reminder."
+      >
         <Tabs label="Filter items" tabs={tabs} value={filter} onChange={setFilter} />
       </PageHeader>
 

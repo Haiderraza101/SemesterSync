@@ -120,7 +120,11 @@ export default function Attendance() {
                   {summary.map((item) => (
                     <tr key={item.course.code}>
                       <td>
-                        <CourseCell color={item.course.color} name={item.course.name} meta={`Section ${item.course.section}`} />
+                        <CourseCell
+                          color={item.course.color}
+                          name={item.course.name}
+                          meta={`Section ${item.course.section}`}
+                        />
                       </td>
                       <td className="cell-numeric">{item.held}</td>
                       <td className="cell-numeric">{item.attended}</td>
@@ -132,12 +136,16 @@ export default function Attendance() {
                             label={`${item.course.name} attendance`}
                             tone={item.risk === "ok" ? "default" : item.risk}
                           />
-                          <span className={`attendance-table__percent attendance-table__percent--${item.risk}`}>{item.percentage}%</span>
+                          <span className={`attendance-table__percent attendance-table__percent--${item.risk}`}>
+                            {item.percentage}%
+                          </span>
                         </div>
                       </td>
                       <td>
                         <Badge variant={RISK_BADGES[item.risk]}>
-                          {item.canMiss === 0 ? "None left" : `${item.canMiss} ${item.canMiss === 1 ? "class" : "classes"}`}
+                          {item.canMiss === 0
+                            ? "None left"
+                            : `${item.canMiss} ${item.canMiss === 1 ? "class" : "classes"}`}
                         </Badge>
                       </td>
                     </tr>
@@ -147,7 +155,8 @@ export default function Attendance() {
             </div>
           </Panel>
           <p className="text-muted">
-            Can still miss is the number of classes you can skip for the rest of the semester and stay at or above {requirement}%.
+            Can still miss is the number of classes you can skip for the rest of the semester and stay at or above{" "}
+            {requirement}%.
           </p>
         </>
       )}

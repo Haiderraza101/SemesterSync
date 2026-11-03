@@ -18,7 +18,15 @@ const VARIANT_STATUS = {
   makeup: "Makeup class",
 };
 
-function ClassDetails({ instance, variant, attendance, onToggleCancel, onMarkAttendance, onAddMakeup, onRemoveMakeup }) {
+function ClassDetails({
+  instance,
+  variant,
+  attendance,
+  onToggleCancel,
+  onMarkAttendance,
+  onAddMakeup,
+  onRemoveMakeup,
+}) {
   const isMakeup = instance.kind === "makeup";
   const present = attendance === "present";
 
@@ -29,14 +37,21 @@ function ClassDetails({ instance, variant, attendance, onToggleCancel, onMarkAtt
         <h2 className="event-details__title">{instance.course.name}</h2>
       </div>
       <dl className="detail-list">
-        <DetailRow label="When" value={`${formatShortDate(parseDateKey(instance.dateKey))}, ${formatTimeRange(instance.start, instance.end)}`} />
+        <DetailRow
+          label="When"
+          value={`${formatShortDate(parseDateKey(instance.dateKey))}, ${formatTimeRange(instance.start, instance.end)}`}
+        />
         <DetailRow label="Room" value={instance.room} />
         <DetailRow label="Section" value={instance.course.section} />
         <DetailRow label="Status" value={VARIANT_STATUS[variant]} />
       </dl>
       <div className="event-details__actions">
         {!instance.cancelled && onMarkAttendance && (
-          <Button variant={present ? "secondary" : "primary"} block onClick={() => onMarkAttendance(instance.id, present ? null : "present")}>
+          <Button
+            variant={present ? "secondary" : "primary"}
+            block
+            onClick={() => onMarkAttendance(instance.id, present ? null : "present")}
+          >
             {present ? "Marked present · Undo" : "Mark attendance"}
           </Button>
         )}
@@ -94,7 +109,11 @@ export default function EventDetails({ event, ...handlers }) {
   if (!event) {
     return (
       <section className="panel event-details">
-        <EmptyState icon="calendar" title="Select an event" description="Click a class, exam or deadline to see its details." />
+        <EmptyState
+          icon="calendar"
+          title="Select an event"
+          description="Click a class, exam or deadline to see its details."
+        />
       </section>
     );
   }

@@ -25,7 +25,13 @@ import {
   getGreeting,
   toTimeKey,
 } from "../utils/date.js";
-import { getClassesOnDate, getExams, getSelectedCourses, getTasksWithCourses, getUpcomingItems } from "../utils/schedule.js";
+import {
+  getClassesOnDate,
+  getExams,
+  getSelectedCourses,
+  getTasksWithCourses,
+  getUpcomingItems,
+} from "../utils/schedule.js";
 import "../styles/pages/dashboard.css";
 
 const STATUS_BADGES = {
@@ -46,7 +52,13 @@ function getClassStatus(instance, now) {
 
 function TodayClasses({ classes, marks, now, onToggle }) {
   if (classes.length === 0) {
-    return <EmptyState icon="calendar" title="No classes today" description="Enjoy the free day, or catch up on assignments." />;
+    return (
+      <EmptyState
+        icon="calendar"
+        title="No classes today"
+        description="Enjoy the free day, or catch up on assignments."
+      />
+    );
   }
 
   return (
@@ -83,7 +95,12 @@ function TodayClasses({ classes, marks, now, onToggle }) {
                 </td>
                 <td className="cell-action">
                   {!instance.cancelled && (
-                    <Button size="sm" variant={present ? "primary" : "secondary"} aria-pressed={present} onClick={() => onToggle(instance.id, present)}>
+                    <Button
+                      size="sm"
+                      variant={present ? "primary" : "secondary"}
+                      aria-pressed={present}
+                      onClick={() => onToggle(instance.id, present)}
+                    >
                       {present ? "Present" : "Mark present"}
                     </Button>
                   )}
@@ -99,7 +116,9 @@ function TodayClasses({ classes, marks, now, onToggle }) {
 
 function UpcomingList({ items }) {
   if (items.length === 0) {
-    return <EmptyState icon="tasks" title="Nothing coming up" description="Exams and deadlines you add will appear here." />;
+    return (
+      <EmptyState icon="tasks" title="Nothing coming up" description="Exams and deadlines you add will appear here." />
+    );
   }
 
   return (
@@ -137,13 +156,18 @@ export default function Dashboard() {
   );
 
   const nextExam = useMemo(
-    () => getExams(schedule, courses).filter((exam) => exam.startsAt >= now).sort((a, b) => a.startsAt - b.startsAt)[0],
+    () =>
+      getExams(schedule, courses)
+        .filter((exam) => exam.startsAt >= now)
+        .sort((a, b) => a.startsAt - b.startsAt)[0],
     [schedule, courses, now]
   );
 
   const dueThisWeek = useMemo(() => {
     const weekEnd = addDays(now, 7);
-    return getTasksWithCourses(schedule, courses).filter((task) => !task.done && task.dueAt >= now && task.dueAt <= weekEnd);
+    return getTasksWithCourses(schedule, courses).filter(
+      (task) => !task.done && task.dueAt >= now && task.dueAt <= weekEnd
+    );
   }, [schedule, courses, now]);
 
   const lowest = getLowestAttendance(attendance);
@@ -225,7 +249,12 @@ export default function Dashboard() {
       <StatGroup stats={stats} />
 
       <div className="page-grid">
-        <Panel className="page-grid__main" title="Today's classes" action={<Link to="/app/calendar">Open calendar</Link>} flush>
+        <Panel
+          className="page-grid__main"
+          title="Today's classes"
+          action={<Link to="/app/calendar">Open calendar</Link>}
+          flush
+        >
           <TodayClasses classes={todayClasses} marks={schedule.attendance.marks} now={now} onToggle={handleToggle} />
         </Panel>
 
@@ -239,9 +268,15 @@ export default function Dashboard() {
                 <li key={item.course.code} className="attendance-mini__item">
                   <div className="attendance-mini__row">
                     <span>{item.course.name}</span>
-                    <span className={`attendance-mini__value attendance-mini__value--${item.risk}`}>{item.percentage}%</span>
+                    <span className={`attendance-mini__value attendance-mini__value--${item.risk}`}>
+                      {item.percentage}%
+                    </span>
                   </div>
-                  <ProgressBar value={item.percentage} label={`${item.course.name} attendance`} tone={item.risk === "ok" ? "default" : "warning"} />
+                  <ProgressBar
+                    value={item.percentage}
+                    label={`${item.course.name} attendance`}
+                    tone={item.risk === "ok" ? "default" : "warning"}
+                  />
                 </li>
               ))}
             </ul>
