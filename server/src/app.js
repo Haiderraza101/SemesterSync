@@ -1,14 +1,15 @@
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
+import { env, isProduction } from "./config/env.js";
 import routes from "./routes/index.js";
-import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import { errorHandler, notFound } from "./middleware/errorHandler.js";
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(express.json());
-app.use(morgan("dev"));
+app.use(cors({ origin: env.clientUrl, credentials: true }));
+app.use(express.json({ limit: "1mb" }));
+app.use(morgan(isProduction ? "combined" : "dev"));
 
 app.use("/api", routes);
 
