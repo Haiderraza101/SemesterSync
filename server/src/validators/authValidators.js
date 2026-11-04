@@ -20,3 +20,11 @@ export function loginValidator(body) {
     password: typeof body.password === "string" && body.password.length > 0 ? "" : "Password is required.",
   });
 }
+
+export function forgotPasswordValidator(body) {
+  return collect({ email: checkEmail(body.email) });
+}
+
+export function resetPasswordValidator(body) {
+  return collect({ password: checkPassword(body.password) });
+}
