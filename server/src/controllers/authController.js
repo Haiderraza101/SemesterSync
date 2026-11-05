@@ -44,7 +44,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   try {
     const resetUrl = `${env.clientUrl}/reset-password/${token}`;
     await sendEmail({ to: user.email, ...passwordResetEmail({ name: user.name, resetUrl }) });
-  } catch (error) {
+  } catch {
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save({ validateBeforeSave: false });
