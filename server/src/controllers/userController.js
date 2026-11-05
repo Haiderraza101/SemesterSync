@@ -1,4 +1,5 @@
 import Schedule from "../models/Schedule.js";
+import ShareCode from "../models/ShareCode.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -27,7 +28,7 @@ export const changePassword = asyncHandler(async (req, res) => {
 });
 
 export const deleteAccount = asyncHandler(async (req, res) => {
-  await Schedule.deleteOne({ user: req.user._id });
+  await Promise.all([Schedule.deleteOne({ user: req.user._id }), ShareCode.deleteMany({ owner: req.user._id })]);
   await req.user.deleteOne();
   res.status(204).end();
 });
