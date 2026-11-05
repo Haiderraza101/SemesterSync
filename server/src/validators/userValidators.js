@@ -21,7 +21,9 @@ export function changePasswordValidator(body) {
   const newPasswordError = checkPassword(body.newPassword);
   return collect({
     currentPassword:
-      typeof body.currentPassword === "string" && body.currentPassword.length > 0 ? "" : "Current password is required.",
+      typeof body.currentPassword === "string" && body.currentPassword.length > 0
+        ? ""
+        : "Current password is required.",
     newPassword: newPasswordError
       ? newPasswordError
       : body.newPassword === body.currentPassword

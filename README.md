@@ -79,6 +79,26 @@ SemesterSync helps university students keep their class timetable, exam date she
 
 The frontend runs against a mock data layer while the backend is being built. Set `VITE_USE_MOCK=false` in `client/.env` to call the Express API instead. In mock mode any email and a password of at least six characters will log in, and the demo schedule is stored in the browser.
 
+## Backend API
+
+All routes are under `/api`. Protected routes need an `Authorization: Bearer <token>` header.
+
+| Method | Route | Auth | Description |
+| --- | --- | --- | --- |
+| GET | `/health` | No | Health check |
+| POST | `/auth/register` | No | Create an account and return a token |
+| POST | `/auth/login` | No | Log in and return a token |
+| POST | `/auth/forgot-password` | No | Email a password reset link |
+| POST | `/auth/reset-password/:token` | No | Set a new password with a reset token |
+| GET | `/auth/me` | Yes | Current user |
+| GET, PUT, DELETE | `/users/me` | Yes | Read, update or delete the profile |
+| PUT | `/users/me/password` | Yes | Change password |
+| GET, PUT, DELETE | `/schedule` | Yes | Read, update or reset the saved schedule |
+| POST, DELETE | `/share` | Yes | Create or disable a share code |
+| GET | `/share/:code` | Yes | Look up a shared schedule |
+
+Passwords are hashed with bcrypt, tokens are signed JWTs, auth routes are rate limited and responses use `{ message, errors }` for failures. Without SMTP settings, reset emails are printed to the server console in development.
+
 ## Getting Started
 
 ### Prerequisites
@@ -96,7 +116,7 @@ cp client/.env.example client/.env
 
 Format the frontend code with `npx prettier --write "client/src/**/*.{js,jsx,css}"`.
 
-Fill in `server/.env` with your MongoDB URI and a JWT secret.
+Fill in `server/.env` with your MongoDB URI and a JWT secret. Set `VITE_USE_MOCK=false` in `client/.env` to use the real API.
 
 ### Run
 
