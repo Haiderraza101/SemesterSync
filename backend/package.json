@@ -1,5 +1,5 @@
 {
-  "name": "semestersync-server",
+  "name": "semestersync-backend",
   "version": "0.1.0",
   "private": true,
   "type": "module",

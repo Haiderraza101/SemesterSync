@@ -31,7 +31,7 @@ SemesterSync helps university students keep their class timetable, exam date she
 
 ```
 .
-├── client/                 React frontend (Vite)
+├── frontend/               React frontend (Vite)
 │   └── src/
 │       ├── api/            Axios instance with auth header
 │       ├── components/
@@ -49,7 +49,7 @@ SemesterSync helps university students keep their class timetable, exam date she
 │       ├── services/       Auth and schedule API calls
 │       ├── styles/         Tokens, base, components and page styles
 │       └── utils/          Dates, clashes, attendance, export, validation
-└── server/                 Express backend
+└── backend/                Express backend
     └── src/
         ├── config/
         ├── controllers/
@@ -77,7 +77,7 @@ SemesterSync helps university students keep their class timetable, exam date she
 | `/app/export` | Timetable export as PDF or PNG |
 | `/app/settings` | Profile, notifications, calendar and account settings |
 
-The frontend runs against a mock data layer while the backend is being built. Set `VITE_USE_MOCK=false` in `client/.env` to call the Express API instead. In mock mode any email and a password of at least six characters will log in, and the demo schedule is stored in the browser.
+The frontend runs against a mock data layer while the backend is being built. Set `VITE_USE_MOCK=false` in `frontend/.env` to call the Express API instead. In mock mode any email and a password of at least six characters will log in, and the demo schedule is stored in the browser.
 
 ## Backend API
 
@@ -110,13 +110,13 @@ Passwords are hashed with bcrypt, tokens are signed JWTs, auth routes are rate l
 
 ```bash
 npm run install:all
-cp server/.env.example server/.env
-cp client/.env.example client/.env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
 
-Format the frontend code with `npx prettier --write "client/src/**/*.{js,jsx,css}"`.
+Format the frontend code with `npx prettier --write "frontend/src/**/*.{js,jsx,css}"`.
 
-Fill in `server/.env` with your MongoDB URI and a JWT secret. Set `VITE_USE_MOCK=false` in `client/.env` to use the real API.
+Fill in `backend/.env` with your MongoDB URI and a JWT secret. Set `VITE_USE_MOCK=false` in `frontend/.env` to use the real API.
 
 ### Run
 
