@@ -39,6 +39,7 @@ export default function Login() {
   const { values, errors, handleChange, validate } = useForm(INITIAL_VALUES, validateLogin);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  const notice = location.state?.notice;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -47,7 +48,7 @@ export default function Login() {
 
     setSubmitting(true);
     try {
-      await login({ email: values.email.trim(), password: values.password });
+      await login({ email: values.email.trim(), password: values.password, remember: values.remember });
       navigate(location.state?.from || "/app", { replace: true });
     } catch (error) {
       setFormError(getErrorMessage(error));
@@ -63,6 +64,7 @@ export default function Login() {
           <p className="auth-form__subtitle">Enter your details to access your schedule.</p>
         </div>
 
+        {notice && !formError && <Notice variant="success" title={notice} />}
         {formError && <Notice variant="danger" title={formError} />}
 
         <TextField

@@ -1,71 +1,70 @@
-import { env } from "../config/env.js";
-import User, { hashResetToken } from "../models/User.js";
-import { sendEmail } from "../services/emailService.js";
-import { passwordResetEmail } from "../services/emailTemplates.js";
-import AppError from "../utils/AppError.js";
+import * as authService from "../services/authService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { createSession } from "../utils/token.js";
+import { clearRefreshCookie, readRefreshCookie, setRefreshCookie } from "../utils/cookies.js";
+
+const RESET_REQUESTED = { message: "If an account exists for that email, a reset link has been sent." };
+
+function clientContext(req) {
+  return { userAgent: req.get("user-agent"), ipAddress: req.ip };
+}
+
+function sendSession(res, status, { user, session, accessToken, refreshToken }) {
+  if (refreshToken) setRefreshCookie(res, refreshToken, session);
+  res.status(status).json({ user, accessToken });
+}
 
 export const register = asyncHandler(async (req, res) => {
-  const { name, email, rollNumber, section, password } = req.body;
-  const user = await User.create({ name, email, rollNumber, section, password });
-  res.status(201).json(createSession(user));
+  sendSession(res, 201, await authService.register(req.body, clientContext(req)));
 });
 
 export const login = asyncHandler(async (req, res) => {
-  const email = req.body.email.trim().toLowerCase();
-  const user = await User.findOne({ email }).select("+password");
+  sendSession(res, 200, await authService.login(req.body, clientContext(req)));
+});
 
-  if (!user || !(await user.comparePassword(req.body.password))) {
-    throw new AppError("Invalid email or password.", 401);
+export const refresh = asyncHandler(async (req, res) => {
+  try {
+    sendSession(res, 200, await authService.refresh(readRefreshCookie(req), clientContext(req)));
+  } catch (error) {
+    clearRefreshCookie(res);
+    throw error;
   }
+});
 
-  res.json(createSession(user));
+export const logout = asyncHandler(async (req, res) => {
+  await authService.logout(readRefreshCookie(req));
+  clearRefreshCookie(res);
+  res.status(204).end();
+});
+
+export const logoutEverywhere = asyncHandler(async (req, res) => {
+  await authService.logoutEverywhere(req.user._id);
+  clearRefreshCookie(res);
+  res.status(204).end();
 });
 
 export const getCurrentUser = (req, res) => {
   res.json({ user: req.user });
 };
 
-const RESET_RESPONSE = { message: "If an account exists for that email, a reset link has been sent." };
+export const forgotPassword = (req, res) => {
+  authService.requestPasswordReset(req.body.email).catch((error) => {
+    console.error(`Password reset request failed: ${error.message}`);
+  });
+  res.status(202).json(RESET_REQUESTED);
+};
 
-export const forgotPassword = asyncHandler(async (req, res) => {
-  const email = req.body.email.trim().toLowerCase();
-  const user = await User.findOne({ email });
-
-  if (!user) {
-    res.json(RESET_RESPONSE);
-    return;
-  }
-
-  const token = user.createPasswordResetToken();
-  await user.save({ validateBeforeSave: false });
-
-  try {
-    const resetUrl = `${env.clientUrl}/reset-password/${token}`;
-    await sendEmail({ to: user.email, ...passwordResetEmail({ name: user.name, resetUrl }) });
-  } catch {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-    throw new AppError("The reset email could not be sent. Please try again later.", 502);
-  }
-
-  res.json(RESET_RESPONSE);
+export const verifyResetToken = asyncHandler(async (req, res) => {
+  await authService.verifyResetToken(req.params.token);
+  res.json({ valid: true });
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
-  const user = await User.findOne({
-    resetPasswordToken: hashResetToken(req.params.token),
-    resetPasswordExpires: { $gt: new Date() },
-  }).select("+resetPasswordToken +resetPasswordExpires");
+  await authService.resetPassword(req.params.token, req.body.password);
+  clearRefreshCookie(res);
+  res.json({ message: "Your password has been reset. Log in with your new password." });
+});
 
-  if (!user) throw new AppError("This reset link is invalid or has expired.", 400);
-
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
-  await user.save();
-
-  res.json(createSession(user));
+export const changePassword = asyncHandler(async (req, res) => {
+  await authService.changePassword(req.user._id, req.auth.sessionId, req.body);
+  res.json({ message: "Password updated. Other devices have been logged out." });
 });

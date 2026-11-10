@@ -1,30 +1,40 @@
-import { ROLL_NUMBER_PATTERN, checkEmail, checkPassword, collect, isNonEmptyString } from "./common.js";
+import { z } from "zod";
+import {
+  emailSchema,
+  existingPasswordSchema,
+  nameSchema,
+  passwordSchema,
+  rollNumberSchema,
+  sectionSchema,
+} from "./common.js";
 
-export function registerValidator(body) {
-  return collect({
-    name: isNonEmptyString(body.name) ? "" : "Name is required.",
-    rollNumber: !isNonEmptyString(body.rollNumber)
-      ? "Roll number is required."
-      : ROLL_NUMBER_PATTERN.test(body.rollNumber.trim())
-        ? ""
-        : "Use the format 23L-0634.",
-    section: isNonEmptyString(body.section) ? "" : "Section is required.",
-    email: checkEmail(body.email),
-    password: checkPassword(body.password),
-  });
-}
+const rememberSchema = z.boolean({ invalid_type_error: "Remember me must be true or false." });
 
-export function loginValidator(body) {
-  return collect({
-    email: checkEmail(body.email),
-    password: typeof body.password === "string" && body.password.length > 0 ? "" : "Password is required.",
-  });
-}
+export const registerSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  rollNumber: rollNumberSchema,
+  section: sectionSchema,
+  password: passwordSchema(),
+  remember: rememberSchema.default(true),
+});
 
-export function forgotPasswordValidator(body) {
-  return collect({ email: checkEmail(body.email) });
-}
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: existingPasswordSchema(),
+  remember: rememberSchema.default(false),
+});
 
-export function resetPasswordValidator(body) {
-  return collect({ password: checkPassword(body.password) });
-}
+export const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
+export const resetTokenParamsSchema = z.object({
+  token: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{32,128}$/, "This reset link is invalid or has expired. Request a new one."),
+});
+
+export const resetPasswordSchema = z.object({
+  password: passwordSchema(),
+});

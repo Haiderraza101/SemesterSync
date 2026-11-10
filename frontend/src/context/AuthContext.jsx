@@ -1,45 +1,89 @@
-import { createContext, useCallback, useMemo, useState } from "react";
-import { STORAGE_KEYS } from "../config.js";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { onSessionExpired } from "../api/tokenStore.js";
 import { authService } from "../services/authService.js";
-import { readJson, readString, removeItem, writeJson, writeString } from "../utils/storage.js";
 
 export const AuthContext = createContext(null);
 
-function readSession() {
-  const token = readString(STORAGE_KEYS.token);
-  const user = readJson(STORAGE_KEYS.user);
-  return token && user ? user : null;
+const LOADING_STATE = { status: "loading", user: null };
+
+function toState(user) {
+  return user ? { status: "authenticated", user } : { status: "guest", user: null };
 }
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(readSession);
+  const [state, setState] = useState(LOADING_STATE);
 
-  const startSession = useCallback(({ token, user: nextUser }) => {
-    writeString(STORAGE_KEYS.token, token);
-    writeJson(STORAGE_KEYS.user, nextUser);
-    setUser(nextUser);
-    return nextUser;
-  }, []);
+  const setUser = useCallback((user) => setState(toState(user)), []);
 
-  const login = useCallback(async (credentials) => startSession(await authService.login(credentials)), [startSession]);
+  useEffect(() => {
+    let active = true;
+    authService
+      .restoreSession()
+      .then((user) => active && setUser(user))
+      .catch(() => active && setUser(null));
+    return () => {
+      active = false;
+    };
+  }, [setUser]);
 
-  const register = useCallback(async (payload) => startSession(await authService.register(payload)), [startSession]);
+  useEffect(() => onSessionExpired(() => setUser(null)), [setUser]);
 
-  const logout = useCallback(() => {
-    removeItem(STORAGE_KEYS.token);
+  const login = useCallback(
+    async (credentials) => {
+      const user = await authService.login(credentials);
+      setUser(user);
+      return user;
+    },
+    [setUser]
+  );
+
+  const register = useCallback(
+    async (payload) => {
+      const user = await authService.register(payload);
+      setUser(user);
+      return user;
+    },
+    [setUser]
+  );
+
+  const logout = useCallback(async () => {
+    await authService.logout();
     setUser(null);
-  }, []);
+  }, [setUser]);
 
-  const updateProfile = useCallback(async (profile) => {
-    const { user: updated } = await authService.updateProfile(profile);
-    writeJson(STORAGE_KEYS.user, updated);
-    setUser(updated);
-    return updated;
-  }, []);
+  const logoutEverywhere = useCallback(async () => {
+    await authService.logoutEverywhere();
+    setUser(null);
+  }, [setUser]);
+
+  const clearSession = useCallback(() => {
+    authService.clearSession();
+    setUser(null);
+  }, [setUser]);
+
+  const updateProfile = useCallback(
+    async (profile) => {
+      const user = await authService.updateProfile(profile);
+      setUser(user);
+      return user;
+    },
+    [setUser]
+  );
 
   const value = useMemo(
-    () => ({ user, isAuthenticated: Boolean(user), login, register, logout, updateProfile }),
-    [user, login, register, logout, updateProfile]
+    () => ({
+      user: state.user,
+      status: state.status,
+      isLoading: state.status === "loading",
+      isAuthenticated: state.status === "authenticated",
+      login,
+      register,
+      logout,
+      logoutEverywhere,
+      clearSession,
+      updateProfile,
+    }),
+    [state, login, register, logout, logoutEverywhere, clearSession, updateProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

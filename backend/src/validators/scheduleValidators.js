@@ -1,35 +1,28 @@
-import { EDITABLE_SCHEDULE_FIELDS } from "../models/Schedule.js";
+import { z } from "zod";
 
-const ARRAY_FIELDS = ["selections", "cancelled", "makeups", "tasks"];
-const OBJECT_FIELDS = ["dateSheets", "attendance", "settings"];
+const list = (field) => z.array(z.any(), { invalid_type_error: `${field} must be a list.` }).optional();
+const record = (field) => z.record(z.any(), { invalid_type_error: `${field} must be an object.` }).optional();
 
-function isPlainObject(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
-export function scheduleValidator(body) {
-  const errors = {};
-  const keys = Object.keys(body);
-
-  if (keys.length === 0) errors.schedule = "Provide at least one field to update.";
-
-  keys
-    .filter((key) => !EDITABLE_SCHEDULE_FIELDS.includes(key))
-    .forEach((key) => {
-      errors[key] = `${key} cannot be updated.`;
-    });
-
-  ARRAY_FIELDS.forEach((field) => {
-    if (body[field] !== undefined && !Array.isArray(body[field])) errors[field] = `${field} must be a list.`;
+export const scheduleSchema = z
+  .object({
+    catalog: z
+      .object(
+        { courses: z.array(z.any(), { required_error: "catalog must include a list of courses." }) },
+        { invalid_type_error: "catalog must include a list of courses." }
+      )
+      .passthrough()
+      .nullable()
+      .optional(),
+    selections: list("selections"),
+    cancelled: list("cancelled"),
+    makeups: list("makeups"),
+    tasks: list("tasks"),
+    dateSheets: record("dateSheets"),
+    attendance: record("attendance"),
+    settings: record("settings"),
+  })
+  .strict("This field cannot be updated.")
+  .refine((body) => Object.keys(body).length > 0, {
+    message: "Provide at least one field to update.",
+    path: ["schedule"],
   });
-
-  OBJECT_FIELDS.forEach((field) => {
-    if (body[field] !== undefined && !isPlainObject(body[field])) errors[field] = `${field} must be an object.`;
-  });
-
-  if (body.catalog !== undefined && body.catalog !== null && !Array.isArray(body.catalog?.courses)) {
-    errors.catalog = "catalog must include a list of courses.";
-  }
-
-  return errors;
-}

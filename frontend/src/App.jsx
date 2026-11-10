@@ -11,6 +11,7 @@ const Landing = lazy(() => import("./pages/Landing.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Register = lazy(() => import("./pages/Register.jsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.jsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));
 const Calendar = lazy(() => import("./pages/Calendar.jsx"));
 const Timetable = lazy(() => import("./pages/Timetable.jsx"));
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
           </Route>
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/app" element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route index element={<Dashboard />} />

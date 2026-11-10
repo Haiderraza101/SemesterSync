@@ -5,13 +5,13 @@ import Notice from "../ui/Notice.jsx";
 import TextField from "../ui/TextField.jsx";
 import { useForm } from "../../hooks/useForm.js";
 import { authService } from "../../services/authService.js";
-import { getErrorMessage } from "../../utils/errors.js";
+import { getErrorMessage, getFieldErrors } from "../../utils/errors.js";
 import { validatePasswordChange } from "../../utils/validation.js";
 
 const INITIAL_VALUES = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
 function PasswordForm({ onDone, onCancel }) {
-  const { values, errors, handleChange, validate } = useForm(INITIAL_VALUES, validatePasswordChange);
+  const { values, errors, setErrors, handleChange, validate } = useForm(INITIAL_VALUES, validatePasswordChange);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -21,9 +21,13 @@ function PasswordForm({ onDone, onCancel }) {
     if (!validate()) return;
     setSaving(true);
     try {
-      await authService.changePassword({ currentPassword: values.currentPassword, newPassword: values.newPassword });
-      onDone();
+      const { message } = await authService.changePassword({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      });
+      onDone(message);
     } catch (error) {
+      setErrors(getFieldErrors(error));
       setFormError(getErrorMessage(error));
       setSaving(false);
     }
@@ -49,7 +53,7 @@ function PasswordForm({ onDone, onCancel }) {
         value={values.newPassword}
         onChange={handleChange}
         error={errors.newPassword}
-        hint="Use 8 or more characters with a number."
+        hint="Use 8 or more characters with a letter and a number."
       />
       <TextField
         label="Confirm new password"

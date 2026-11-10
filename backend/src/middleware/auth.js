@@ -1,7 +1,8 @@
 import User from "../models/User.js";
-import AppError from "../utils/AppError.js";
+import { findActiveSession } from "../services/sessionService.js";
+import { verifyAccessToken } from "../services/tokenService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { verifyToken } from "../utils/token.js";
+import { authRequired, sessionEnded } from "../utils/authErrors.js";
 
 function readBearerToken(header = "") {
   const [scheme, token] = header.split(" ");
@@ -10,16 +11,16 @@ function readBearerToken(header = "") {
 
 export const protect = asyncHandler(async (req, res, next) => {
   const token = readBearerToken(req.headers.authorization);
-  if (!token) throw new AppError("Please log in to continue.", 401);
+  if (!token) throw authRequired();
 
-  const payload = verifyToken(token);
-  const user = await User.findById(payload.sub);
+  const payload = verifyAccessToken(token);
+  if (!payload.sub || !payload.sid) throw sessionEnded();
 
-  if (!user) throw new AppError("The account for this session no longer exists.", 401);
-  if (user.changedPasswordAfter(payload.iat)) {
-    throw new AppError("Your password was changed recently. Please log in again.", 401);
-  }
+  const [user, session] = await Promise.all([User.findById(payload.sub), findActiveSession(payload.sid, payload.sub)]);
+
+  if (!user || !session) throw sessionEnded();
 
   req.user = user;
+  req.auth = { userId: user.id, sessionId: payload.sid };
   next();
 });

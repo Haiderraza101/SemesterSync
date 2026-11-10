@@ -6,7 +6,7 @@ import Notice from "../components/ui/Notice.jsx";
 import TextField from "../components/ui/TextField.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useForm } from "../hooks/useForm.js";
-import { getErrorMessage } from "../utils/errors.js";
+import { getErrorMessage, getFieldErrors } from "../utils/errors.js";
 import { validateRegister } from "../utils/validation.js";
 import "../styles/pages/auth.css";
 
@@ -44,7 +44,7 @@ function RegisterAside() {
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const { values, errors, handleChange, validate } = useForm(INITIAL_VALUES, validateRegister);
+  const { values, errors, setErrors, handleChange, validate } = useForm(INITIAL_VALUES, validateRegister);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
 
@@ -61,9 +61,11 @@ export default function Register() {
         section: values.section.trim().toUpperCase(),
         email: values.email.trim(),
         password: values.password,
+        remember: true,
       });
       navigate("/app/timetable", { replace: true });
     } catch (error) {
+      setErrors(getFieldErrors(error));
       setFormError(getErrorMessage(error));
       setSubmitting(false);
     }
@@ -125,7 +127,7 @@ export default function Register() {
           value={values.password}
           onChange={handleChange}
           error={errors.password}
-          hint="Use 8 or more characters with a number."
+          hint="Use 8 or more characters with a letter and a number."
         />
         <TextField
           label="Confirm password"

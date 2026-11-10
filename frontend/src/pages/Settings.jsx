@@ -113,17 +113,29 @@ function CalendarSettings({ settings, onChange }) {
 }
 
 function AccountSettings() {
-  const { logout } = useAuth();
+  const { clearSession, logoutEverywhere } = useAuth();
   const { resetSchedule } = useSchedule();
   const { notify } = useToast();
   const navigate = useNavigate();
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
-  const handlePasswordChanged = () => {
+  const handlePasswordChanged = (message) => {
     setPasswordOpen(false);
-    notify("Password updated.");
+    notify(message || "Password updated.");
+  };
+
+  const handleLogoutEverywhere = async () => {
+    setSigningOut(true);
+    try {
+      await logoutEverywhere();
+      navigate("/login", { replace: true, state: { notice: "You have been logged out of all devices." } });
+    } catch (error) {
+      notify(getErrorMessage(error), "danger");
+      setSigningOut(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -131,7 +143,7 @@ function AccountSettings() {
     try {
       await authService.deleteAccount();
       resetSchedule();
-      logout();
+      clearSession();
       navigate("/", { replace: true });
     } catch (error) {
       notify(getErrorMessage(error), "danger");
@@ -144,6 +156,11 @@ function AccountSettings() {
     <Panel title="Account" flush>
       <SettingRow label="Password" description="Change the password you use to log in.">
         <Button onClick={() => setPasswordOpen(true)}>Change password</Button>
+      </SettingRow>
+      <SettingRow label="Devices" description="Log out everywhere you are signed in, including this browser.">
+        <Button disabled={signingOut} onClick={handleLogoutEverywhere}>
+          {signingOut ? "Logging out…" : "Log out of all devices"}
+        </Button>
       </SettingRow>
       <SettingRow label="Delete account" description="Permanently removes your schedule, attendance and settings.">
         <Button variant="danger" disabled={deleting} onClick={() => setConfirmDelete(true)}>

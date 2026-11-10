@@ -19,12 +19,20 @@ const TITLES = {
   "/app/settings": "Settings",
 };
 
+const PREFIX_TITLES = [["/reset-password/", "Choose a new password"]];
+
+function resolveTitle(pathname) {
+  if (TITLES[pathname]) return TITLES[pathname];
+  const match = PREFIX_TITLES.find(([prefix]) => pathname.startsWith(prefix));
+  return match ? match[1] : null;
+}
+
 export default function DocumentTitle() {
   const { pathname } = useLocation();
 
   useEffect(() => {
     const normalized = pathname.length > 1 ? pathname.replace(/\/$/, "") : pathname;
-    const title = TITLES[normalized];
+    const title = resolveTitle(normalized);
     document.title = title ? `${title} · ${APP_NAME}` : APP_NAME;
   }, [pathname]);
 

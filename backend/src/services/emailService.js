@@ -22,9 +22,15 @@ function getTransporter() {
 export async function sendEmail({ to, subject, text, html }) {
   if (!isConfigured()) {
     if (isProduction) throw new Error("Email delivery is not configured.");
-    console.info(`Email to ${to}: ${subject}\n${text}`);
+    console.info(`\n[email] To: ${to}\n[email] Subject: ${subject}\n${text}\n`);
     return;
   }
 
   await getTransporter().sendMail({ from: env.smtp.from, to, subject, text, html });
+}
+
+export function sendEmailInBackground(message) {
+  sendEmail(message).catch((error) => {
+    console.error(`Email "${message.subject}" to ${message.to} failed: ${error.message}`);
+  });
 }

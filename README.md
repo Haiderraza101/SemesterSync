@@ -81,23 +81,39 @@ The frontend runs against a mock data layer while the backend is being built. Se
 
 ## Backend API
 
-All routes are under `/api`. Protected routes need an `Authorization: Bearer <token>` header.
+All routes are under `/api`. Protected routes need an `Authorization: Bearer <accessToken>` header.
 
 | Method | Route | Auth | Description |
 | --- | --- | --- | --- |
 | GET | `/health` | No | Health check |
-| POST | `/auth/register` | No | Create an account and return a token |
-| POST | `/auth/login` | No | Log in and return a token |
-| POST | `/auth/forgot-password` | No | Email a password reset link |
-| POST | `/auth/reset-password/:token` | No | Set a new password with a reset token |
+| POST | `/auth/register` | No | Create an account and start a session |
+| POST | `/auth/login` | No | Log in and start a session |
+| POST | `/auth/refresh` | Cookie | Rotate the refresh token and return a new access token |
+| POST | `/auth/logout` | Cookie | End the current session |
+| POST | `/auth/logout-all` | Yes | End every session for the account |
 | GET | `/auth/me` | Yes | Current user |
+| POST | `/auth/forgot-password` | No | Email a password reset link |
+| GET | `/auth/reset-password/:token` | No | Check that a reset link is still valid |
+| POST | `/auth/reset-password/:token` | No | Set a new password and end every session |
 | GET, PUT, DELETE | `/users/me` | Yes | Read, update or delete the profile |
-| PUT | `/users/me/password` | Yes | Change password |
+| PUT | `/users/me/password` | Yes | Change password and end other sessions |
 | GET, PUT, DELETE | `/schedule` | Yes | Read, update or reset the saved schedule |
 | POST, DELETE | `/share` | Yes | Create or disable a share code |
 | GET | `/share/:code` | Yes | Look up a shared schedule |
 
-Passwords are hashed with bcrypt, tokens are signed JWTs, auth routes are rate limited and responses use `{ message, errors }` for failures. Without SMTP settings, reset emails are printed to the server console in development.
+Failures respond with `{ message, code, errors }`, where `errors` maps field names to messages.
+
+### Authentication
+
+- **Access token:** a JWT that lasts 15 minutes. The frontend keeps it in memory only and sends it as a Bearer header.
+- **Refresh token:** a random token in an `httpOnly` cookie scoped to `/api/auth`. Only its SHA-256 hash is stored, in the `sessions` collection. It rotates on every refresh, and reusing an old token ends the session.
+- **Remember me:** keeps the session for 30 days. Without it the cookie ends with the browser and the session expires after 12 hours.
+- **Login protection:** passwords are hashed with bcrypt, failed logins take the same time whether or not the email exists, and an account locks for 15 minutes after 5 failed attempts.
+- **Password reset:** the forgot password response is the same for every email. Reset links are single use and expire after 30 minutes. A reset ends every session, and a confirmation email is sent.
+- **Rate limits:** login, registration, password reset and session refresh each have their own limit. Cookie-based routes reject requests from origins other than `CLIENT_URL`.
+- **Validation:** request bodies and params are validated with Zod, and unknown fields are removed.
+
+Without SMTP settings, emails (including reset links) are printed to the backend console in development.
 
 ## Getting Started
 
@@ -125,4 +141,4 @@ npm run dev
 ```
 
 - Frontend: http://localhost:5173
-- API: http://localhost:5000/api/health
+- API: http://localhost:5001/api/health

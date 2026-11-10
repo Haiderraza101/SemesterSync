@@ -1,19 +1,51 @@
 import rateLimit from "express-rate-limit";
 
-const FIFTEEN_MINUTES = 15 * 60 * 1000;
+const MINUTE_MS = 60 * 1000;
 
-export const authLimiter = rateLimit({
-  windowMs: FIFTEEN_MINUTES,
-  limit: 20,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { message: "Too many attempts. Please wait a few minutes and try again." },
+function createLimiter({ minutes, limit, message, skipSuccessfulRequests = false }) {
+  return rateLimit({
+    windowMs: minutes * MINUTE_MS,
+    limit,
+    skipSuccessfulRequests,
+    standardHeaders: "draft-7",
+    legacyHeaders: false,
+    message: { message, code: "RATE_LIMITED" },
+  });
+}
+
+export const apiLimiter = createLimiter({
+  minutes: 15,
+  limit: 500,
+  message: "Too many requests. Please slow down.",
 });
 
-export const apiLimiter = rateLimit({
-  windowMs: FIFTEEN_MINUTES,
-  limit: 500,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: { message: "Too many requests. Please slow down." },
+export const loginLimiter = createLimiter({
+  minutes: 15,
+  limit: 10,
+  skipSuccessfulRequests: true,
+  message: "Too many login attempts. Please wait 15 minutes and try again.",
+});
+
+export const registerLimiter = createLimiter({
+  minutes: 60,
+  limit: 10,
+  message: "Too many accounts created from this network. Please try again later.",
+});
+
+export const passwordResetLimiter = createLimiter({
+  minutes: 15,
+  limit: 5,
+  message: "Too many password reset requests. Please wait 15 minutes and try again.",
+});
+
+export const sessionLimiter = createLimiter({
+  minutes: 15,
+  limit: 120,
+  message: "Too many session requests. Please slow down.",
+});
+
+export const sensitiveActionLimiter = createLimiter({
+  minutes: 15,
+  limit: 10,
+  message: "Too many attempts. Please wait a few minutes and try again.",
 });

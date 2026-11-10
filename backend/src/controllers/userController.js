@@ -1,34 +1,14 @@
-import Schedule from "../models/Schedule.js";
-import ShareCode from "../models/ShareCode.js";
-import User from "../models/User.js";
-import AppError from "../utils/AppError.js";
+import * as userService from "../services/userService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { signToken } from "../utils/token.js";
-import { PROFILE_FIELDS } from "../validators/userValidators.js";
+import { clearRefreshCookie } from "../utils/cookies.js";
 
 export const updateProfile = asyncHandler(async (req, res) => {
-  PROFILE_FIELDS.forEach((field) => {
-    if (req.body[field] !== undefined) req.user[field] = req.body[field];
-  });
-  await req.user.save();
-  res.json({ user: req.user });
-});
-
-export const changePassword = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select("+password");
-
-  if (!(await user.comparePassword(req.body.currentPassword))) {
-    throw new AppError("Your current password is incorrect.", 400);
-  }
-
-  user.password = req.body.newPassword;
-  await user.save();
-
-  res.json({ message: "Password updated.", token: signToken(user.id) });
+  const user = await userService.updateProfile(req.user, req.body);
+  res.json({ user });
 });
 
 export const deleteAccount = asyncHandler(async (req, res) => {
-  await Promise.all([Schedule.deleteOne({ user: req.user._id }), ShareCode.deleteMany({ owner: req.user._id })]);
-  await req.user.deleteOne();
+  await userService.deleteAccount(req.user);
+  clearRefreshCookie(res);
   res.status(204).end();
 });

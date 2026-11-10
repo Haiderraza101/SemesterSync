@@ -14,11 +14,24 @@ export function validateLogin({ email, password }) {
 
 const ROLL_NUMBER_PATTERN = /^\d{2}[A-Z]-\d{4}$/i;
 
+const PASSWORD_MAX_BYTES = 72;
+
 export function validatePassword(password) {
   if (!password) return "Enter a password.";
   if (password.length < 8) return "Use at least 8 characters.";
+  if (!/[A-Za-z]/.test(password)) return "Include at least one letter.";
   if (!/\d/.test(password)) return "Include at least one number.";
+  if (new TextEncoder().encode(password).length > PASSWORD_MAX_BYTES) return "Use 72 characters or fewer.";
   return "";
+}
+
+export function validateResetPassword(values) {
+  const errors = {};
+  const passwordError = validatePassword(values.password);
+  if (passwordError) errors.password = passwordError;
+  if (!values.confirmPassword) errors.confirmPassword = "Confirm your new password.";
+  else if (values.confirmPassword !== values.password) errors.confirmPassword = "Passwords do not match.";
+  return errors;
 }
 
 export function validateRegister(values) {

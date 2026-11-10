@@ -3,8 +3,7 @@ export const USE_MOCK_API = import.meta.env.VITE_USE_MOCK !== "false";
 export const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
 export const STORAGE_KEYS = {
-  token: "semestersync.token",
-  user: "semestersync.user",
+  mockSession: "semestersync.mockSession",
   schedule: "semestersync.schedule",
 };
 

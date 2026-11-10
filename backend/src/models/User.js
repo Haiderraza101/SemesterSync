@@ -1,10 +1,9 @@
-import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import { env } from "../config/env.js";
 import { EMAIL_PATTERN, ROLL_NUMBER_PATTERN } from "../validators/common.js";
 
-const SALT_ROUNDS = 12;
-const RESET_TOKEN_TTL_MS = 30 * 60 * 1000;
+const PUBLIC_FIELDS = ["name", "email", "rollNumber", "section", "createdAt", "updatedAt"];
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,6 +19,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      maxlength: [254, "Email must be 254 characters or fewer."],
       match: [EMAIL_PATTERN, "Enter a valid email address."],
     },
     rollNumber: {
@@ -39,25 +39,24 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Password is required."],
-      minlength: [8, "Password must be at least 8 characters."],
       select: false,
     },
-    passwordChangedAt: Date,
-    resetPasswordToken: { type: String, select: false },
-    resetPasswordExpires: { type: Date, select: false },
+    passwordChangedAt: { type: Date, select: false },
+    passwordResetTokenHash: { type: String, select: false, index: { sparse: true } },
+    passwordResetExpiresAt: { type: Date, select: false },
+    failedLoginAttempts: { type: Number, default: 0, select: false },
+    lockUntil: { type: Date, select: false },
+    lastLoginAt: Date,
   },
   {
     timestamps: true,
     toJSON: {
       transform(doc, ret) {
-        ret.id = ret._id.toString();
-        delete ret._id;
-        delete ret.__v;
-        delete ret.password;
-        delete ret.passwordChangedAt;
-        delete ret.resetPasswordToken;
-        delete ret.resetPasswordExpires;
-        return ret;
+        const result = { id: ret._id.toString() };
+        PUBLIC_FIELDS.forEach((field) => {
+          if (ret[field] !== undefined) result[field] = ret[field];
+        });
+        return result;
       },
     },
   }
@@ -65,29 +64,22 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre("save", async function hashPassword() {
   if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
-  if (!this.isNew) this.passwordChangedAt = new Date(Date.now() - 1000);
+  this.password = await bcrypt.hash(this.password, env.auth.bcryptRounds);
+  if (!this.isNew) this.passwordChangedAt = new Date();
 });
 
 userSchema.methods.comparePassword = function comparePassword(candidate) {
   return bcrypt.compare(candidate, this.password);
 };
 
-userSchema.methods.changedPasswordAfter = function changedPasswordAfter(issuedAtSeconds) {
-  if (!this.passwordChangedAt) return false;
-  return Math.floor(this.passwordChangedAt.getTime() / 1000) > issuedAtSeconds;
+userSchema.methods.isLocked = function isLocked(now = new Date()) {
+  return Boolean(this.lockUntil && this.lockUntil > now);
 };
 
-userSchema.methods.createPasswordResetToken = function createPasswordResetToken() {
-  const token = crypto.randomBytes(32).toString("hex");
-  this.resetPasswordToken = hashResetToken(token);
-  this.resetPasswordExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
-  return token;
+userSchema.methods.lockMinutesRemaining = function lockMinutesRemaining(now = new Date()) {
+  if (!this.isLocked(now)) return 0;
+  return Math.max(1, Math.ceil((this.lockUntil.getTime() - now.getTime()) / 60000));
 };
-
-export function hashResetToken(token) {
-  return crypto.createHash("sha256").update(token).digest("hex");
-}
 
 const User = mongoose.model("User", userSchema);
 
