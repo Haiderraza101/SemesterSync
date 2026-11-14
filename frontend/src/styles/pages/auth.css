@@ -95,38 +95,6 @@
   font-weight: 500;
 }
 
-.preview-card {
-  max-width: 380px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--radius-lg);
-}
-
-.preview-card__label {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--color-border);
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
-
-.preview-card__body {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: 12px 14px;
-  font-size: var(--text-md);
-}
-
-.preview-card__title {
-  font-weight: 500;
-}
-
-.preview-card__meta {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
 .steps-list {
   border-top: 1px solid var(--color-primary-border);
 }

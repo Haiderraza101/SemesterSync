@@ -2,6 +2,7 @@ export function getErrorMessage(error, fallback = "Something went wrong. Please 
   if (!error) return fallback;
   if (error.response?.data?.message) return error.response.data.message;
   if (error.request && !error.response) return "Could not reach the server. Check your connection and try again.";
+  if (error.response?.status >= 500) return "The server is unavailable right now. Please try again in a moment.";
   return error.message || fallback;
 }
 

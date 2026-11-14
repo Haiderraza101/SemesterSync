@@ -13,21 +13,27 @@ import "../styles/pages/auth.css";
 
 const INITIAL_VALUES = { email: "", password: "", remember: true };
 
+const LOGIN_FEATURES = [
+  "Your timetable read straight from the university Excel file",
+  "Clash warnings before you commit to a section",
+  "Reminders and a morning summary by email",
+];
+
 function LoginAside() {
   return (
     <>
       <h2 className="auth-split__headline">Classes, exams and deadlines in one calendar.</h2>
       <p className="auth-split__lead">Your schedule, attendance and reminders, kept in sync for the whole semester.</p>
-      <div className="preview-card">
-        <div className="preview-card__label">Next class</div>
-        <div className="preview-card__body">
-          <div>
-            <div className="preview-card__title">Web Programming</div>
-            <div className="preview-card__meta">Section A, Room CS-3</div>
-          </div>
-          <span className="text-secondary">Mon 8:30 AM</span>
-        </div>
-      </div>
+      <ul className="steps-list">
+        {LOGIN_FEATURES.map((feature) => (
+          <li key={feature} className="steps-list__item">
+            <span className="steps-list__number" aria-hidden="true">
+              ✓
+            </span>
+            <span>{feature}</span>
+          </li>
+        ))}
+      </ul>
     </>
   );
 }

@@ -4,10 +4,11 @@ import EmptyState from "../ui/EmptyState.jsx";
 import { cx } from "../../utils/cx.js";
 import { getSlotKey } from "../../utils/clashes.js";
 import { SHORT_DAY_NAMES, formatTime } from "../../utils/date.js";
+import { TYPE_LABELS } from "../../utils/sectionFilters.js";
 
-export default function SectionTable({ courses, draft, clashingSlots, onToggle, onSectionChange }) {
+export default function SectionTable({ courses, draft, sectionOptions, clashingSlots, onToggle, onSectionChange }) {
   if (courses.length === 0) {
-    return <EmptyState icon="search" title="No courses match your search" />;
+    return <EmptyState icon="search" title="No courses match your search and filters" />;
   }
 
   return (
@@ -29,7 +30,8 @@ export default function SectionTable({ courses, draft, clashingSlots, onToggle, 
           {courses.map((course) => {
             const entry = draft[course.code];
             const details = course.sections[entry.section];
-            const sectionOptions = Object.keys(course.sections);
+            const options = sectionOptions.get(course.code);
+            const typeLabel = TYPE_LABELS[details.type];
             return (
               <tr key={course.code} className={cx(!entry.included && "section-table__row--off")}>
                 <td>
@@ -41,7 +43,11 @@ export default function SectionTable({ courses, draft, clashingSlots, onToggle, 
                   />
                 </td>
                 <td>
-                  <CourseCell color={course.color} name={course.name} meta={course.code} />
+                  <CourseCell
+                    color={course.color}
+                    name={course.name}
+                    meta={details.type && details.type !== "core" ? `${course.code} · ${typeLabel}` : course.code}
+                  />
                 </td>
                 <td>
                   <label className="sr-only" htmlFor={`section-${course.code}`}>
@@ -53,7 +59,7 @@ export default function SectionTable({ courses, draft, clashingSlots, onToggle, 
                     value={entry.section}
                     onChange={(event) => onSectionChange(course.code, event.target.value)}
                   >
-                    {sectionOptions.map((section) => (
+                    {options.map((section) => (
                       <option key={section} value={section}>
                         Section {section}
                       </option>

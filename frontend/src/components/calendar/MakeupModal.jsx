@@ -2,7 +2,8 @@ import { useState } from "react";
 import Button from "../ui/Button.jsx";
 import Modal from "../ui/Modal.jsx";
 import TextField from "../ui/TextField.jsx";
-import { SEMESTER } from "../../config.js";
+import { useSchedule } from "../../hooks/useSchedule.js";
+import { getSemester } from "../../utils/schedule.js";
 import { addDays, parseDateKey, timeToMinutes, toDateKey } from "../../utils/date.js";
 
 function createInitialValues(instance) {
@@ -14,10 +15,14 @@ function createInitialValues(instance) {
   };
 }
 
-function validate(values) {
+function isOutsideSemester(date, semester) {
+  return (semester.start && date < semester.start) || (semester.end && date > semester.end);
+}
+
+function validate(values, semester) {
   const errors = {};
   if (!values.date) errors.date = "Choose a date.";
-  else if (values.date < SEMESTER.start || values.date > SEMESTER.end) errors.date = "Pick a date within the semester.";
+  else if (isOutsideSemester(values.date, semester)) errors.date = "Pick a date within the semester.";
   if (!values.start) errors.start = "Choose a start time.";
   if (!values.end) errors.end = "Choose an end time.";
   else if (values.start && timeToMinutes(values.end) <= timeToMinutes(values.start))
@@ -27,6 +32,8 @@ function validate(values) {
 }
 
 function MakeupForm({ instance, onSubmit, onCancel }) {
+  const { schedule } = useSchedule();
+  const semester = getSemester(schedule);
   const [values, setValues] = useState(() => createInitialValues(instance));
   const [errors, setErrors] = useState({});
 
@@ -37,7 +44,7 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const nextErrors = validate(values);
+    const nextErrors = validate(values, semester);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
     onSubmit({
@@ -56,8 +63,8 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
         label="Date"
         name="date"
         type="date"
-        min={SEMESTER.start}
-        max={SEMESTER.end}
+        min={semester.start || undefined}
+        max={semester.end || undefined}
         value={values.date}
         onChange={handleChange}
         error={errors.date}

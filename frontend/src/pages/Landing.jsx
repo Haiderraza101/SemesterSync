@@ -5,31 +5,10 @@ import { useAuth } from "../hooks/useAuth.js";
 import { cx } from "../utils/cx.js";
 import "../styles/pages/landing.css";
 
-const PREVIEW_DAYS = ["Mon", "Tue", "Wed", "Thu"];
-
-const PREVIEW_ROWS = [
-  {
-    time: "8:30",
-    cells: [
-      { title: "Web Prog", meta: "CS-3" },
-      { title: "AI", meta: "E-14" },
-      { title: "AI", meta: "Quiz 3" },
-      { title: "Web Prog", meta: "CS-3" },
-    ],
-  },
-  {
-    time: "10:00",
-    cells: [
-      { title: "Compiler", meta: "CS-5" },
-      { title: "Deep Learn", meta: "E-7" },
-      null,
-      { title: "Compiler", meta: "CS-5" },
-    ],
-  },
-  {
-    time: "11:30",
-    cells: [{ title: "Info Sec", meta: "B-2" }, null, { title: "Clash", meta: "2 classes", clash: true }, null],
-  },
+const PREVIEW_STEPS = [
+  { title: "Upload", text: "The timetable Excel file, exactly as the university shares it." },
+  { title: "Choose", text: "Your section, electives and repeat courses, with clash checks." },
+  { title: "Follow", text: "Calendar, attendance, exams and email reminders all semester." },
 ];
 
 const FEATURES = [
@@ -51,42 +30,20 @@ function SchedulePreview() {
   return (
     <div className="landing-preview">
       <div className="landing-preview__header">
-        <strong>Week of 9 November</strong>
-        <span className="text-muted">BCS-7A</span>
+        <strong>From Excel file to calendar</strong>
+        <span className="text-muted">3 steps</span>
       </div>
-      <div className="data-table-wrapper">
-        <table className="landing-preview__table">
-          <thead>
-            <tr>
-              <th scope="col">
-                <span className="sr-only">Time</span>
-              </th>
-              {PREVIEW_DAYS.map((day) => (
-                <th key={day} scope="col">
-                  {day}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {PREVIEW_ROWS.map((row) => (
-              <tr key={row.time}>
-                <th scope="row">{row.time}</th>
-                {row.cells.map((cell, index) => (
-                  <td key={`${row.time}-${PREVIEW_DAYS[index]}`}>
-                    {cell && (
-                      <div className={cx("landing-preview__event", cell.clash && "landing-preview__event--clash")}>
-                        <strong>{cell.title}</strong>
-                        <span>{cell.meta}</span>
-                      </div>
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ol className="landing-preview__steps">
+        {PREVIEW_STEPS.map((step, index) => (
+          <li key={step.title} className="landing-preview__step">
+            <span className="landing-preview__step-number">{index + 1}</span>
+            <div>
+              <strong>{step.title}</strong>
+              <p>{step.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

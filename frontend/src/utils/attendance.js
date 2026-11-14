@@ -12,14 +12,16 @@ function getRisk(canMiss) {
 }
 
 export function getAttendanceSummary(schedule, courses, requirement = 80) {
-  const { start, end } = getSemesterRange();
+  const range = getSemesterRange(schedule);
   const plannedByCourse = new Map();
 
-  getClassInstances(schedule, courses, start, end)
-    .filter((instance) => !instance.cancelled)
-    .forEach((instance) => {
-      plannedByCourse.set(instance.course.code, (plannedByCourse.get(instance.course.code) || 0) + 1);
-    });
+  if (range) {
+    getClassInstances(schedule, courses, range.start, range.end)
+      .filter((instance) => !instance.cancelled)
+      .forEach((instance) => {
+        plannedByCourse.set(instance.course.code, (plannedByCourse.get(instance.course.code) || 0) + 1);
+      });
+  }
 
   const marksByCourse = new Map();
   Object.entries(schedule.attendance.marks).forEach(([instanceId, status]) => {

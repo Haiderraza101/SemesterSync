@@ -44,7 +44,6 @@ SemesterSync helps university students keep their class timetable, exam date she
 │       ├── context/        Auth, schedule and toast providers
 │       ├── hooks/          useAuth, useSchedule, useForm, useToast
 │       ├── layouts/        App shell and split auth layout
-│       ├── mocks/          Sample data used until the API is ready
 │       ├── pages/          One file per route
 │       ├── services/       Auth and schedule API calls
 │       ├── styles/         Tokens, base, components and page styles
@@ -77,7 +76,7 @@ SemesterSync helps university students keep their class timetable, exam date she
 | `/app/export` | Timetable export as PDF or PNG |
 | `/app/settings` | Profile, notifications, calendar and account settings |
 
-The frontend runs against a mock data layer while the backend is being built. Set `VITE_USE_MOCK=false` in `frontend/.env` to call the Express API instead. In mock mode any email and a password of at least six characters will log in, and the demo schedule is stored in the browser.
+All data comes from the Express API. There is no sample or demo data: a new account starts empty until a timetable is uploaded.
 
 ## Backend API
 
@@ -97,8 +96,9 @@ All routes are under `/api`. Protected routes need an `Authorization: Bearer <ac
 | POST | `/auth/reset-password/:token` | No | Set a new password and end every session |
 | GET, PUT, DELETE | `/users/me` | Yes | Read, update or delete the profile |
 | PUT | `/users/me/password` | Yes | Change password and end other sessions |
+| POST | `/timetable/parse` | Yes | Upload a timetable Excel file (`file` field) and get the parsed course catalog |
 | GET, PUT, DELETE | `/schedule` | Yes | Read, update or reset the saved schedule |
-| POST, DELETE | `/share` | Yes | Create or disable a share code |
+| GET, POST, DELETE | `/share` | Yes | Read, create or disable your share code (with optional exams and tasks) |
 | GET | `/share/:code` | Yes | Look up a shared schedule |
 
 Failures respond with `{ message, code, errors }`, where `errors` maps field names to messages.
@@ -114,6 +114,32 @@ Failures respond with `{ message, code, errors }`, where `errors` maps field nam
 - **Validation:** request bodies and params are validated with Zod, and unknown fields are removed.
 
 Without SMTP settings, emails (including reset links) are printed to the backend console in development.
+
+### Timetable parsing
+
+`POST /timetable/parse` accepts an `.xlsx` or `.xls` file up to 10 MB. The file is checked by extension and file signature and is processed in memory, never written to disk. Parsing lives in `backend/src/services/timetable/`:
+
+- `formats/` holds one module per timetable layout. Each one parses a workbook into class entries, and the layout that finds the most classes wins. `roomGridFormat` reads the FAST layout where each block has a header row of time slots, days run down the first column, rooms are rows, and each course cell has its instructor in the row below.
+- Class times come from an explicit time written in the cell (for example `11:40 - 01:00`), then a time label above the cell, and otherwise from where the cell sits under the header slots.
+- `courseCodes.js` reads course codes from any sheet that lists them (such as Course Allocation) and matches them to timetable names, including abbreviations like `Data Com. & Netwks.`. Courses without a match get a generated code.
+- `catalogBuilder.js` groups classes into courses and sections, with a room on every slot.
+
+The selected schedule is saved to MongoDB through `/schedule` and loads again on any device after login.
+
+### Semester dates
+
+The semester name is detected from the timetable title (for example "Fall 2026"). The first and last teaching day are set in Settings and saved with the schedule. Classes, attendance totals and reminders only run between those dates.
+
+### Notifications
+
+`backend/src/jobs/notificationScheduler.js` runs every minute in `APP_TIMEZONE` (default `Asia/Karachi`) and emails each user:
+
+- the morning summary at their chosen time (today's classes, exams, and tasks due today or tomorrow)
+- class reminders 15 or 30 minutes before each class, skipping cancelled classes and including makeup classes
+- task reminders 1 day or 3 hours before the due time
+- exam reminders 1 day, 2 days or 1 week before each paper
+
+Every notification is recorded in the `notificationlogs` collection so it is sent once, and a failed email is retried on the next run. Set `NOTIFICATIONS_ENABLED=false` to turn the scheduler off.
 
 ## Getting Started
 
@@ -132,7 +158,7 @@ cp frontend/.env.example frontend/.env
 
 Format the frontend code with `npx prettier --write "frontend/src/**/*.{js,jsx,css}"`.
 
-Fill in `backend/.env` with your MongoDB URI and a JWT secret. Set `VITE_USE_MOCK=false` in `frontend/.env` to use the real API.
+Fill in `backend/.env` with your MongoDB URI and a JWT secret. Add SMTP settings to send real emails; without them, emails are printed to the backend console in development.
 
 ### Run
 

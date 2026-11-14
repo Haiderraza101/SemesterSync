@@ -6,6 +6,7 @@ import SettingRow from "../components/settings/SettingRow.jsx";
 import Button from "../components/ui/Button.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
 import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import Notice from "../components/ui/Notice.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import Switch from "../components/ui/Switch.jsx";
@@ -42,12 +43,93 @@ function SettingSelect({ id, options, value, onChange }) {
   );
 }
 
+function SemesterSettings({ settings, onChange }) {
+  const { notify } = useToast();
+  const [values, setValues] = useState({
+    semesterName: settings.semesterName || "",
+    semesterStart: settings.semesterStart || "",
+    semesterEnd: settings.semesterEnd || "",
+  });
+  const [error, setError] = useState("");
+  const changed =
+    values.semesterName !== (settings.semesterName || "") ||
+    values.semesterStart !== (settings.semesterStart || "") ||
+    values.semesterEnd !== (settings.semesterEnd || "");
+
+  const update = (field) => (event) => {
+    setValues((current) => ({ ...current, [field]: event.target.value }));
+    setError("");
+  };
+
+  const save = (event) => {
+    event.preventDefault();
+    if (!values.semesterStart || !values.semesterEnd) {
+      setError("Enter both the first and the last teaching day.");
+      return;
+    }
+    if (values.semesterEnd < values.semesterStart) {
+      setError("The last teaching day must be after the first one.");
+      return;
+    }
+    onChange({ ...values, semesterName: values.semesterName.trim() });
+    notify("Semester dates saved.");
+  };
+
+  return (
+    <form onSubmit={save} noValidate>
+      <Panel
+        title="Semester"
+        flush
+        footer={
+          <>
+            <span className="toolbar__meta">Classes, attendance and reminders only run between these dates.</span>
+            <Button type="submit" variant="primary" disabled={!changed}>
+              Save semester
+            </Button>
+          </>
+        }
+      >
+        {error && <Notice variant="danger" title={error} />}
+        <SettingRow label="Semester name" htmlFor="semester-name" description="Detected from the timetable when possible.">
+          <input
+            id="semester-name"
+            className="input"
+            maxLength={40}
+            placeholder="Fall 2026"
+            value={values.semesterName}
+            onChange={update("semesterName")}
+          />
+        </SettingRow>
+        <SettingRow label="First teaching day" htmlFor="semester-start">
+          <input
+            id="semester-start"
+            type="date"
+            className="input"
+            value={values.semesterStart}
+            onChange={update("semesterStart")}
+          />
+        </SettingRow>
+        <SettingRow label="Last teaching day" htmlFor="semester-end">
+          <input
+            id="semester-end"
+            type="date"
+            className="input"
+            min={values.semesterStart || undefined}
+            value={values.semesterEnd}
+            onChange={update("semesterEnd")}
+          />
+        </SettingRow>
+      </Panel>
+    </form>
+  );
+}
+
 function NotificationSettings({ settings, onChange }) {
   return (
     <Panel title="Notifications" flush>
       <SettingRow
         label="Morning summary email"
-        description="Today's classes plus upcoming exams and deadlines, sent every morning."
+        description="Today's classes, exams and deadlines, emailed to your account address every morning."
       >
         <Switch
           label="Morning summary email"
@@ -188,6 +270,7 @@ export default function Settings() {
     <div className="settings-page">
       <PageHeader title="Settings" description="Manage your profile, notifications and calendar preferences." />
       <ProfileForm />
+      <SemesterSettings settings={schedule.settings} onChange={updateSettings} />
       <NotificationSettings settings={schedule.settings} onChange={updateSettings} />
       <CalendarSettings settings={schedule.settings} onChange={updateSettings} />
       <AccountSettings />

@@ -44,6 +44,12 @@ export const sessionLimiter = createLimiter({
   message: "Too many session requests. Please slow down.",
 });
 
+export const uploadLimiter = createLimiter({
+  minutes: 15,
+  limit: 20,
+  message: "Too many uploads. Please wait a few minutes and try again.",
+});
+
 export const sensitiveActionLimiter = createLimiter({
   minutes: 15,
   limit: 10,

@@ -1,5 +1,5 @@
 export const SPREADSHEET_EXTENSIONS = [".xlsx", ".xls"];
-export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 export function validateSpreadsheet(file) {
   if (!file) return "Choose a file to upload.";
@@ -7,7 +7,7 @@ export function validateSpreadsheet(file) {
   if (!SPREADSHEET_EXTENSIONS.some((extension) => name.endsWith(extension))) {
     return "Upload an Excel file (.xlsx or .xls).";
   }
-  if (file.size > MAX_UPLOAD_BYTES) return "The file is larger than 5 MB.";
+  if (file.size > MAX_UPLOAD_BYTES) return "The file is larger than 10 MB.";
   return "";
 }
 

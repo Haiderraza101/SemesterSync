@@ -1,10 +1,11 @@
 import { createContext, useEffect, useMemo, useReducer } from "react";
-import { STORAGE_KEYS, USE_MOCK_API } from "../config.js";
+import PageLoader from "../components/ui/PageLoader.jsx";
+import { STORAGE_KEYS } from "../config.js";
+import { useScheduleSync } from "../hooks/useScheduleSync.js";
 import { readJson, writeJson } from "../utils/storage.js";
 import {
   DEFAULT_SETTINGS,
   SCHEDULE_VERSION,
-  createDemoSchedule,
   createEmptySchedule,
   scheduleReducer,
 } from "./scheduleState.js";
@@ -20,11 +21,12 @@ function initSchedule(userId) {
   if (stored?.version === SCHEDULE_VERSION) {
     return { ...stored, settings: { ...DEFAULT_SETTINGS, ...stored.settings } };
   }
-  return USE_MOCK_API ? createDemoSchedule() : createEmptySchedule();
+  return createEmptySchedule();
 }
 
 export function ScheduleProvider({ userId, children }) {
   const [schedule, dispatch] = useReducer(scheduleReducer, userId, initSchedule);
+  const syncStatus = useScheduleSync(schedule, dispatch);
 
   useEffect(() => {
     writeJson(getStorageKey(userId), schedule);
@@ -34,7 +36,8 @@ export function ScheduleProvider({ userId, children }) {
     () => ({
       setCatalog: (catalog) => dispatch({ type: "catalog/set", catalog }),
       setSelections: (selections) => dispatch({ type: "selections/set", selections }),
-      importSchedule: (selections, mode) => dispatch({ type: "schedule/import", selections, mode }),
+      importSchedule: (selections, mode, extras = {}) =>
+        dispatch({ type: "schedule/import", selections, mode, exams: extras.exams, tasks: extras.tasks }),
       toggleCancelled: (id) => dispatch({ type: "class/toggleCancel", id }),
       addMakeup: (makeup) => dispatch({ type: "makeup/add", makeup }),
       removeMakeup: (id) => dispatch({ type: "makeup/remove", id }),
@@ -50,7 +53,9 @@ export function ScheduleProvider({ userId, children }) {
     []
   );
 
-  const value = useMemo(() => ({ schedule, ...actions }), [schedule, actions]);
+  const value = useMemo(() => ({ schedule, syncStatus, ...actions }), [schedule, syncStatus, actions]);
+
+  if (syncStatus === "loading") return <PageLoader />;
 
   return <ScheduleContext.Provider value={value}>{children}</ScheduleContext.Provider>;
 }

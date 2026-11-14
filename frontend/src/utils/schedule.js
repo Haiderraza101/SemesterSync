@@ -1,4 +1,3 @@
-import { SEMESTER } from "../config.js";
 import { addDays, combineDateTime, parseDateKey, startOfDay, toDateKey } from "./date.js";
 
 export function getCourseIndex(catalog) {
@@ -29,11 +28,28 @@ export function getInstanceId(code, dateKey, start) {
   return `${code}_${dateKey}_${start.replace(":", "")}`;
 }
 
-export function getSemesterRange() {
-  return { start: parseDateKey(SEMESTER.start), end: parseDateKey(SEMESTER.end) };
+export function getSemester(schedule) {
+  const settings = schedule?.settings || {};
+  return {
+    name: settings.semesterName || schedule?.catalog?.semesterName || "",
+    start: settings.semesterStart || "",
+    end: settings.semesterEnd || "",
+  };
+}
+
+export function hasSemesterDates(schedule) {
+  const { start, end } = getSemester(schedule);
+  return Boolean(start && end && start <= end);
+}
+
+export function getSemesterRange(schedule) {
+  if (!hasSemesterDates(schedule)) return null;
+  const { start, end } = getSemester(schedule);
+  return { start: parseDateKey(start), end: parseDateKey(end) };
 }
 
 export function getClassInstances(schedule, courses, from, to) {
+  const semester = getSemester(schedule);
   const cancelled = new Set(schedule.cancelled);
   const firstDay = startOfDay(from);
   const lastDay = startOfDay(to);
@@ -41,7 +57,8 @@ export function getClassInstances(schedule, courses, from, to) {
 
   for (let date = firstDay; date <= lastDay; date = addDays(date, 1)) {
     const dateKey = toDateKey(date);
-    if (dateKey < SEMESTER.start || dateKey > SEMESTER.end) continue;
+    if (semester.start && dateKey < semester.start) continue;
+    if (semester.end && dateKey > semester.end) continue;
     const day = date.getDay();
 
     courses.forEach((course) => {
@@ -56,7 +73,7 @@ export function getClassInstances(schedule, courses, from, to) {
             dateKey,
             start: slot.start,
             end: slot.end,
-            room: course.room,
+            room: slot.room || course.room,
             cancelled: cancelled.has(id),
           });
         });

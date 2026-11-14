@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import CourseCell from "../components/app/CourseCell.jsx";
 import ProgressBar from "../components/app/ProgressBar.jsx";
 import Badge from "../components/ui/Badge.jsx";
@@ -77,6 +78,8 @@ export default function Attendance() {
           />
         }
       />
+
+      <SemesterNotice />
 
       {courses.length === 0 ? (
         <Panel>

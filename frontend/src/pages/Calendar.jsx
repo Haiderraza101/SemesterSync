@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from "react";
+import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import CalendarLegend from "../components/calendar/CalendarLegend.jsx";
 import CalendarToolbar from "../components/calendar/CalendarToolbar.jsx";
 import CalendarView from "../components/calendar/CalendarView.jsx";
@@ -89,6 +90,7 @@ export default function Calendar() {
 
   return (
     <>
+      <SemesterNotice />
       <CalendarToolbar
         title={title}
         view={view}

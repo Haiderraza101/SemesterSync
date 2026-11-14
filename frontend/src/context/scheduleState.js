@@ -1,11 +1,3 @@
-import {
-  SAMPLE_ATTENDANCE_BASELINE,
-  SAMPLE_CATALOG,
-  SAMPLE_DATE_SHEETS,
-  SAMPLE_SELECTIONS,
-  SAMPLE_TASKS,
-} from "../mocks/schedule.js";
-
 export const SCHEDULE_VERSION = 1;
 
 export const DEFAULT_SETTINGS = {
@@ -16,6 +8,9 @@ export const DEFAULT_SETTINGS = {
   defaultView: "timeGridWeek",
   showSaturday: false,
   attendanceRequirement: 80,
+  semesterName: "",
+  semesterStart: "",
+  semesterEnd: "",
 };
 
 export function createEmptySchedule() {
@@ -33,30 +28,28 @@ export function createEmptySchedule() {
   };
 }
 
-export function createDemoSchedule() {
-  const selectedCodes = new Set(SAMPLE_SELECTIONS.map((selection) => selection.code));
-  const midterm = SAMPLE_DATE_SHEETS.midterm;
-
-  return {
-    ...createEmptySchedule(),
-    catalog: SAMPLE_CATALOG,
-    selections: SAMPLE_SELECTIONS,
-    dateSheets: {
-      midterm: {
-        fileName: midterm.fileName,
-        exams: midterm.exams
-          .filter((exam) => selectedCodes.has(exam.code))
-          .map((exam) => ({ ...exam, reminder: "1d" })),
-      },
-      final: null,
-    },
-    tasks: SAMPLE_TASKS,
-    attendance: { baseline: SAMPLE_ATTENDANCE_BASELINE, marks: {} },
-  };
-}
-
 function toggleInList(list, value) {
   return list.includes(value) ? list.filter((item) => item !== value) : [...list, value];
+}
+
+function mergeSharedExams(dateSheets, exams = []) {
+  const next = { ...dateSheets };
+  ["midterm", "final"].forEach((term) => {
+    const incoming = exams.filter((exam) => exam.term === term).map(({ term: examTerm, ...exam }) => exam);
+    if (incoming.length === 0) return;
+    const merged = new Map((next[term]?.exams || []).map((exam) => [exam.code, exam]));
+    incoming.forEach((exam) => merged.set(exam.code, { reminder: "1d", ...merged.get(exam.code), ...exam }));
+    next[term] = { fileName: next[term]?.fileName || "Shared schedule", exams: [...merged.values()] };
+  });
+  return next;
+}
+
+function mergeSharedTasks(tasks, incoming = []) {
+  const existing = new Set(tasks.map((task) => `${task.title}|${task.courseCode}|${task.due}`));
+  const added = incoming
+    .filter((task) => !existing.has(`${task.title}|${task.courseCode}|${task.due}`))
+    .map((task, index) => ({ ...task, id: `task-${Date.now()}-${index}`, reminder: "1d", done: false }));
+  return [...tasks, ...added];
 }
 
 function mergeSelections(current, incoming) {
@@ -73,6 +66,10 @@ export function scheduleReducer(state, action) {
         ...state,
         catalog: action.catalog,
         selections: state.selections.filter((selection) => codes.has(selection.code)),
+        settings: {
+          ...state.settings,
+          semesterName: state.settings.semesterName || action.catalog.semesterName || "",
+        },
       };
     }
     case "selections/set":
@@ -81,6 +78,8 @@ export function scheduleReducer(state, action) {
       return {
         ...state,
         selections: action.mode === "merge" ? mergeSelections(state.selections, action.selections) : action.selections,
+        dateSheets: mergeSharedExams(state.dateSheets, action.exams),
+        tasks: mergeSharedTasks(state.tasks, action.tasks),
       };
     case "class/toggleCancel":
       return { ...state, cancelled: toggleInList(state.cancelled, action.id) };
@@ -111,6 +110,8 @@ export function scheduleReducer(state, action) {
       return { ...state, settings: { ...state.settings, ...action.settings } };
     case "schedule/reset":
       return createEmptySchedule();
+    case "schedule/load":
+      return { ...state, ...action.schedule, settings: { ...DEFAULT_SETTINGS, ...action.schedule.settings } };
     default:
       return state;
   }

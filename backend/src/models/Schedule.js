@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+function isOptionalDate(value) {
+  return value === "" || DATE_PATTERN.test(value);
+}
+
 const selectionSchema = new mongoose.Schema(
   {
     code: { type: String, required: true, trim: true, uppercase: true },
@@ -45,6 +49,9 @@ const settingsSchema = new mongoose.Schema(
     defaultView: { type: String, enum: ["timeGridDay", "timeGridWeek", "dayGridMonth"], default: "timeGridWeek" },
     showSaturday: { type: Boolean, default: false },
     attendanceRequirement: { type: Number, enum: [75, 80], default: 80 },
+    semesterName: { type: String, trim: true, maxlength: 40, default: "" },
+    semesterStart: { type: String, default: "", validate: [isOptionalDate, "Use the format YYYY-MM-DD."] },
+    semesterEnd: { type: String, default: "", validate: [isOptionalDate, "Use the format YYYY-MM-DD."] },
   },
   { _id: false }
 );

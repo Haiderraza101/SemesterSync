@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Button from "../components/ui/Button.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
@@ -14,6 +14,22 @@ import { getErrorMessage } from "../utils/errors.js";
 import { getCourseIndex } from "../utils/schedule.js";
 import "../styles/pages/share.css";
 
+function buildSharedExams(schedule) {
+  const selected = new Set(schedule.selections.map((selection) => selection.code));
+  return ["midterm", "final"].flatMap((term) =>
+    (schedule.dateSheets[term]?.exams || [])
+      .filter((exam) => selected.has(exam.code))
+      .map(({ code, date, start, end, venue }) => ({ term, code, date, start, end, venue: venue || "" }))
+  );
+}
+
+function buildSharedTasks(schedule) {
+  const selected = new Set(schedule.selections.map((selection) => selection.code));
+  return schedule.tasks
+    .filter((task) => !task.done && (!task.courseCode || selected.has(task.courseCode)))
+    .map(({ title, courseCode, type, due }) => ({ title, courseCode: courseCode || "", type, due }));
+}
+
 const IMPORT_MODES = [
   { value: "replace", label: "Replace my current schedule" },
   { value: "merge", label: "Add to my current schedule" },
@@ -25,14 +41,33 @@ function ShareCodePanel() {
   const [generating, setGenerating] = useState(false);
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [include, setInclude] = useState({ exams: true, tasks: false });
+  const [loadingCode, setLoadingCode] = useState(true);
+  const [disabling, setDisabling] = useState(false);
   const code = schedule.shareCode;
   const shareLink = code ? `${window.location.origin}/join/${code}` : "";
-  const examCount = (schedule.dateSheets.midterm?.exams.length || 0) + (schedule.dateSheets.final?.exams.length || 0);
+  const sharedExams = useMemo(() => buildSharedExams(schedule), [schedule]);
+  const sharedTasks = useMemo(() => buildSharedTasks(schedule), [schedule]);
+
+  useEffect(() => {
+    let active = true;
+    scheduleService
+      .getMyShareCode()
+      .then((current) => active && setShareCode(current))
+      .catch((error) => active && notify(getErrorMessage(error), "danger"))
+      .finally(() => active && setLoadingCode(false));
+    return () => {
+      active = false;
+    };
+  }, [setShareCode, notify]);
 
   const generate = async () => {
     setGenerating(true);
     try {
-      const { code: nextCode } = await scheduleService.createShareCode(schedule.selections);
+      const { code: nextCode } = await scheduleService.createShareCode({
+        selections: schedule.selections,
+        exams: include.exams ? sharedExams : [],
+        tasks: include.tasks ? sharedTasks : [],
+      });
       setShareCode(nextCode);
       notify("New share code created.");
     } catch (error) {
@@ -51,16 +86,26 @@ function ShareCodePanel() {
     }
   };
 
-  const disableSharing = () => {
-    setShareCode(null);
-    setConfirmDisable(false);
-    notify("Sharing disabled.");
+  const disableSharing = async () => {
+    setDisabling(true);
+    try {
+      await scheduleService.disableShareCode();
+      setShareCode(null);
+      notify("Sharing disabled.");
+    } catch (error) {
+      notify(getErrorMessage(error), "danger");
+    } finally {
+      setDisabling(false);
+      setConfirmDisable(false);
+    }
   };
 
   return (
     <Panel title="Your schedule code" className="share-layout__panel">
       <div className="share-panel__body">
-        {code ? (
+        {loadingCode ? (
+          <p className="text-muted">Loading your share code…</p>
+        ) : code ? (
           <>
             <div className="share-code">
               <output className="share-code__value" aria-label="Share code">
@@ -85,28 +130,30 @@ function ShareCodePanel() {
           <legend className="field__label">Included in the code</legend>
           <Checkbox label={`Courses and sections (${schedule.selections.length})`} checked readOnly disabled />
           <Checkbox
-            label={`Exams (${examCount})`}
+            label={`Exams (${sharedExams.length})`}
             checked={include.exams}
             onChange={() => setInclude((current) => ({ ...current, exams: !current.exams }))}
           />
           <Checkbox
-            label="Assignments and quizzes"
+            label={`Assignments and quizzes (${sharedTasks.length})`}
             checked={include.tasks}
             onChange={() => setInclude((current) => ({ ...current, tasks: !current.tasks }))}
           />
         </fieldset>
-        <p className="text-muted share-panel__note">Attendance and personal notes are never shared.</p>
+        <p className="text-muted share-panel__note">
+          Choices apply when you generate a code. Attendance is never shared.
+        </p>
 
         <div className="share-panel__actions">
           <Button
             variant={code ? "secondary" : "primary"}
-            disabled={generating || schedule.selections.length === 0}
+            disabled={generating || loadingCode || schedule.selections.length === 0}
             onClick={generate}
           >
             {generating ? "Generating…" : code ? "Generate new code" : "Generate code"}
           </Button>
           {code && (
-            <Button variant="danger" onClick={() => setConfirmDisable(true)}>
+            <Button variant="danger" disabled={disabling} onClick={() => setConfirmDisable(true)}>
               Disable sharing
             </Button>
           )}
@@ -161,8 +208,11 @@ function ImportPanel() {
   const available = lookup ? lookup.selections.filter((selection) => courseIndex.has(selection.code)) : [];
   const missing = lookup ? lookup.selections.length - available.length : 0;
 
+  const sharedExams = lookup ? (lookup.exams || []).filter((exam) => courseIndex.has(exam.code)) : [];
+  const sharedTasks = lookup ? lookup.tasks || [] : [];
+
   const handleImport = () => {
-    importSchedule(available, mode);
+    importSchedule(available, mode, { exams: sharedExams, tasks: sharedTasks });
     setImported(true);
     notify(`${available.length} ${available.length === 1 ? "course" : "courses"} imported.`);
   };
@@ -197,7 +247,11 @@ function ImportPanel() {
                 <span className="cell-primary">
                   {lookup.owner} · {lookup.section}
                 </span>
-                <span className="text-muted">{lookup.selections.length} courses</span>
+                <span className="text-muted">
+                  {lookup.selections.length} courses
+                  {sharedExams.length > 0 && ` · ${sharedExams.length} exams`}
+                  {sharedTasks.length > 0 && ` · ${sharedTasks.length} tasks`}
+                </span>
               </div>
               <table className="data-table">
                 <tbody>

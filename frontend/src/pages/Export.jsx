@@ -6,7 +6,6 @@ import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import SegmentedControl from "../components/ui/SegmentedControl.jsx";
 import SelectField from "../components/ui/SelectField.jsx";
-import { SEMESTER } from "../config.js";
 import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
@@ -14,7 +13,7 @@ import { cx } from "../utils/cx.js";
 import { DAY_NAMES, formatShortTimeRange } from "../utils/date.js";
 import { getErrorMessage } from "../utils/errors.js";
 import { exportTimetable } from "../utils/exportTimetable.js";
-import { getSelectedCourses } from "../utils/schedule.js";
+import { getSelectedCourses, getSemester } from "../utils/schedule.js";
 import { buildTimetableGrid } from "../utils/timetableGrid.js";
 import "../styles/pages/export.css";
 
@@ -28,12 +27,14 @@ const ORIENTATION_OPTIONS = [
   { value: "portrait", label: "A4 portrait" },
 ];
 
-function TimetablePreview({ previewRef, user, rows, days, showRooms, shaded }) {
+function TimetablePreview({ previewRef, user, semesterName, rows, days, showRooms, shaded }) {
   return (
     <div ref={previewRef} className="export-sheet">
       <div className="export-sheet__header">
         <div>
-          <strong className="export-sheet__title">Weekly timetable, {SEMESTER.name}</strong>
+          <strong className="export-sheet__title">
+            {semesterName ? `Weekly timetable, ${semesterName}` : "Weekly timetable"}
+          </strong>
           <span className="export-sheet__meta">
             {user.name} · {user.rollNumber} · {user.section}
           </span>
@@ -85,6 +86,7 @@ export default function Export() {
   const [exporting, setExporting] = useState(false);
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
+  const semesterName = getSemester(schedule).name;
   const days = useMemo(
     () => (schedule.settings.showSaturday ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5]),
     [schedule.settings.showSaturday]
@@ -98,7 +100,7 @@ export default function Export() {
       await exportTimetable(previewRef.current, {
         format,
         orientation,
-        fileName: `timetable-${SEMESTER.name.toLowerCase().replace(/\s+/g, "-")}`,
+        fileName: semesterName ? `timetable-${semesterName.toLowerCase().replace(/\s+/g, "-")}` : "timetable",
       });
       notify(`Timetable downloaded as ${format.toUpperCase()}.`);
     } catch (error) {
@@ -132,6 +134,7 @@ export default function Export() {
         <div className="page-grid">
           <div className="page-grid__main export-stage">
             <TimetablePreview
+            semesterName={semesterName}
               previewRef={previewRef}
               user={user}
               rows={rows}

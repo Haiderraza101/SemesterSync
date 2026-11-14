@@ -9,7 +9,7 @@ export function buildTimetableGrid(courses, days) {
       if (!slotMap.has(key)) slotMap.set(key, { start: slot.start, end: slot.end, cells: new Map() });
       const row = slotMap.get(key);
       const entries = row.cells.get(slot.day) || [];
-      entries.push(course);
+      entries.push({ ...course, room: slot.room || course.room });
       row.cells.set(slot.day, entries);
     });
   });

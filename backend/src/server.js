@@ -2,6 +2,7 @@ import "dotenv/config";
 import app from "./app.js";
 import { connectDB, disconnectDB } from "./config/db.js";
 import { assertEnv, env } from "./config/env.js";
+import { startNotificationScheduler, stopNotificationScheduler } from "./jobs/notificationScheduler.js";
 
 const SHUTDOWN_TIMEOUT_MS = 10000;
 
@@ -25,6 +26,7 @@ function registerShutdown(server) {
   const shutdown = (signal) => {
     console.log(`${signal} received. Shutting down.`);
     setTimeout(() => process.exit(1), SHUTDOWN_TIMEOUT_MS).unref();
+    stopNotificationScheduler();
     server.close(async () => {
       await disconnectDB();
       process.exit(0);
@@ -38,8 +40,10 @@ function registerShutdown(server) {
 async function start() {
   try {
     assertEnv();
+    process.env.TZ = env.timezone;
     await connectDB(env.mongoUri);
     registerShutdown(await listen());
+    startNotificationScheduler();
   } catch (error) {
     console.error(error.message);
     process.exit(1);

@@ -178,7 +178,7 @@ export default function DateSheets() {
           {(!saved || draft) && (
             <FileDropzone
               label={`Drop the ${term} date sheet here`}
-              hint="Excel files (.xlsx, .xls) up to 5 MB"
+              hint="Excel files (.xlsx, .xls) up to 10 MB"
               busy={uploading}
               busyLabel="Reading date sheet…"
               onFile={handleFile}

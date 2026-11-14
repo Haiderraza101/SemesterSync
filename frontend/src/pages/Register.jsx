@@ -85,7 +85,7 @@ export default function Register() {
           label="Full name"
           name="name"
           autoComplete="name"
-          placeholder="Haider Raza"
+          placeholder="Your full name"
           value={values.name}
           onChange={handleChange}
           error={errors.name}
@@ -94,7 +94,7 @@ export default function Register() {
           <TextField
             label="Roll number"
             name="rollNumber"
-            placeholder="23L-0634"
+            placeholder="e.g. 23L-1234"
             value={values.rollNumber}
             onChange={handleChange}
             error={errors.rollNumber}
@@ -102,7 +102,7 @@ export default function Register() {
           <TextField
             label="Section"
             name="section"
-            placeholder="BCS-7A"
+            placeholder="e.g. BCS-7A"
             value={values.section}
             onChange={handleChange}
             error={errors.section}

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import { Link } from "react-router-dom";
 import CourseCell from "../components/app/CourseCell.jsx";
 import ProgressBar from "../components/app/ProgressBar.jsx";
@@ -238,6 +239,8 @@ export default function Dashboard() {
           </>
         }
       />
+
+      <SemesterNotice />
 
       {clashes.length > 0 && (
         <Notice variant="warning" title="Schedule clash." action={<Link to="/app/timetable">Resolve</Link>}>
