@@ -1,3 +1,4 @@
+import { examTermLabel } from "../../utils/examTerms.js";
 import Button from "../ui/Button.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
 import { formatShortDate, formatTime, formatTimeRange, parseDateKey, toTimeKey } from "../../utils/date.js";
@@ -79,7 +80,7 @@ function ExamDetails({ exam }) {
   return (
     <>
       <div className="event-details__header">
-        <span className="event-details__kind">{exam.term === "midterm" ? "Midterm exam" : "Final exam"}</span>
+        <span className="event-details__kind">{`${examTermLabel(exam.term)} exam`}</span>
         <h2 className="event-details__title">{exam.course.name}</h2>
       </div>
       <dl className="detail-list">

@@ -1,5 +1,6 @@
 import { addDays, combineDateTime } from "./date.js";
 import { getSlotKey } from "./clashes.js";
+import { examTermLabel } from "./examTerms.js";
 import { getClassInstances, getExams, getTasksWithCourses } from "./schedule.js";
 
 const TASK_DURATION_MINUTES = 30;
@@ -42,7 +43,7 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
     .filter((exam) => inRange(exam.startsAt, range))
     .map((exam) => ({
       id: exam.id,
-      title: `${exam.term === "midterm" ? "Midterm" : "Final"}: ${exam.course.shortName}`,
+      title: `${examTermLabel(exam.term)}: ${exam.course.shortName}`,
       start: exam.startsAt,
       end: combineDateTime(exam.date, exam.end),
       classNames: ["ss-event", "ss-event--exam"],

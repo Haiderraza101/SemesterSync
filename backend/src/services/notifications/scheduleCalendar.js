@@ -1,4 +1,4 @@
-const TERMS = ["midterm", "final"];
+import { EXAM_TERMS } from "../../utils/examTerms.js";
 
 export function toDateKey(date) {
   const year = date.getFullYear();
@@ -88,7 +88,7 @@ export function getClassesOn(schedule, courses, date) {
 
 export function getExams(schedule, courses) {
   const courseIndex = new Map(courses.map((course) => [course.code, course]));
-  return TERMS.flatMap((term) =>
+  return EXAM_TERMS.flatMap((term) =>
     (schedule.dateSheets?.[term]?.exams || [])
       .filter((exam) => courseIndex.has(exam.code) && exam.date && exam.start)
       .map((exam) => ({

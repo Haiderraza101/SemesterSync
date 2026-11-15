@@ -65,6 +65,7 @@ const scheduleSchema = new mongoose.Schema(
     makeups: { type: [makeupSchema], default: [] },
     dateSheets: {
       midterm: { type: mongoose.Schema.Types.Mixed, default: null },
+      midterm2: { type: mongoose.Schema.Types.Mixed, default: null },
       final: { type: mongoose.Schema.Types.Mixed, default: null },
     },
     tasks: { type: [taskSchema], default: [] },

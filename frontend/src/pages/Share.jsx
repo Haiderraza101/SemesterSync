@@ -11,12 +11,13 @@ import { useToast } from "../hooks/useToast.js";
 import { scheduleService } from "../services/scheduleService.js";
 import { copyText } from "../utils/clipboard.js";
 import { getErrorMessage } from "../utils/errors.js";
+import { EXAM_TERM_KEYS } from "../utils/examTerms.js";
 import { getCourseIndex } from "../utils/schedule.js";
 import "../styles/pages/share.css";
 
 function buildSharedExams(schedule) {
   const selected = new Set(schedule.selections.map((selection) => selection.code));
-  return ["midterm", "final"].flatMap((term) =>
+  return EXAM_TERM_KEYS.flatMap((term) =>
     (schedule.dateSheets[term]?.exams || [])
       .filter((exam) => selected.has(exam.code))
       .map(({ code, date, start, end, venue }) => ({ term, code, date, start, end, venue: venue || "" }))

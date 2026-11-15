@@ -1,3 +1,4 @@
+import { EXAM_TERM_KEYS, examTermLabel } from "./examTerms.js";
 import { addDays, combineDateTime, parseDateKey, startOfDay, toDateKey } from "./date.js";
 
 export function getCourseIndex(catalog) {
@@ -108,7 +109,7 @@ export function getClassesOnDate(schedule, courses, date) {
 
 export function getExams(schedule, courses) {
   const courseIndex = new Map(courses.map((course) => [course.code, course]));
-  return ["midterm", "final"].flatMap((term) =>
+  return EXAM_TERM_KEYS.flatMap((term) =>
     (schedule.dateSheets[term]?.exams || [])
       .filter((exam) => courseIndex.has(exam.code))
       .map((exam) => ({
@@ -134,7 +135,7 @@ export function getUpcomingItems(schedule, courses, now = new Date(), limit = 4)
   const exams = getExams(schedule, courses).map((exam) => ({
     id: exam.id,
     kind: "exam",
-    title: `${exam.term === "midterm" ? "Midterm" : "Final"}, ${exam.course.name}`,
+    title: `${examTermLabel(exam.term)}, ${exam.course.name}`,
     detail: exam.venue,
     date: exam.startsAt,
   }));

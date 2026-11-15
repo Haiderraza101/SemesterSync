@@ -13,7 +13,7 @@ const PREVIEW_STEPS = [
 
 const FEATURES = [
   { title: "Timetable upload", text: "Import the Excel timetable and add your sections as weekly classes." },
-  { title: "Date sheets", text: "Add midterm and final exams with reminders before each paper." },
+  { title: "Date sheets", text: "Add both midterms and the final with reminders before each paper." },
   { title: "Clash detection", text: "Get a warning when two selected sections overlap." },
   { title: "Assignments and quizzes", text: "Track due dates alongside your classes." },
   { title: "Attendance tracker", text: "See how many classes you can still miss in each course." },

@@ -1,3 +1,5 @@
+import { EXAM_TERM_KEYS } from "../utils/examTerms.js";
+
 export const SCHEDULE_VERSION = 1;
 
 export const DEFAULT_SETTINGS = {
@@ -20,7 +22,7 @@ export function createEmptySchedule() {
     selections: [],
     cancelled: [],
     makeups: [],
-    dateSheets: { midterm: null, final: null },
+    dateSheets: { midterm: null, midterm2: null, final: null },
     tasks: [],
     attendance: { baseline: {}, marks: {} },
     shareCode: null,
@@ -34,7 +36,7 @@ function toggleInList(list, value) {
 
 function mergeSharedExams(dateSheets, exams = []) {
   const next = { ...dateSheets };
-  ["midterm", "final"].forEach((term) => {
+  EXAM_TERM_KEYS.forEach((term) => {
     const incoming = exams.filter((exam) => exam.term === term).map(({ term: examTerm, ...exam }) => exam);
     if (incoming.length === 0) return;
     const merged = new Map((next[term]?.exams || []).map((exam) => [exam.code, exam]));

@@ -1,5 +1,6 @@
 import NotificationLog from "../../models/NotificationLog.js";
 import Schedule from "../../models/Schedule.js";
+import { EXAM_TERM_LABELS } from "../../utils/examTerms.js";
 import { sendEmail } from "../emailService.js";
 import { morningSummaryEmail, remindersEmail } from "../emailTemplates.js";
 import {
@@ -16,7 +17,6 @@ import {
 
 const MINUTE_MS = 60 * 1000;
 const OFFSET_MINUTES = { "15m": 15, "30m": 30, "3h": 180, "1d": 1440, "2d": 2880, "1w": 10080 };
-const TERM_LABELS = { midterm: "Midterm", final: "Final" };
 const DEFAULT_SUMMARY_TIME = "07:00";
 
 function inWindow(date, window) {
@@ -82,7 +82,7 @@ function collectExamReminders(schedule, courses, window) {
     .filter((exam) => inWindow(remindAt(exam.startsAt, exam.reminder), window))
     .map((exam) => ({
       key: `exam:${exam.term}:${exam.code}:${exam.date}:${exam.reminder}`,
-      text: `${TERM_LABELS[exam.term]} exam: ${exam.name} on ${exam.date} at ${formatTime(exam.start)}${exam.venue ? `, ${exam.venue}` : ""}`,
+      text: `${EXAM_TERM_LABELS[exam.term]} exam: ${exam.name} on ${exam.date} at ${formatTime(exam.start)}${exam.venue ? `, ${exam.venue}` : ""}`,
     }));
 }
 

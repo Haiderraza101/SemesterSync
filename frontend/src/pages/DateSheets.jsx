@@ -15,13 +15,11 @@ import { scheduleService } from "../services/scheduleService.js";
 import { formatShortDate, formatTimeRange, parseDateKey } from "../utils/date.js";
 import { getErrorMessage } from "../utils/errors.js";
 import { validateSpreadsheet } from "../utils/files.js";
+import { EXAM_TERMS, examTermLabel } from "../utils/examTerms.js";
 import { EXAM_REMINDER_OPTIONS } from "../utils/reminders.js";
 import { getSelectedCourses } from "../utils/schedule.js";
 
-const TERMS = [
-  { value: "midterm", label: "Midterm exams" },
-  { value: "final", label: "Final exams" },
-];
+
 
 function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange }) {
   return (
@@ -62,7 +60,7 @@ function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange })
                 </td>
                 <td className="cell-nowrap cell-primary">{formatShortDate(parseDateKey(exam.date))}</td>
                 <td className="cell-nowrap">{formatTimeRange(exam.start, exam.end)}</td>
-                <td>{exam.venue}</td>
+                <td>{exam.venue || <span className="text-muted">Not announced</span>}</td>
                 <td>
                   {editable ? (
                     <SelectField
@@ -115,6 +113,10 @@ export default function DateSheets() {
     setUploading(true);
     try {
       const sheet = await scheduleService.parseDateSheet(file, term);
+      if (sheet.detectedTerm && sheet.detectedTerm !== term) {
+        setTerm(sheet.detectedTerm);
+        notify(`This file is the ${examTermLabel(sheet.detectedTerm)} date sheet, so it was opened under that tab.`);
+      }
       const exams = sheet.exams
         .filter((exam) => courseIndex.has(exam.code))
         .map((exam) => ({ ...exam, included: true, reminder: defaultReminder }));
@@ -155,7 +157,7 @@ export default function DateSheets() {
         title="Date sheets"
         description="Upload the exam date sheet. Only papers for your registered courses are added."
       >
-        <Tabs label="Exam term" tabs={TERMS} value={term} onChange={changeTerm} />
+        <Tabs label="Exam term" tabs={EXAM_TERMS} value={term} onChange={changeTerm} />
       </PageHeader>
 
       {courses.length === 0 ? (
@@ -177,7 +179,7 @@ export default function DateSheets() {
 
           {(!saved || draft) && (
             <FileDropzone
-              label={`Drop the ${term} date sheet here`}
+              label={`Drop the ${examTermLabel(term)} date sheet here`}
               hint="Excel files (.xlsx, .xls) up to 10 MB"
               busy={uploading}
               busyLabel="Reading date sheet…"

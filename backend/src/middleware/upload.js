@@ -9,7 +9,7 @@ const SPREADSHEET_SIGNATURES = [
 ];
 
 const unsupportedType = () =>
-  new AppError("Upload the timetable as an .xlsx or .xls file.", 415, { code: "UNSUPPORTED_FILE_TYPE" });
+  new AppError("Upload an Excel file (.xlsx or .xls).", 415, { code: "UNSUPPORTED_FILE_TYPE" });
 
 const spreadsheetUploader = multer({
   storage: multer.memoryStorage(),

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { EXAM_TERMS } from "../utils/examTerms.js";
 
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -13,7 +14,7 @@ const selectionSchema = new mongoose.Schema(
 
 const sharedExamSchema = new mongoose.Schema(
   {
-    term: { type: String, enum: ["midterm", "final"], required: true },
+    term: { type: String, enum: EXAM_TERMS, required: true },
     code: { type: String, required: true, uppercase: true, trim: true },
     date: { type: String, required: true, match: DATE_PATTERN },
     start: { type: String, required: true, match: TIME_PATTERN },

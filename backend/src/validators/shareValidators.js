@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EXAM_TERMS } from "../utils/examTerms.js";
 
 const SELECT_MESSAGE = "Select at least one course before sharing.";
 const SELECTION_MESSAGE = "Each course needs a code and a section.";
@@ -15,7 +16,7 @@ const selectionText = z
 
 const examSchema = z.object(
   {
-    term: z.enum(["midterm", "final"], { errorMap: () => ({ message: EXAM_MESSAGE }) }),
+    term: z.enum(EXAM_TERMS, { errorMap: () => ({ message: EXAM_MESSAGE }) }),
     code: z.string({ required_error: EXAM_MESSAGE }).trim().min(1, EXAM_MESSAGE).max(40),
     date: z.string({ required_error: EXAM_MESSAGE }).regex(DATE_PATTERN, EXAM_MESSAGE),
     start: z.string({ required_error: EXAM_MESSAGE }).regex(TIME_PATTERN, EXAM_MESSAGE),

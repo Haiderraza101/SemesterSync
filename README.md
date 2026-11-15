@@ -96,6 +96,7 @@ All routes are under `/api`. Protected routes need an `Authorization: Bearer <ac
 | POST | `/auth/reset-password/:token` | No | Set a new password and end every session |
 | GET, PUT, DELETE | `/users/me` | Yes | Read, update or delete the profile |
 | PUT | `/users/me/password` | Yes | Change password and end other sessions |
+| POST | `/datesheets/parse` | Yes | Upload a date sheet Excel file (`file`, optional `term`) and get every paper with date and time |
 | POST | `/timetable/parse` | Yes | Upload a timetable Excel file (`file` field) and get the parsed course catalog |
 | GET, PUT, DELETE | `/schedule` | Yes | Read, update or reset the saved schedule |
 | GET, POST, DELETE | `/share` | Yes | Read, create or disable your share code (with optional exams and tasks) |
@@ -125,6 +126,10 @@ Without SMTP settings, emails (including reset links) are printed to the backend
 - `catalogBuilder.js` groups classes into courses and sections, with a room on every slot.
 
 The selected schedule is saved to MongoDB through `/schedule` and loads again on any device after login.
+
+### Date sheets
+
+`POST /datesheets/parse` reads FAST date sheets laid out as Day, Date, then repeating Code and time slot columns (for example `Code | 09:00 - 10:00 | Code | 10:30 - 11:30`). Dates such as `29-Oct-2026`, Excel date cells and `29/10/2026` are all accepted. The exam term (Midterm 1, Midterm 2 or Final) is detected from the title, and only papers for the student's selected courses are added to the calendar.
 
 ### Semester dates
 
