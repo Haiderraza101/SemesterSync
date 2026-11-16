@@ -1,8 +1,9 @@
 import { forwardRef, useId } from "react";
 import { cx } from "../../utils/cx.js";
+import Select from "./Select.jsx";
 
 const SelectField = forwardRef(function SelectField(
-  { label, options, hint, error, hideLabel = false, inline = false, id, className, ...selectProps },
+  { label, options, hint, error, hideLabel = false, inline = false, id, name, className, value, onChange, ...selectProps },
   ref
 ) {
   const generatedId = useId();
@@ -15,20 +16,16 @@ const SelectField = forwardRef(function SelectField(
       <label htmlFor={selectId} className={cx("field__label", hideLabel && "sr-only")}>
         {label}
       </label>
-      <select
+      <Select
         ref={ref}
         id={selectId}
-        className={cx("select", error && "input--invalid")}
-        aria-invalid={error ? true : undefined}
+        value={value}
+        options={options}
+        invalid={Boolean(error)}
         aria-describedby={message ? messageId : undefined}
+        onChange={(next) => onChange?.({ target: { name, value: next } })}
         {...selectProps}
-      >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      />
       {message && (
         <p id={messageId} className={error ? "field__error" : "field__hint"}>
           {message}

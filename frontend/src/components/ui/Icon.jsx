@@ -1,4 +1,11 @@
 const PATHS = {
+  "chevron-left": "M15 18l-6-6 6-6",
+  "chevron-right": "M9 18l6-6-6-6",
+  "chevrons-left": "M11 17l-5-5 5-5M18 17l-5-5 5-5",
+  "chevrons-right": "M13 17l5-5-5-5M6 17l5-5-5-5",
+  unfold: "M7 15l5 5 5-5M7 9l5-5 5 5",
+  enter: "M9 10l-5 5 5 5M20 4v7a4 4 0 0 1-4 4H4",
+  pointer: "M9 9l5 12 1.8-5.2L21 14zM7.2 2.2L8 5.1M5.1 8l-2.9-.8M14 4.1L12 6M6 12l-1.9 2",
   dashboard: "M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z",
   calendar: "M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z",
   timetable: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h8",

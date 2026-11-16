@@ -413,7 +413,9 @@
 
 .task-table td:first-child,
 .task-table th:first-child {
-  width: 44px;
+  width: 50px;
+  padding-right: 0;
+  text-align: center;
 }
 
 .task-table__title--done {

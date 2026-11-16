@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import Button from "../ui/Button.jsx";
+import DateField from "../ui/DateField.jsx";
 import Panel from "../ui/Panel.jsx";
 import SelectField from "../ui/SelectField.jsx";
 import TextField from "../ui/TextField.jsx";
@@ -45,7 +46,7 @@ export default function TaskForm({ courses, onSubmit }) {
 
   return (
     <Panel as="div" title="New item">
-      <form className="modal__form" onSubmit={handleSubmit} noValidate>
+      <form className="form-stack" onSubmit={handleSubmit} noValidate>
         <TextField
           label="Title"
           name="title"
@@ -81,10 +82,9 @@ export default function TaskForm({ courses, onSubmit }) {
           </div>
         </fieldset>
         <div className="form-row">
-          <TextField
+          <DateField
             label="Due date"
             name="date"
-            type="date"
             value={values.date}
             onChange={handleChange}
             error={errors.date}

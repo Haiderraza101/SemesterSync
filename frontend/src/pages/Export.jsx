@@ -145,7 +145,7 @@ export default function Export() {
           </div>
           <div className="page-grid__side">
             <Panel as="div" title="Options">
-              <div className="modal__form">
+              <div className="form-stack">
                 <fieldset>
                   <legend className="field__label export-options__legend">Format</legend>
                   <SegmentedControl label="Format" options={FORMAT_OPTIONS} value={format} onChange={setFormat} block />

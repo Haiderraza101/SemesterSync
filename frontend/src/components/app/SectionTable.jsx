@@ -1,6 +1,7 @@
 import Checkbox from "../ui/Checkbox.jsx";
 import CourseCell from "./CourseCell.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
+import Select from "../ui/Select.jsx";
 import { cx } from "../../utils/cx.js";
 import { getSlotKey } from "../../utils/clashes.js";
 import { SHORT_DAY_NAMES, formatTime } from "../../utils/date.js";
@@ -8,7 +9,7 @@ import { TYPE_LABELS } from "../../utils/sectionFilters.js";
 
 export default function SectionTable({ courses, draft, sectionOptions, clashingSlots, onToggle, onSectionChange }) {
   if (courses.length === 0) {
-    return <EmptyState icon="search" title="No courses match your search and filters" />;
+    return <EmptyState variant="compact" icon="search" title="No courses match your search and filters" />;
   }
 
   return (
@@ -50,21 +51,15 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
                   />
                 </td>
                 <td>
-                  <label className="sr-only" htmlFor={`section-${course.code}`}>
-                    Section for {course.name}
-                  </label>
-                  <select
+                  <Select
                     id={`section-${course.code}`}
-                    className="select section-table__select"
+                    size="sm"
+                    className="section-table__select"
+                    aria-label={`Section for ${course.name}`}
                     value={entry.section}
-                    onChange={(event) => onSectionChange(course.code, event.target.value)}
-                  >
-                    {options.map((section) => (
-                      <option key={section} value={section}>
-                        Section {section}
-                      </option>
-                    ))}
-                  </select>
+                    options={options.map((section) => ({ value: section, label: section }))}
+                    onChange={(section) => onSectionChange(course.code, section)}
+                  />
                 </td>
                 <td>
                   <div className="slot-list">

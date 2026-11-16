@@ -6,9 +6,11 @@ import SettingRow from "../components/settings/SettingRow.jsx";
 import Button from "../components/ui/Button.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
 import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import DatePicker from "../components/ui/DatePicker.jsx";
 import Notice from "../components/ui/Notice.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
+import Select from "../components/ui/Select.jsx";
 import Switch from "../components/ui/Switch.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
@@ -32,15 +34,7 @@ const VIEW_OPTIONS = [
 ];
 
 function SettingSelect({ id, options, value, onChange }) {
-  return (
-    <select id={id} className="select" value={value} onChange={(event) => onChange(event.target.value)}>
-      {options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
-  );
+  return <Select id={id} options={options} value={value} onChange={onChange} />;
 }
 
 function SemesterSettings({ settings, onChange }) {
@@ -101,22 +95,19 @@ function SemesterSettings({ settings, onChange }) {
           />
         </SettingRow>
         <SettingRow label="First teaching day" htmlFor="semester-start">
-          <input
+          <DatePicker
             id="semester-start"
-            type="date"
-            className="input"
             value={values.semesterStart}
-            onChange={update("semesterStart")}
+            max={values.semesterEnd || undefined}
+            onChange={(value) => update("semesterStart")({ target: { value } })}
           />
         </SettingRow>
         <SettingRow label="Last teaching day" htmlFor="semester-end">
-          <input
+          <DatePicker
             id="semester-end"
-            type="date"
-            className="input"
-            min={values.semesterStart || undefined}
             value={values.semesterEnd}
-            onChange={update("semesterEnd")}
+            min={values.semesterStart || undefined}
+            onChange={(value) => update("semesterEnd")({ target: { value } })}
           />
         </SettingRow>
       </Panel>

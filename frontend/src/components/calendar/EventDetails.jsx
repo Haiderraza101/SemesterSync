@@ -110,7 +110,7 @@ export default function EventDetails({ event, ...handlers }) {
   if (!event) {
     return (
       <section className="panel event-details">
-        <EmptyState
+        <EmptyState variant="compact"
           icon="calendar"
           title="Select an event"
           description="Click a class, exam or deadline to see its details."

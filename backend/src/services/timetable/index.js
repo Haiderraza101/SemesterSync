@@ -8,6 +8,11 @@ import { detectSemesterName } from "./workbookMeta.js";
 
 const FORMATS = [courseListFormat, roomGridFormat];
 const PRIORITY_WEIGHT = 0.1;
+
+function score({ format, result }) {
+  return result.entries.length * (1 + format.priority * PRIORITY_WEIGHT);
+}
+
 function loadWorkbook(buffer) {
   try {
     return readWorkbook(buffer);

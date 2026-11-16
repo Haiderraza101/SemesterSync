@@ -15,7 +15,7 @@ function getStatus(task, now) {
 export default function TaskTable({ tasks, now, onToggle, onDelete }) {
   if (tasks.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="compact"
         icon="tasks"
         title="Nothing here yet"
         description="Add assignments and quizzes with the form to track them."

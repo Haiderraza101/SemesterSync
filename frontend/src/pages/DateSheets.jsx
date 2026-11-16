@@ -214,7 +214,7 @@ export default function DateSheets() {
               }
             >
               {draft.exams.length === 0 ? (
-                <EmptyState
+                <EmptyState variant="compact"
                   title="No papers match your courses"
                   description="Check that you uploaded the right date sheet."
                 />

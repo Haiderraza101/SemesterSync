@@ -7,6 +7,7 @@ import { ToastProvider } from "./context/ToastContext.jsx";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/components.css";
+import "./styles/ui.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

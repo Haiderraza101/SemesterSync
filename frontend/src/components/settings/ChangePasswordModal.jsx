@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Button from "../ui/Button.jsx";
 import Modal from "../ui/Modal.jsx";
+import ModalSubmitButton from "../ui/ModalSubmitButton.jsx";
 import Notice from "../ui/Notice.jsx";
 import TextField from "../ui/TextField.jsx";
 import { useForm } from "../../hooks/useForm.js";
@@ -10,15 +10,16 @@ import { validatePasswordChange } from "../../utils/validation.js";
 
 const INITIAL_VALUES = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
-function PasswordForm({ onDone, onCancel }) {
+const FORM_ID = "change-password-form";
+
+function PasswordForm({ onDone, saving, setSaving }) {
   const { values, errors, setErrors, handleChange, validate } = useForm(INITIAL_VALUES, validatePasswordChange);
-  const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setFormError("");
-    if (!validate()) return;
+    if (saving || !validate()) return;
     setSaving(true);
     try {
       const { message } = await authService.changePassword({
@@ -34,7 +35,7 @@ function PasswordForm({ onDone, onCancel }) {
   };
 
   return (
-    <form className="modal__form" onSubmit={handleSubmit} noValidate>
+    <form id={FORM_ID} className="modal__form form-stack" onSubmit={handleSubmit} noValidate>
       {formError && <Notice variant="danger" title={formError} />}
       <TextField
         label="Current password"
@@ -64,20 +65,27 @@ function PasswordForm({ onDone, onCancel }) {
         onChange={handleChange}
         error={errors.confirmPassword}
       />
-      <div className="modal__form-actions">
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button type="submit" variant="primary" disabled={saving}>
-          {saving ? "Updating…" : "Update password"}
-        </Button>
-      </div>
     </form>
   );
 }
 
 export default function ChangePasswordModal({ open, onDone, onClose }) {
+  const [saving, setSaving] = useState(false);
+
+  const handleDone = (message) => {
+    setSaving(false);
+    onDone(message);
+  };
+
   return (
-    <Modal open={open} title="Change password" onClose={onClose}>
-      {open && <PasswordForm onDone={onDone} onCancel={onClose} />}
+    <Modal
+      open={open}
+      parent="Settings"
+      title="Change password"
+      onClose={onClose}
+      footer={<ModalSubmitButton label="Update password" busyLabel="Updating..." busy={saving} formId={FORM_ID} />}
+    >
+      {open && <PasswordForm onDone={handleDone} saving={saving} setSaving={setSaving} />}
     </Modal>
   );
 }

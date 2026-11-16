@@ -1,6 +1,7 @@
 import { useState } from "react";
-import Button from "../ui/Button.jsx";
+import DateField from "../ui/DateField.jsx";
 import Modal from "../ui/Modal.jsx";
+import ModalSubmitButton from "../ui/ModalSubmitButton.jsx";
 import TextField from "../ui/TextField.jsx";
 import { useSchedule } from "../../hooks/useSchedule.js";
 import { getSemester } from "../../utils/schedule.js";
@@ -31,7 +32,9 @@ function validate(values, semester) {
   return errors;
 }
 
-function MakeupForm({ instance, onSubmit, onCancel }) {
+const FORM_ID = "makeup-form";
+
+function MakeupForm({ instance, onSubmit }) {
   const { schedule } = useSchedule();
   const semester = getSemester(schedule);
   const [values, setValues] = useState(() => createInitialValues(instance));
@@ -58,11 +61,11 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
   };
 
   return (
-    <form className="modal__form" onSubmit={handleSubmit} noValidate>
-      <TextField
+    <form id={FORM_ID} className="modal__form form-stack" onSubmit={handleSubmit} noValidate>
+      {instance.course.name && <p className="text-muted">Reschedule {instance.course.name}.</p>}
+      <DateField
         label="Date"
         name="date"
-        type="date"
         min={semester.start || undefined}
         max={semester.end || undefined}
         value={values.date}
@@ -88,12 +91,6 @@ function MakeupForm({ instance, onSubmit, onCancel }) {
         />
       </div>
       <TextField label="Room" name="room" value={values.room} onChange={handleChange} error={errors.room} />
-      <div className="modal__form-actions">
-        <Button onClick={onCancel}>Cancel</Button>
-        <Button type="submit" variant="primary">
-          Add makeup class
-        </Button>
-      </div>
     </form>
   );
 }
@@ -102,11 +99,12 @@ export default function MakeupModal({ instance, onSubmit, onClose }) {
   return (
     <Modal
       open={Boolean(instance)}
+      parent="Calendar"
       title="Add makeup class"
-      description={instance ? instance.course.name : undefined}
       onClose={onClose}
+      footer={<ModalSubmitButton label="Add makeup class" formId={FORM_ID} />}
     >
-      {instance && <MakeupForm key={instance.id} instance={instance} onSubmit={onSubmit} onCancel={onClose} />}
+      {instance && <MakeupForm key={instance.id} instance={instance} onSubmit={onSubmit} />}
     </Modal>
   );
 }

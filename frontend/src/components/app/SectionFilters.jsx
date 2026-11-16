@@ -1,18 +1,12 @@
 import Icon from "../ui/Icon.jsx";
+import Select from "../ui/Select.jsx";
 import { SCOPES, TYPE_OPTIONS } from "../../utils/sectionFilters.js";
 
 function FilterSelect({ label, value, options, onChange }) {
   return (
-    <label className="filter-select">
-      <span className="sr-only">{label}</span>
-      <select className="select" value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div className="filter-select">
+      <Select aria-label={label} value={value} options={options} onChange={onChange} />
+    </div>
   );
 }
 

@@ -27,7 +27,7 @@ const RISK_BADGES = {
 
 function TodayMarking({ classes, marks, onMark }) {
   if (classes.length === 0) {
-    return <EmptyState icon="calendar" title="No classes to mark today" />;
+    return <EmptyState variant="compact" icon="calendar" title="No classes to mark today" />;
   }
 
   return (

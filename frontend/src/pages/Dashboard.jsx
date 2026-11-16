@@ -54,7 +54,7 @@ function getClassStatus(instance, now) {
 function TodayClasses({ classes, marks, now, onToggle }) {
   if (classes.length === 0) {
     return (
-      <EmptyState
+      <EmptyState variant="compact"
         icon="calendar"
         title="No classes today"
         description="Enjoy the free day, or catch up on assignments."
@@ -118,7 +118,7 @@ function TodayClasses({ classes, marks, now, onToggle }) {
 function UpcomingList({ items }) {
   if (items.length === 0) {
     return (
-      <EmptyState icon="tasks" title="Nothing coming up" description="Exams and deadlines you add will appear here." />
+      <EmptyState variant="compact" icon="tasks" title="Nothing coming up" description="Exams and deadlines you add will appear here." />
     );
   }
 
