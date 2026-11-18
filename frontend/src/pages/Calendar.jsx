@@ -1,64 +1,68 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import SemesterNotice from "../components/app/SemesterNotice.jsx";
+import CalendarHeader from "../components/calendar/CalendarHeader.jsx";
 import CalendarLegend from "../components/calendar/CalendarLegend.jsx";
-import CalendarToolbar from "../components/calendar/CalendarToolbar.jsx";
-import CalendarView from "../components/calendar/CalendarView.jsx";
 import CourseFilter from "../components/calendar/CourseFilter.jsx";
 import EventDetails from "../components/calendar/EventDetails.jsx";
 import MakeupModal from "../components/calendar/MakeupModal.jsx";
+import MonthGrid from "../components/calendar/MonthGrid.jsx";
+import TimeGrid from "../components/calendar/TimeGrid.jsx";
 import Button from "../components/ui/Button.jsx";
+import Sheet from "../components/ui/Sheet.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
-import { buildCalendarEvents } from "../utils/calendarEvents.js";
+import { buildCalendarEvents, toCalendarItem } from "../utils/calendarEvents.js";
+import { formatTitle, getRange, getVisibleDays, viewFromSetting, weekdayIndexes } from "../utils/calendarLayout.js";
 import { findClashes, getClashingSlotKeys } from "../utils/clashes.js";
+import { startOfDay } from "../utils/date.js";
 import { getSelectedCourses } from "../utils/schedule.js";
 import "../styles/pages/calendar.css";
+
+const ALL = "all";
 
 export default function Calendar() {
   const { schedule, toggleCancelled, markAttendance, addMakeup, removeMakeup } = useSchedule();
   const { notify } = useToast();
-  const calendarRef = useRef(null);
-  const [range, setRange] = useState(null);
-  const [title, setTitle] = useState("");
-  const [view, setView] = useState(schedule.settings.defaultView);
+  const { showSaturday, defaultView } = schedule.settings;
+  const [view, setView] = useState(() => viewFromSetting(defaultView));
+  const [date, setDate] = useState(() => startOfDay(new Date()));
   const [selectedId, setSelectedId] = useState(null);
   const [hiddenCodes, setHiddenCodes] = useState(() => new Set());
+  const [focusCode, setFocusCode] = useState(ALL);
+  const [kind, setKind] = useState(ALL);
   const [makeupFor, setMakeupFor] = useState(null);
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const clashingSlots = useMemo(() => getClashingSlotKeys(findClashes(courses)), [courses]);
+  const range = useMemo(() => getRange(view, date, showSaturday), [view, date, showSaturday]);
+
+  const effectiveHidden = useMemo(() => {
+    if (focusCode === ALL) return hiddenCodes;
+    return new Set(courses.map((course) => course.code).filter((code) => code !== focusCode));
+  }, [focusCode, hiddenCodes, courses]);
 
   const events = useMemo(
-    () => buildCalendarEvents({ schedule, courses, range, clashingSlots, hiddenCodes }),
-    [schedule, courses, range, clashingSlots, hiddenCodes]
+    () => buildCalendarEvents({ schedule, courses, range, clashingSlots, hiddenCodes: effectiveHidden }),
+    [schedule, courses, range, clashingSlots, effectiveHidden]
   );
 
-  const displayedEvents = useMemo(
+  const items = useMemo(
     () =>
-      events.map((event) =>
-        event.id === selectedId ? { ...event, classNames: [...event.classNames, "ss-event--selected"] } : event
-      ),
-    [events, selectedId]
+      events
+        .map(toCalendarItem)
+        .filter((item) => kind === ALL || (kind === "class" ? item.type === "class" : item.type === kind)),
+    [events, kind]
+  );
+
+  const courseOptions = useMemo(
+    () => [
+      { value: ALL, label: "All courses" },
+      ...courses.map((course) => ({ value: course.code, label: course.shortName || course.name })),
+    ],
+    [courses]
   );
 
   const selectedEvent = events.find((event) => event.id === selectedId) || null;
-
-  const getApi = () => calendarRef.current?.getApi();
-
-  const handleDatesSet = useCallback((info) => {
-    setRange((current) =>
-      current && current.start.getTime() === info.start.getTime() && current.end.getTime() === info.end.getTime()
-        ? current
-        : { start: info.start, end: info.end }
-    );
-    setTitle(info.view.title);
-    setView(info.view.type);
-  }, []);
-
-  const handleEventClick = useCallback((info) => {
-    info.jsEvent.preventDefault();
-    setSelectedId(info.event.id);
-  }, []);
 
   const handleToggleCancel = (id) => {
     const wasCancelled = schedule.cancelled.includes(id);
@@ -88,46 +92,70 @@ export default function Calendar() {
     });
   };
 
+  const openDay = (day) => {
+    setDate(startOfDay(day));
+    setView("day");
+  };
+
   return (
     <>
       <SemesterNotice />
-      <CalendarToolbar
-        title={title}
+      <CalendarHeader
         view={view}
-        onPrev={() => getApi()?.prev()}
-        onNext={() => getApi()?.next()}
-        onToday={() => getApi()?.today()}
-        onViewChange={(nextView) => getApi()?.changeView(nextView)}
+        date={date}
+        title={formatTitle(view, date, showSaturday)}
+        showSaturday={showSaturday}
+        courseOptions={courseOptions}
+        focusCode={focusCode}
+        kind={kind}
+        onViewChange={setView}
+        onDateChange={setDate}
+        onFocusChange={setFocusCode}
+        onKindChange={setKind}
         actions={
-          <Button to="/app/tasks" variant="primary">
+          <Button to="/app/tasks" variant="primary" className="cal-header__action">
             Add task
           </Button>
         }
       />
       <div className="calendar-layout">
         <div className="calendar-layout__main">
-          <CalendarView
-            ref={calendarRef}
-            events={displayedEvents}
-            initialView={schedule.settings.defaultView}
-            showSaturday={schedule.settings.showSaturday}
-            onDatesSet={handleDatesSet}
-            onEventClick={handleEventClick}
-          />
+          {view === "month" ? (
+            <MonthGrid
+              month={date}
+              weekdays={weekdayIndexes(showSaturday)}
+              items={items}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onOpenDay={openDay}
+            />
+          ) : (
+            <TimeGrid
+              days={getVisibleDays(view, date, showSaturday)}
+              items={items}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+          )}
         </div>
-        <aside className="calendar-layout__side" aria-label="Calendar details">
-          <EventDetails
-            event={selectedEvent}
-            attendance={selectedEvent ? schedule.attendance.marks[selectedEvent.id] : undefined}
-            onToggleCancel={handleToggleCancel}
-            onMarkAttendance={markAttendance}
-            onAddMakeup={setMakeupFor}
-            onRemoveMakeup={handleRemoveMakeup}
-          />
+        <div className="calendar-layout__extras">
           {courses.length > 0 && <CourseFilter courses={courses} hiddenCodes={hiddenCodes} onToggle={toggleCourse} />}
           <CalendarLegend />
-        </aside>
+        </div>
       </div>
+      <Sheet open={Boolean(selectedEvent)} title="Event details" onClose={() => setSelectedId(null)}>
+        <EventDetails
+          event={selectedEvent}
+          attendance={selectedEvent ? schedule.attendance.marks[selectedEvent.id] : undefined}
+          onToggleCancel={handleToggleCancel}
+          onMarkAttendance={markAttendance}
+          onAddMakeup={(instance) => {
+            setSelectedId(null);
+            setMakeupFor(instance);
+          }}
+          onRemoveMakeup={handleRemoveMakeup}
+        />
+      </Sheet>
       <MakeupModal instance={makeupFor} onSubmit={handleMakeupSubmit} onClose={() => setMakeupFor(null)} />
     </>
   );

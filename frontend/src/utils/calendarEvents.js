@@ -33,7 +33,6 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
         title: instance.course.shortName,
         start: startsAt,
         end: combineDateTime(instance.dateKey, instance.end),
-        classNames: ["ss-event", `ss-event--${variant}`],
         extendedProps: { type: "class", variant, instance },
       };
     }
@@ -46,7 +45,6 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
       title: `${examTermLabel(exam.term)}: ${exam.course.shortName}`,
       start: exam.startsAt,
       end: combineDateTime(exam.date, exam.end),
-      classNames: ["ss-event", "ss-event--exam"],
       extendedProps: { type: "exam", variant: "exam", exam },
     }));
 
@@ -57,9 +55,72 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
       title: task.title,
       start: task.dueAt,
       end: new Date(task.dueAt.getTime() + TASK_DURATION_MINUTES * 60 * 1000),
-      classNames: ["ss-event", "ss-event--task"],
       extendedProps: { type: "task", variant: "task", task },
     }));
 
   return [...classEvents, ...examEvents, ...taskEvents];
+}
+
+export const EXAM_COLOR = "#1f2933";
+export const TASK_COLOR = "#8a2c22";
+
+const STATUS_LABELS = {
+  class: "Class",
+  makeup: "Makeup",
+  cancelled: "Cancelled",
+  clash: "Clash",
+};
+
+export function toCalendarItem(event) {
+  const { type, variant } = event.extendedProps;
+
+  if (type === "exam") {
+    const { exam } = event.extendedProps;
+    return {
+      id: event.id,
+      event,
+      type,
+      variant,
+      start: event.start,
+      end: event.end,
+      title: exam.course.name,
+      shortTitle: exam.course.shortName,
+      status: examTermLabel(exam.term),
+      place: exam.venue || "Venue not announced",
+      color: EXAM_COLOR,
+    };
+  }
+
+  if (type === "task") {
+    const { task } = event.extendedProps;
+    return {
+      id: event.id,
+      event,
+      type,
+      variant,
+      start: event.start,
+      end: event.end,
+      title: task.title,
+      shortTitle: task.title,
+      status: task.type === "quiz" ? "Quiz" : "Deadline",
+      place: task.course?.name || "",
+      color: TASK_COLOR,
+    };
+  }
+
+  const { instance } = event.extendedProps;
+  return {
+    id: event.id,
+    event,
+    type,
+    variant,
+    start: event.start,
+    end: event.end,
+    title: instance.course.name,
+    shortTitle: instance.course.shortName,
+    status: STATUS_LABELS[variant] || "Class",
+    place: instance.room,
+    section: instance.course.section,
+    color: instance.course.color,
+  };
 }

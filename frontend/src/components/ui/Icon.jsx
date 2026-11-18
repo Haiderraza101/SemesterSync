@@ -1,5 +1,7 @@
 const PATHS = {
   "chevron-left": "M15 18l-6-6 6-6",
+  "chevron-up": "M18 15l-6-6-6 6",
+  "chevron-down": "M6 9l6 6 6-6",
   "chevron-right": "M9 18l6-6-6-6",
   "chevrons-left": "M11 17l-5-5 5-5M18 17l-5-5 5-5",
   "chevrons-right": "M13 17l5-5-5-5M6 17l5-5-5-5",

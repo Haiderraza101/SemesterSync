@@ -11,7 +11,10 @@ export default function Floating({
   matchWidth = false,
   offset = 4,
   align = "start",
+  placement = "bottom",
+  closeOnOutside = true,
   className,
+  style,
   children,
   ...props
 }) {
@@ -33,6 +36,14 @@ export default function Floating({
 
       const rect = anchor.getBoundingClientRect();
       const height = panel.offsetHeight;
+      if (placement === "side") {
+        const sideWidth = panel.offsetWidth;
+        const fitsRight = rect.right + offset + sideWidth + VIEWPORT_MARGIN <= window.innerWidth;
+        const sideLeft = fitsRight ? rect.right + offset : Math.max(VIEWPORT_MARGIN, rect.left - sideWidth - offset);
+        const sideTop = Math.min(Math.max(VIEWPORT_MARGIN, rect.top), window.innerHeight - height - VIEWPORT_MARGIN);
+        setPosition({ top: sideTop, left: sideLeft, side: fitsRight ? "right" : "left" });
+        return;
+      }
       const width = matchWidth ? Math.max(rect.width, panel.offsetWidth) : panel.offsetWidth;
       const spaceBelow = window.innerHeight - rect.bottom;
       const placeTop = spaceBelow < height + offset + VIEWPORT_MARGIN && rect.top > spaceBelow;
@@ -58,10 +69,10 @@ export default function Floating({
       window.removeEventListener("resize", update);
       window.removeEventListener("scroll", update, true);
     };
-  }, [open, anchorRef, matchWidth, offset, align]);
+  }, [open, anchorRef, matchWidth, offset, align, placement]);
 
   useEffect(() => {
-    if (!open) return undefined;
+    if (!open || !closeOnOutside) return undefined;
 
     const handlePointer = (event) => {
       if (panelRef.current?.contains(event.target) || anchorRef.current?.contains(event.target)) return;
@@ -81,7 +92,7 @@ export default function Floating({
       document.removeEventListener("touchstart", handlePointer);
       document.removeEventListener("keydown", handleKey, true);
     };
-  }, [open, anchorRef]);
+  }, [open, anchorRef, closeOnOutside]);
 
   if (!open) return null;
 
@@ -91,6 +102,7 @@ export default function Floating({
       className={cx("ui-popover", className)}
       data-side={position.side}
       style={{
+        ...style,
         top: position.top,
         left: position.left,
         width: position.width,
