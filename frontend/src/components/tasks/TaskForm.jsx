@@ -4,6 +4,7 @@ import DateField from "../ui/DateField.jsx";
 import Panel from "../ui/Panel.jsx";
 import SelectField from "../ui/SelectField.jsx";
 import TextField from "../ui/TextField.jsx";
+import TimeField from "../ui/TimeField.jsx";
 import { useForm } from "../../hooks/useForm.js";
 import { TASK_REMINDER_OPTIONS } from "../../utils/reminders.js";
 import { validateTask } from "../../utils/validation.js";
@@ -89,10 +90,9 @@ export default function TaskForm({ courses, onSubmit }) {
             onChange={handleChange}
             error={errors.date}
           />
-          <TextField
+          <TimeField
             label="Time"
             name="time"
-            type="time"
             value={values.time}
             onChange={handleChange}
             error={errors.time}

@@ -923,201 +923,6 @@
   transform: translateY(-50%);
 }
 
-.ui-calendar-popover {
-  width: 350px;
-  border-radius: var(--ui-radius-3xl);
-  box-shadow: var(--ui-shadow-popover);
-}
-
-.ui-calendar {
-  box-sizing: border-box;
-  width: 350px;
-  max-width: 100%;
-  padding: 20px;
-  overflow: hidden;
-  user-select: none;
-}
-
-.ui-drawer .ui-calendar {
-  width: 100%;
-  padding: 8px 20px 24px;
-}
-
-.ui-calendar__caption {
-  position: relative;
-  display: flex;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 32px;
-}
-
-.ui-calendar__label {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--ui-foreground);
-}
-
-.ui-calendar__nav {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  height: 40px;
-  align-items: center;
-  justify-content: space-between;
-  pointer-events: none;
-}
-
-.ui-calendar__nav-group {
-  display: flex;
-  gap: 6px;
-  pointer-events: auto;
-}
-
-.ui-calendar__nav-button {
-  display: inline-flex;
-  width: 36px;
-  height: 36px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--ui-primary-20);
-  border-radius: var(--ui-radius-lg);
-  background: var(--color-surface);
-  color: var(--ui-primary);
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.ui-calendar__nav-button:hover {
-  background: var(--ui-muted);
-}
-
-.ui-calendar__nav-button:active {
-  transform: scale(0.95);
-}
-
-.ui-calendar__double {
-  display: flex;
-}
-
-.ui-calendar__double svg + svg {
-  margin-left: -10px;
-}
-
-.ui-calendar__weekdays {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.ui-calendar__weekday {
-  display: flex;
-  width: 44px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: rgba(107, 114, 128, 0.6);
-  text-transform: uppercase;
-}
-
-.ui-calendar__weeks {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ui-calendar__week {
-  display: flex;
-  justify-content: space-between;
-}
-
-.ui-calendar__day {
-  position: relative;
-  display: flex;
-  width: 44px;
-  height: 44px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: var(--ui-radius-xl);
-  background: transparent;
-  color: var(--ui-foreground);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.ui-calendar__day:hover {
-  background: var(--ui-muted);
-}
-
-.ui-calendar__day:focus-visible {
-  outline: 2px solid var(--ui-primary-20);
-  outline-offset: 1px;
-}
-
-.ui-calendar__day--today {
-  font-weight: 700;
-  color: var(--ui-primary);
-}
-
-.ui-calendar__day--today::after {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: var(--ui-primary);
-  content: "";
-  transform: translateX(-50%);
-}
-
-.ui-calendar__day--outside {
-  color: rgba(107, 114, 128, 0.3);
-  opacity: 0.5;
-}
-
-.ui-calendar__day--selected,
-.ui-calendar__day--selected:hover {
-  z-index: 10;
-  background: var(--ui-primary);
-  color: var(--ui-primary-foreground);
-  opacity: 1;
-}
-
-.ui-calendar__day--selected.ui-calendar__day--today::after {
-  background: var(--ui-primary-foreground);
-}
-
-.ui-calendar__day:disabled {
-  color: rgba(107, 114, 128, 0.3);
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.ui-calendar__day:disabled:hover {
-  background: transparent;
-}
-
-@media (max-width: 400px) {
-  .ui-calendar__day,
-  .ui-calendar__weekday {
-    width: 38px;
-  }
-
-  .ui-calendar__day {
-    height: 38px;
-  }
-}
-
 .form-stack {
   display: flex;
   flex-direction: column;
@@ -1225,4 +1030,226 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+}
+
+.period-picker-popover {
+  border-radius: var(--ui-radius-xl);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 0 1px #e5e7eb;
+}
+
+.period-picker {
+  width: 380px;
+  max-width: calc(100vw - 16px);
+  padding: 16px;
+  background: var(--color-surface);
+}
+
+.period-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.period-picker__group {
+  display: flex;
+  gap: 4px;
+}
+
+.period-picker__nav {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.period-picker__nav:hover {
+  background: var(--color-primary-soft);
+}
+
+.period-picker__nav-second {
+  margin-left: -16px;
+}
+
+.period-picker__nav:has(.period-picker__nav-second) svg:first-child {
+  margin-left: 6px;
+}
+
+.period-picker__title {
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
+}
+
+.period-picker__weekdays,
+.period-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.period-picker__weekdays {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.period-picker__grid {
+  row-gap: 8px;
+}
+
+.period-picker__day {
+  display: flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #1f2937;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.period-picker__day:hover {
+  background: var(--color-primary-soft);
+}
+
+.period-picker__day--outside {
+  color: #d1d5db;
+}
+
+.period-picker__day--today {
+  box-shadow: inset 0 0 0 1px var(--color-primary-border);
+}
+
+.period-picker__day--hovered {
+  background: #d6e1ee;
+}
+
+.period-picker__day--selected,
+.period-picker__day--selected:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.period-picker__footer {
+  display: flex;
+  margin-top: 16px;
+  padding-left: 16px;
+}
+
+.period-picker__today {
+  width: 110px;
+  height: 36px;
+  border: 1px solid var(--color-primary-border);
+  border-radius: var(--ui-radius-md);
+  background: var(--color-surface);
+  color: #1f2937;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.period-picker__today:hover {
+  background: var(--color-primary-soft);
+}
+
+.period-picker__day:disabled,
+.period-picker__day:disabled:hover {
+  background: transparent;
+  color: #e5e7eb;
+  cursor: not-allowed;
+}
+
+.period-picker__today:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-drawer--picker .period-picker {
+  width: 100%;
+  max-width: none;
+  padding: 16px 16px 28px;
+}
+
+.time-picker-popover {
+  width: 200px;
+  border-radius: var(--ui-radius-3xl);
+  box-shadow: var(--ui-shadow-popover);
+}
+
+.time-picker {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-surface);
+  color: #171717;
+}
+
+.time-picker-drawer .time-picker {
+  padding: 8px 16px 24px;
+}
+
+.time-picker__column {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.time-picker__label {
+  margin-bottom: 8px;
+  padding: 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #a3a3a3;
+  text-transform: uppercase;
+}
+
+.time-picker__list {
+  height: 240px;
+  overflow-y: auto;
+  padding: 4px;
+  border-radius: var(--ui-radius-xl);
+  background: #fafafa;
+  scrollbar-width: none;
+}
+
+.time-picker__list::-webkit-scrollbar {
+  display: none;
+}
+
+.time-picker__option {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--ui-radius-lg);
+  background: transparent;
+  color: #404040;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.time-picker__option:hover {
+  background: #f5f5f5;
+}
+
+.time-picker__option--selected,
+.time-picker__option--selected:hover {
+  background: var(--ui-primary);
+  color: #ffffff;
 }

@@ -2,6 +2,7 @@ import Schedule from "../models/Schedule.js";
 import ShareCode from "../models/ShareCode.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
+import { deleteUserLectures } from "./lectureService.js";
 import { deleteUserSessions } from "./sessionService.js";
 
 const PROFILE_FIELDS = ["name", "email", "rollNumber", "section"];
@@ -29,6 +30,7 @@ export async function deleteAccount(user) {
     Schedule.deleteOne({ user: user._id }),
     ShareCode.deleteMany({ owner: user._id }),
     deleteUserSessions(user._id),
+    deleteUserLectures(user._id),
   ]);
   await user.deleteOne();
 }

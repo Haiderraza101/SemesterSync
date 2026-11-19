@@ -143,7 +143,7 @@ export default function Calendar() {
           <CalendarLegend />
         </div>
       </div>
-      <Sheet open={Boolean(selectedEvent)} title="Event details" onClose={() => setSelectedId(null)}>
+      <Sheet open={Boolean(selectedEvent)} title={selectedEvent?.extendedProps.type === "class" ? "Lecture" : "Event details"} onClose={() => setSelectedId(null)}>
         <EventDetails
           event={selectedEvent}
           attendance={selectedEvent ? schedule.attendance.marks[selectedEvent.id] : undefined}

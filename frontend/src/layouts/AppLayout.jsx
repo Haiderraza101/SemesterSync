@@ -6,6 +6,7 @@ import Logo from "../components/ui/Logo.jsx";
 import "../styles/app.css";
 
 const SIDEBAR_ID = "app-sidebar";
+const WIDE_ROUTES = ["/app/calendar"];
 
 export default function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,7 +46,7 @@ export default function AppLayout() {
       <Sidebar id={SIDEBAR_ID} open={menuOpen} onNavigate={() => setMenuOpen(false)} />
       {menuOpen && <div className="app-overlay" aria-hidden="true" onClick={() => setMenuOpen(false)} />}
       <main id="main-content" className="app-main" tabIndex={-1}>
-        <div className="app-content">
+        <div className={WIDE_ROUTES.includes(location.pathname) ? "app-content app-content--wide" : "app-content"}>
           <Outlet />
         </div>
       </main>

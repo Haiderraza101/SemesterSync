@@ -124,6 +124,10 @@
   padding: var(--space-7) var(--space-7) 40px;
 }
 
+.app-content--wide {
+  max-width: none;
+}
+
 .page-grid {
   display: flex;
   flex-wrap: wrap;

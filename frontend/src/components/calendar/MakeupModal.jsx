@@ -3,6 +3,7 @@ import DateField from "../ui/DateField.jsx";
 import Modal from "../ui/Modal.jsx";
 import ModalSubmitButton from "../ui/ModalSubmitButton.jsx";
 import TextField from "../ui/TextField.jsx";
+import TimeField from "../ui/TimeField.jsx";
 import { useSchedule } from "../../hooks/useSchedule.js";
 import { getSemester } from "../../utils/schedule.js";
 import { addDays, parseDateKey, timeToMinutes, toDateKey } from "../../utils/date.js";
@@ -73,18 +74,16 @@ function MakeupForm({ instance, onSubmit }) {
         error={errors.date}
       />
       <div className="form-row">
-        <TextField
+        <TimeField
           label="Start time"
           name="start"
-          type="time"
           value={values.start}
           onChange={handleChange}
           error={errors.start}
         />
-        <TextField
+        <TimeField
           label="End time"
           name="end"
-          type="time"
           value={values.end}
           onChange={handleChange}
           error={errors.end}

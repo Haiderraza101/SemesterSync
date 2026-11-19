@@ -108,8 +108,8 @@ function columnTemplate(days, itemsByDay) {
   return `80px ${columns.join(" ")}`;
 }
 
-function GridBody({ days, itemsByDay, hours, startHour, selectedId, onSelect, now, corner }) {
-  const template = columnTemplate(days, itemsByDay);
+function GridBody({ days, itemsByDay, hours, startHour, selectedId, onSelect, now, corner, fit = false }) {
+  const template = fit ? `80px repeat(${days.length}, minmax(0, 1fr))` : columnTemplate(days, itemsByDay);
   return (
     <div className="cal-grid__table">
       <div className="cal-grid__row cal-grid__row--head" style={{ gridTemplateColumns: template }}>
@@ -178,7 +178,7 @@ function DesktopGrid({ days, ...gridProps }) {
   return (
     <div className="cal-grid">
       <div ref={scrollRef} className="cal-grid__scroll scrollbar-premium">
-        <GridBody days={days} {...gridProps} corner={overflowing ? <ScrollButtons onScroll={scroll} /> : null} />
+        <GridBody days={days} {...gridProps} fit corner={overflowing ? <ScrollButtons onScroll={scroll} /> : null} />
       </div>
     </div>
   );

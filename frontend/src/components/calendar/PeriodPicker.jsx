@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { addDays, isSameDay, startOfDay } from "../../utils/date.js";
+import { addDays, isSameDay, startOfDay, toDateKey } from "../../utils/date.js";
 import { startOfWeek } from "../../utils/calendarLayout.js";
 import { cx } from "../../utils/cx.js";
 import Icon from "../ui/Icon.jsx";
@@ -27,12 +27,17 @@ function NavButton({ label, onClick, double, direction }) {
   );
 }
 
-export default function PeriodPicker({ mode, value, onSelect }) {
-  const [month, setMonth] = useState(() => new Date(value.getFullYear(), value.getMonth(), 1));
+export default function PeriodPicker({ mode, value, onSelect, min, max }) {
+  const today = startOfDay(new Date());
+  const anchor = value || (min && toDateKey(today) < min ? new Date(`${min}T00:00`) : today);
+  const [month, setMonth] = useState(() => new Date(anchor.getFullYear(), anchor.getMonth(), 1));
   const [hoverWeek, setHoverWeek] = useState(null);
   const days = useMemo(() => buildDays(month), [month]);
-  const selectedWeek = startOfWeek(value).getTime();
-  const today = startOfDay(new Date());
+  const selectedWeek = value ? startOfWeek(value).getTime() : null;
+  const isDisabled = (date) => {
+    const key = toDateKey(date);
+    return Boolean((min && key < min) || (max && key > max));
+  };
 
   const changeMonth = (offset) => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + offset, 1));
 
@@ -57,7 +62,7 @@ export default function PeriodPicker({ mode, value, onSelect }) {
       <div className="period-picker__grid" onMouseLeave={() => setHoverWeek(null)}>
         {days.map(({ date, currentMonth }) => {
           const week = startOfWeek(date).getTime();
-          const selected = mode === "week" ? week === selectedWeek : isSameDay(date, value);
+          const selected = Boolean(value) && (mode === "week" ? week === selectedWeek : isSameDay(date, value));
           const hovered = mode === "week" && hoverWeek === week && !selected;
           return (
             <button
@@ -71,6 +76,7 @@ export default function PeriodPicker({ mode, value, onSelect }) {
                 isSameDay(date, today) && "period-picker__day--today"
               )}
               aria-pressed={selected}
+              disabled={isDisabled(date)}
               onMouseEnter={() => setHoverWeek(week)}
               onClick={() => onSelect(date)}
             >
@@ -80,7 +86,7 @@ export default function PeriodPicker({ mode, value, onSelect }) {
         })}
       </div>
       <div className="period-picker__footer">
-        <button type="button" className="period-picker__today" onClick={() => onSelect(today)}>
+        <button type="button" className="period-picker__today" disabled={isDisabled(today)} onClick={() => onSelect(today)}>
           Today
         </button>
       </div>

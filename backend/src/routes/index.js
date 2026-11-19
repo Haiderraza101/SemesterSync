@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes.js";
 import dateSheetRoutes from "./dateSheetRoutes.js";
+import lectureRoutes from "./lectureRoutes.js";
 import scheduleRoutes from "./scheduleRoutes.js";
 import shareRoutes from "./shareRoutes.js";
 import timetableRoutes from "./timetableRoutes.js";
@@ -18,5 +19,6 @@ router.use("/schedule", scheduleRoutes);
 router.use("/share", shareRoutes);
 router.use("/timetable", timetableRoutes);
 router.use("/datesheets", dateSheetRoutes);
+router.use("/lectures", lectureRoutes);
 
 export default router;

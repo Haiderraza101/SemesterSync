@@ -86,7 +86,7 @@ export function toCalendarItem(event) {
       title: exam.course.name,
       shortTitle: exam.course.shortName,
       status: examTermLabel(exam.term),
-      place: exam.venue || "Venue not announced",
+      place: exam.venue || "",
       color: EXAM_COLOR,
     };
   }

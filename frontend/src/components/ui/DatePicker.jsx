@@ -1,15 +1,18 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import { cx } from "../../utils/cx.js";
-import Calendar, { fromDateKey } from "./Calendar.jsx";
+import { parseDateKey, toDateKey } from "../../utils/date.js";
+import PeriodPicker from "../calendar/PeriodPicker.jsx";
 import Drawer from "./Drawer.jsx";
 import Floating from "./Floating.jsx";
 import Icon from "./Icon.jsx";
 
+const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
 function formatDisplay(key) {
-  const date = fromDateKey(key);
-  if (!date) return "";
-  return `${String(date.getDate()).padStart(2, "0")}/${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+  if (!DATE_KEY_PATTERN.test(key || "")) return "";
+  const [year, month, day] = key.split("-");
+  return `${day}/${month}/${year}`;
 }
 
 const DatePicker = forwardRef(function DatePicker(
@@ -28,8 +31,8 @@ const DatePicker = forwardRef(function DatePicker(
     if (restoreFocus) inputRef.current?.focus();
   };
 
-  const handleSelect = (key) => {
-    onChange?.(key);
+  const handleSelect = (date) => {
+    onChange?.(toDateKey(date));
     close({ restoreFocus: !isMobile });
   };
 
@@ -43,7 +46,15 @@ const DatePicker = forwardRef(function DatePicker(
     }
   };
 
-  const calendar = <Calendar value={value} min={min} max={max} onSelect={handleSelect} autoFocus />;
+  const picker = (
+    <PeriodPicker
+      mode="day"
+      value={DATE_KEY_PATTERN.test(value || "") ? parseDateKey(value) : null}
+      min={min}
+      max={max}
+      onSelect={handleSelect}
+    />
+  );
 
   return (
     <div ref={anchorRef} className={cx("ui-datepicker", className)}>
@@ -66,8 +77,8 @@ const DatePicker = forwardRef(function DatePicker(
         <Icon name="calendar" size={18} strokeWidth={2} />
       </span>
       {isMobile ? (
-        <Drawer open={open} onClose={() => close()} role="dialog" aria-label="Choose a date">
-          {calendar}
+        <Drawer open={open} onClose={() => close()} role="dialog" aria-label="Choose a date" className="ui-drawer--picker">
+          {picker}
         </Drawer>
       ) : (
         <Floating
@@ -75,11 +86,11 @@ const DatePicker = forwardRef(function DatePicker(
           open={open}
           onClose={close}
           offset={8}
-          className="ui-calendar-popover"
+          className="period-picker-popover"
           role="dialog"
           aria-label="Choose a date"
         >
-          {calendar}
+          {picker}
         </Floating>
       )}
     </div>

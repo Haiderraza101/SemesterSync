@@ -251,6 +251,10 @@
   flex-direction: column;
 }
 
+.cal-grid > .cal-grid__scroll > .cal-grid__table {
+  min-width: 100%;
+}
+
 .cal-grid__row {
   display: grid;
 }
@@ -794,138 +798,6 @@
   text-decoration: underline;
 }
 
-.period-picker-popover {
-  border-radius: var(--ui-radius-xl);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1), 0 0 0 1px #e5e7eb;
-}
-
-.period-picker {
-  width: 380px;
-  max-width: calc(100vw - 16px);
-  padding: 16px;
-  background: var(--color-surface);
-}
-
-.period-picker__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.period-picker__group {
-  display: flex;
-  gap: 4px;
-}
-
-.period-picker__nav {
-  display: inline-flex;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--ui-radius-md);
-  background: var(--color-surface);
-  color: var(--color-primary);
-  cursor: pointer;
-}
-
-.period-picker__nav:hover {
-  background: var(--color-primary-soft);
-}
-
-.period-picker__nav-second {
-  margin-left: -16px;
-}
-
-.period-picker__nav:has(.period-picker__nav-second) svg:first-child {
-  margin-left: 6px;
-}
-
-.period-picker__title {
-  font-size: 16px;
-  font-weight: 400;
-  color: #000000;
-}
-
-.period-picker__weekdays,
-.period-picker__grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
-
-.period-picker__weekdays {
-  margin-bottom: 8px;
-  font-size: 12px;
-  font-weight: 300;
-  color: var(--color-primary);
-  text-align: center;
-}
-
-.period-picker__grid {
-  row-gap: 8px;
-}
-
-.period-picker__day {
-  display: flex;
-  width: 36px;
-  height: 36px;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #1f2937;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.period-picker__day:hover {
-  background: var(--color-primary-soft);
-}
-
-.period-picker__day--outside {
-  color: #d1d5db;
-}
-
-.period-picker__day--today {
-  box-shadow: inset 0 0 0 1px var(--color-primary-border);
-}
-
-.period-picker__day--hovered {
-  background: #d6e1ee;
-}
-
-.period-picker__day--selected,
-.period-picker__day--selected:hover {
-  background: var(--color-primary);
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.period-picker__footer {
-  display: flex;
-  margin-top: 16px;
-  padding-left: 16px;
-}
-
-.period-picker__today {
-  width: 110px;
-  height: 36px;
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--ui-radius-md);
-  background: var(--color-surface);
-  color: #1f2937;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.period-picker__today:hover {
-  background: var(--color-primary-soft);
-}
-
 .calendar-layout {
   display: flex;
   flex-direction: column;
@@ -1073,4 +945,302 @@
 
 .calendar-legend__swatch--task {
   background: #8a2c22;
+}
+
+.ui-sheet:has(.lecture-resources) {
+  width: 520px;
+}
+
+.lecture-resources {
+  border-top: 1px solid var(--ui-border);
+}
+
+.lecture-resources > .tabs {
+  padding: 0 16px;
+}
+
+.lecture-sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.lecture-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.lecture-section:last-child {
+  border-bottom: 0;
+}
+
+.lecture-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lecture-section__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.lecture-section__count {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--ui-muted);
+  font-size: 12px;
+  color: var(--ui-muted-foreground);
+  text-align: center;
+}
+
+.lecture-save {
+  font-size: 12px;
+  color: var(--ui-muted-foreground);
+}
+
+.lecture-save--saved {
+  color: #15803d;
+}
+
+.lecture-save--error {
+  color: var(--ui-danger);
+}
+
+.lecture-notes {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px 14px;
+  border: 1px solid var(--ui-input);
+  border-radius: var(--ui-radius-lg);
+  background: transparent;
+  color: var(--ui-foreground);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  transition: all 150ms ease;
+}
+
+.lecture-notes:focus {
+  border-color: var(--ui-primary);
+  box-shadow: 0 0 0 1px var(--ui-primary);
+}
+
+.lecture-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+  list-style: none;
+}
+
+.lecture-link,
+.lecture-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.lecture-link:last-child,
+.lecture-file:last-child {
+  border-bottom: 0;
+}
+
+.lecture-link__anchor {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lecture-link__anchor:hover .lecture-link__title {
+  color: var(--ui-primary);
+  text-decoration: underline;
+}
+
+.lecture-link__title,
+.lecture-file__name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ui-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lecture-link__host,
+.lecture-file__meta {
+  font-size: 12px;
+  color: var(--ui-muted-foreground);
+}
+
+.lecture-file__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--ui-radius-md);
+  background: var(--color-primary-soft);
+  color: var(--ui-primary);
+}
+
+.lecture-file__text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.lecture-icon-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--ui-radius-md);
+  background: transparent;
+  color: var(--ui-muted-foreground);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.lecture-icon-button:hover {
+  background: var(--ui-muted);
+  color: var(--ui-foreground);
+}
+
+.lecture-icon-button--danger:hover {
+  background: #fef2f2;
+  color: var(--ui-danger);
+}
+
+.lecture-link-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: 8px;
+}
+
+.lecture-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 12px;
+  border: 1px dashed #d1d5db;
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-muted-50);
+  color: var(--ui-muted-foreground);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.lecture-drop strong {
+  color: var(--ui-primary);
+  font-weight: 600;
+}
+
+.lecture-drop:hover,
+.lecture-drop--active {
+  border-color: var(--ui-primary);
+  background: var(--color-primary-soft);
+}
+
+.lecture-drop__hint {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.lecture-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.lecture-upload__name {
+  overflow: hidden;
+  color: var(--ui-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lecture-upload__bar {
+  overflow: hidden;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--ui-muted);
+}
+
+.lecture-upload__bar span {
+  display: block;
+  height: 100%;
+  background: var(--ui-primary);
+  transition: width 150ms ease;
+}
+
+.lecture-loading {
+  padding: 24px 16px;
+  font-size: 14px;
+  color: var(--ui-muted-foreground);
+}
+
+.lecture-history {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+  list-style: none;
+}
+
+.lecture-history__item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius-lg);
+}
+
+.lecture-history__date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.lecture-history__date span {
+  font-weight: 400;
+  color: var(--ui-muted-foreground);
+}
+
+.lecture-history__notes {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ui-foreground-80);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 767px) {
+  .lecture-link-form {
+    grid-template-columns: 1fr;
+  }
 }

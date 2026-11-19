@@ -7,7 +7,6 @@ import EmptyState from "../components/ui/EmptyState.jsx";
 import Notice from "../components/ui/Notice.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
-import SelectField from "../components/ui/SelectField.jsx";
 import Tabs from "../components/ui/Tabs.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
@@ -16,15 +15,14 @@ import { formatShortDate, formatTimeRange, parseDateKey } from "../utils/date.js
 import { getErrorMessage } from "../utils/errors.js";
 import { validateSpreadsheet } from "../utils/files.js";
 import { EXAM_TERMS, examTermLabel } from "../utils/examTerms.js";
-import { EXAM_REMINDER_OPTIONS } from "../utils/reminders.js";
 import { getSelectedCourses } from "../utils/schedule.js";
 
 
 
-function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange }) {
+function ExamTable({ exams, courseIndex, editable, onToggle }) {
   return (
     <div className="data-table-wrapper">
-      <table className="data-table" style={{ minWidth: 760 }}>
+      <table className="data-table" style={{ minWidth: 560 }}>
         <thead>
           <tr>
             {editable && (
@@ -35,14 +33,11 @@ function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange })
             <th scope="col">Course</th>
             <th scope="col">Date</th>
             <th scope="col">Time</th>
-            <th scope="col">Venue</th>
-            <th scope="col">Reminder</th>
           </tr>
         </thead>
         <tbody>
           {exams.map((exam) => {
             const course = courseIndex.get(exam.code);
-            const reminderLabel = EXAM_REMINDER_OPTIONS.find((option) => option.value === exam.reminder)?.label;
             return (
               <tr key={exam.code}>
                 {editable && (
@@ -60,20 +55,6 @@ function ExamTable({ exams, courseIndex, editable, onToggle, onReminderChange })
                 </td>
                 <td className="cell-nowrap cell-primary">{formatShortDate(parseDateKey(exam.date))}</td>
                 <td className="cell-nowrap">{formatTimeRange(exam.start, exam.end)}</td>
-                <td>{exam.venue || <span className="text-muted">Not announced</span>}</td>
-                <td>
-                  {editable ? (
-                    <SelectField
-                      label={`Reminder for ${course.name}`}
-                      hideLabel
-                      options={EXAM_REMINDER_OPTIONS}
-                      value={exam.reminder}
-                      onChange={(event) => onReminderChange(exam.code, event.target.value)}
-                    />
-                  ) : (
-                    reminderLabel
-                  )}
-                </td>
               </tr>
             );
           })}
@@ -90,7 +71,6 @@ export default function DateSheets() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [draft, setDraft] = useState(null);
-  const [defaultReminder, setDefaultReminder] = useState(schedule.settings.examReminder);
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const courseIndex = useMemo(() => new Map(courses.map((course) => [course.code, course])), [courses]);
@@ -119,7 +99,7 @@ export default function DateSheets() {
       }
       const exams = sheet.exams
         .filter((exam) => courseIndex.has(exam.code))
-        .map((exam) => ({ ...exam, included: true, reminder: defaultReminder }));
+        .map((exam) => ({ ...exam, included: true, reminder: exam.reminder || schedule.settings.examReminder }));
       setDraft({ fileName: sheet.fileName, totalPapers: sheet.totalPapers, exams });
     } catch (uploadError) {
       setError(getErrorMessage(uploadError, "The date sheet could not be read."));
@@ -133,13 +113,6 @@ export default function DateSheets() {
       ...current,
       exams: current.exams.map((exam) => (exam.code === code ? { ...exam, ...changes } : exam)),
     }));
-  };
-
-  const applyDefaultReminder = (value) => {
-    setDefaultReminder(value);
-    setDraft(
-      (current) => current && { ...current, exams: current.exams.map((exam) => ({ ...exam, reminder: value })) }
-    );
   };
 
   const handleSave = () => {
@@ -191,19 +164,10 @@ export default function DateSheets() {
             <Panel
               title={draft.fileName}
               description={`${draft.exams.length} of ${draft.totalPapers} papers match your courses`}
-              action={
-                <SelectField
-                  label="Default reminder"
-                  inline
-                  options={EXAM_REMINDER_OPTIONS}
-                  value={defaultReminder}
-                  onChange={(event) => applyDefaultReminder(event.target.value)}
-                />
-              }
               flush
               footer={
                 <>
-                  <span className="text-muted">Exams are added as one-time events with the selected reminder.</span>
+                  <span className="text-muted">Reminders follow your exam reminder setting in Settings.</span>
                   <div className="page-header__actions">
                     <Button onClick={() => setDraft(null)}>Discard</Button>
                     <Button variant="primary" disabled={includedCount === 0} onClick={handleSave}>
@@ -226,7 +190,6 @@ export default function DateSheets() {
                   onToggle={(code) =>
                     updateDraftExam(code, { included: !draft.exams.find((exam) => exam.code === code).included })
                   }
-                  onReminderChange={(code, reminder) => updateDraftExam(code, { reminder })}
                 />
               )}
             </Panel>

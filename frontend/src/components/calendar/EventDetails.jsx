@@ -1,5 +1,6 @@
 import { examTermLabel } from "../../utils/examTerms.js";
 import Button from "../ui/Button.jsx";
+import LectureResources from "./LectureResources.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
 import { formatShortDate, formatTime, formatTimeRange, parseDateKey, toTimeKey } from "../../utils/date.js";
 
@@ -85,7 +86,6 @@ function ExamDetails({ exam }) {
       </div>
       <dl className="detail-list">
         <DetailRow label="When" value={`${formatShortDate(exam.startsAt)}, ${formatTimeRange(exam.start, exam.end)}`} />
-        <DetailRow label="Venue" value={exam.venue} />
       </dl>
     </>
   );
@@ -109,7 +109,7 @@ function TaskDetails({ task }) {
 export default function EventDetails({ event, ...handlers }) {
   if (!event) {
     return (
-      <section className="panel event-details">
+      <section className="event-details">
         <EmptyState variant="compact"
           icon="calendar"
           title="Select an event"
@@ -122,8 +122,13 @@ export default function EventDetails({ event, ...handlers }) {
   const { type, variant } = event.extendedProps;
 
   return (
-    <section className="panel event-details" aria-live="polite">
-      {type === "class" && <ClassDetails instance={event.extendedProps.instance} variant={variant} {...handlers} />}
+    <section className="event-details" aria-live="polite">
+      {type === "class" && (
+        <>
+          <ClassDetails instance={event.extendedProps.instance} variant={variant} {...handlers} />
+          <LectureResources key={event.id} instance={event.extendedProps.instance} />
+        </>
+      )}
       {type === "exam" && <ExamDetails exam={event.extendedProps.exam} />}
       {type === "task" && <TaskDetails task={event.extendedProps.task} />}
     </section>
