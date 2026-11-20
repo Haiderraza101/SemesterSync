@@ -53,6 +53,11 @@ export function validateTask(values) {
   const errors = {};
   if (!values.title.trim()) errors.title = "Enter a title.";
   if (!values.courseCode) errors.courseCode = "Choose a course.";
+  if (values.type === "quiz" && values.lectureId) return errors;
+  if (values.type === "quiz" && values.requiresLecture) {
+    errors.lectureId = "Choose the lecture the quiz is in.";
+    return errors;
+  }
   if (!values.date) errors.date = "Choose a due date.";
   if (!values.time) errors.time = "Choose a time.";
   return errors;

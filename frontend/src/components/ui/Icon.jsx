@@ -1,5 +1,6 @@
 const PATHS = {
   "chevron-left": "M15 18l-6-6 6-6",
+  play: "M6 4l14 8-14 8z",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   "chevron-up": "M18 15l-6-6-6 6",
   "chevron-down": "M6 9l6 6 6-6",

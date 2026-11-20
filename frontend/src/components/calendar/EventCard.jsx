@@ -26,6 +26,8 @@ export default function EventCard({ item, style, height, selected, onSelect, com
   const short = compact || height < SHORT_HEIGHT;
   const timeRange = `${formatCardTime(item.start)} - ${formatCardTime(item.end)}`;
   const icon = STATUS_ICONS[item.variant] || STATUS_ICONS[item.type] || "calendar";
+  const quizzes = item.quizzes || [];
+  const hasQuiz = quizzes.length > 0;
 
   return (
     <>
@@ -54,7 +56,10 @@ export default function EventCard({ item, style, height, selected, onSelect, com
       >
         <span className="cal-card__body">
           <span className="cal-card__heading">
-            <span className="cal-card__title">{compact ? item.shortTitle : item.title}</span>
+            <span className="cal-card__title">
+              {compact && hasQuiz && <span className="cal-card__quiz-dot">Q</span>}
+              {compact ? item.shortTitle : item.title}
+            </span>
             {!short && <span className="cal-card__time">{timeRange}</span>}
             {compact && <span className="cal-card__time">{formatCardTime(item.start)}</span>}
           </span>
@@ -68,6 +73,12 @@ export default function EventCard({ item, style, height, selected, onSelect, com
                 <span className="cal-card__pill">
                   <Icon name={icon} size={short ? 9 : 12} strokeWidth={3} />
                   <span>{item.status}</span>
+                </span>
+              )}
+              {hasQuiz && !ultraShort && (
+                <span className="cal-card__pill cal-card__pill--quiz">
+                  <Icon name="tasks" size={short ? 9 : 12} strokeWidth={3} />
+                  <span>Quiz</span>
                 </span>
               )}
             </span>
@@ -105,6 +116,15 @@ export default function EventCard({ item, style, height, selected, onSelect, com
               <dd>{item.place}</dd>
             </div>
           )}
+          {quizzes.map((quiz) => (
+            <div key={quiz.id} className="cal-hovercard__divider">
+              <dt>Quiz</dt>
+              <dd>
+                {quiz.title}
+                {quiz.done ? " (done)" : ""}
+              </dd>
+            </div>
+          ))}
           {item.section && (
             <div className="cal-hovercard__divider">
               <dt>Section</dt>

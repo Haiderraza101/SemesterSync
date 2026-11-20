@@ -2,10 +2,10 @@ import Checkbox from "../ui/Checkbox.jsx";
 import CourseCell from "./CourseCell.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
 import Select from "../ui/Select.jsx";
+import StatusBadge from "../ui/StatusBadge.jsx";
 import { cx } from "../../utils/cx.js";
 import { getSlotKey } from "../../utils/clashes.js";
 import { SHORT_DAY_NAMES, formatTime } from "../../utils/date.js";
-import { TYPE_LABELS } from "../../utils/sectionFilters.js";
 
 export default function SectionTable({ courses, draft, sectionOptions, clashingSlots, onToggle, onSectionChange }) {
   if (courses.length === 0) {
@@ -21,6 +21,7 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
               <span className="sr-only">Include</span>
             </th>
             <th scope="col">Course</th>
+            <th scope="col">Type</th>
             <th scope="col">Section</th>
             <th scope="col">Timings</th>
             <th scope="col">Room</th>
@@ -32,7 +33,6 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
             const entry = draft[course.code];
             const details = course.sections[entry.section];
             const options = sectionOptions.get(course.code);
-            const typeLabel = TYPE_LABELS[details.type];
             return (
               <tr key={course.code} className={cx(!entry.included && "section-table__row--off")}>
                 <td>
@@ -47,8 +47,11 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
                   <CourseCell
                     color={course.color}
                     name={course.name}
-                    meta={details.type && details.type !== "core" ? `${course.code} · ${typeLabel}` : course.code}
+                    meta={course.kind === "lab" ? `${course.code} · Lab` : course.code}
                   />
+                </td>
+                <td>
+                  <StatusBadge status={details.type || "core"} />
                 </td>
                 <td>
                   <Select
@@ -76,8 +79,8 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
                     })}
                   </div>
                 </td>
-                <td>{details.room}</td>
-                <td>{details.instructor}</td>
+                <td className="cell-muted">{details.room}</td>
+                <td className="cell-muted">{details.instructor || <span className="cell-empty-dash">—</span>}</td>
               </tr>
             );
           })}

@@ -49,8 +49,23 @@ export function getSemesterRange(schedule) {
   return { start: parseDateKey(start), end: parseDateKey(end) };
 }
 
+export function getQuizzesByLecture(schedule) {
+  const quizzes = new Map();
+  schedule.tasks
+    .filter((task) => task.type === "quiz" && task.lectureId)
+    .forEach((task) => quizzes.set(task.lectureId, [...(quizzes.get(task.lectureId) || []), task]));
+  return quizzes;
+}
+
+export function getUpcomingLectures(schedule, course, from = new Date(), weeks = 8) {
+  return getClassInstances(schedule, [course], from, addDays(from, weeks * 7)).filter(
+    (instance) => !instance.cancelled && combineDateTime(instance.dateKey, instance.end) > from
+  );
+}
+
 export function getClassInstances(schedule, courses, from, to) {
   const semester = getSemester(schedule);
+  const quizzes = getQuizzesByLecture(schedule);
   const cancelled = new Set(schedule.cancelled);
   const firstDay = startOfDay(from);
   const lastDay = startOfDay(to);
@@ -76,6 +91,7 @@ export function getClassInstances(schedule, courses, from, to) {
             end: slot.end,
             room: slot.room || course.room,
             cancelled: cancelled.has(id),
+            quizzes: quizzes.get(id) || [],
           });
         });
     });
@@ -97,6 +113,7 @@ export function getClassInstances(schedule, courses, from, to) {
       end: makeup.end,
       room: makeup.room,
       cancelled: false,
+      quizzes: quizzes.get(makeup.id) || [],
     });
   });
 

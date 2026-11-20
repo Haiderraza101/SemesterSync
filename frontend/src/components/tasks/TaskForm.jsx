@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Button from "../ui/Button.jsx";
 import DateField from "../ui/DateField.jsx";
 import Panel from "../ui/Panel.jsx";
@@ -6,6 +6,9 @@ import SelectField from "../ui/SelectField.jsx";
 import TextField from "../ui/TextField.jsx";
 import TimeField from "../ui/TimeField.jsx";
 import { useForm } from "../../hooks/useForm.js";
+import { useSchedule } from "../../hooks/useSchedule.js";
+import { formatShortDate, formatTimeRange, parseDateKey } from "../../utils/date.js";
+import { getUpcomingLectures } from "../../utils/schedule.js";
 import { TASK_REMINDER_OPTIONS } from "../../utils/reminders.js";
 import { validateTask } from "../../utils/validation.js";
 
@@ -23,24 +26,48 @@ export default function TaskForm({ courses, onSubmit }) {
       date: "",
       time: "23:59",
       reminder: "1d",
+      lectureId: "",
     }),
     [courses]
   );
-  const { values, errors, handleChange, validate, reset } = useForm(initialValues, validateTask);
+  const { schedule } = useSchedule();
+  const { values, errors, setValues, handleChange, validate, reset } = useForm(initialValues, (formValues) =>
+    validateTask({ ...formValues, requiresLecture: lectures.length > 0 })
+  );
 
   const courseOptions = courses.map((course) => ({ value: course.code, label: course.name }));
+  const selectedCourse = courses.find((course) => course.code === values.courseCode);
+  const isQuiz = values.type === "quiz";
+
+  const lectures = useMemo(
+    () => (isQuiz && selectedCourse ? getUpcomingLectures(schedule, selectedCourse) : []),
+    [isQuiz, selectedCourse, schedule]
+  );
+
+  const lectureOptions = lectures.map((lecture) => ({
+    value: lecture.id,
+    label: `${formatShortDate(parseDateKey(lecture.dateKey))} · ${formatTimeRange(lecture.start, lecture.end)} · ${lecture.room}${lecture.kind === "makeup" ? " (makeup)" : ""}`,
+  }));
+
+  const chosenLecture = lectures.find((lecture) => lecture.id === values.lectureId);
+
+  useEffect(() => {
+    if (values.lectureId && !chosenLecture) setValues((current) => ({ ...current, lectureId: "" }));
+  }, [values.lectureId, chosenLecture, setValues]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!validate()) return;
+    const linked = isQuiz && chosenLecture;
     onSubmit({
       id: `task-${Date.now()}`,
       title: values.title.trim(),
       courseCode: values.courseCode,
       type: values.type,
-      due: `${values.date}T${values.time}`,
+      due: linked ? `${chosenLecture.dateKey}T${chosenLecture.start}` : `${values.date}T${values.time}`,
       reminder: values.reminder,
       done: false,
+      ...(linked && { lectureId: chosenLecture.id }),
     });
     reset();
   };
@@ -51,7 +78,7 @@ export default function TaskForm({ courses, onSubmit }) {
         <TextField
           label="Title"
           name="title"
-          placeholder="Assignment 5"
+          placeholder={isQuiz ? "Quiz 3" : "Assignment 5"}
           value={values.title}
           onChange={handleChange}
           error={errors.title}
@@ -82,6 +109,22 @@ export default function TaskForm({ courses, onSubmit }) {
             ))}
           </div>
         </fieldset>
+        {isQuiz && lectures.length > 0 && (
+          <SelectField
+            label="Lecture"
+            name="lectureId"
+            placeholder="Choose the lecture"
+            options={lectureOptions}
+            value={values.lectureId}
+            onChange={handleChange}
+            error={errors.lectureId}
+            hint="The quiz is added to that lecture on your calendar."
+          />
+        )}
+        {isQuiz && lectures.length === 0 && selectedCourse && (
+          <p className="field__hint">No upcoming lectures for this course, so set the date and time yourself.</p>
+        )}
+        {!(isQuiz && lectures.length > 0) && (
         <div className="form-row">
           <DateField
             label="Due date"
@@ -98,6 +141,7 @@ export default function TaskForm({ courses, onSubmit }) {
             error={errors.time}
           />
         </div>
+        )}
         <SelectField
           label="Reminder"
           name="reminder"
@@ -106,7 +150,7 @@ export default function TaskForm({ courses, onSubmit }) {
           onChange={handleChange}
         />
         <Button type="submit" variant="primary" block>
-          Add item
+          {isQuiz ? "Add quiz" : "Add assignment"}
         </Button>
       </form>
     </Panel>

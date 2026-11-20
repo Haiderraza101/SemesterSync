@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import CourseCell from "../components/app/CourseCell.jsx";
 import ProgressBar from "../components/app/ProgressBar.jsx";
-import Badge from "../components/ui/Badge.jsx";
+import StatusBadge from "../components/ui/StatusBadge.jsx";
 import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
@@ -19,10 +19,10 @@ const MARK_OPTIONS = [
   { value: "absent", label: "Absent" },
 ];
 
-const RISK_BADGES = {
-  ok: "neutral",
+const RISK_STATUS = {
+  ok: "safe",
   warning: "warning",
-  critical: "danger",
+  critical: "critical",
 };
 
 function TodayMarking({ classes, marks, onMark }) {
@@ -129,9 +129,9 @@ export default function Attendance() {
                           meta={`Section ${item.course.section}`}
                         />
                       </td>
-                      <td className="cell-numeric">{item.held}</td>
-                      <td className="cell-numeric">{item.attended}</td>
-                      <td className="cell-numeric">{item.absent}</td>
+                      <td className="cell-numeric cell-muted">{item.held}</td>
+                      <td className="cell-numeric cell-muted">{item.attended}</td>
+                      <td className="cell-numeric cell-muted">{item.absent}</td>
                       <td>
                         <div className="attendance-table__meter">
                           <ProgressBar
@@ -145,11 +145,14 @@ export default function Attendance() {
                         </div>
                       </td>
                       <td>
-                        <Badge variant={RISK_BADGES[item.risk]}>
-                          {item.canMiss === 0
-                            ? "None left"
-                            : `${item.canMiss} ${item.canMiss === 1 ? "class" : "classes"}`}
-                        </Badge>
+                        <StatusBadge
+                          status={RISK_STATUS[item.risk]}
+                          label={
+                            item.canMiss === 0
+                              ? "None left"
+                              : `${item.canMiss} ${item.canMiss === 1 ? "class" : "classes"}`
+                          }
+                        />
                       </td>
                     </tr>
                   ))}

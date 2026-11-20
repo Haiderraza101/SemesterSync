@@ -36,6 +36,7 @@ const taskSchema = new mongoose.Schema(
     due: { type: String, required: true },
     reminder: { type: String, enum: ["1d", "3h", "none"], default: "1d" },
     done: { type: Boolean, default: false },
+    lectureId: { type: String, maxlength: 120 },
   },
   { _id: false }
 );

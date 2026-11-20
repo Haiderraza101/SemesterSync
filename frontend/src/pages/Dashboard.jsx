@@ -1,19 +1,20 @@
 import { useMemo } from "react";
-import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import { Link } from "react-router-dom";
+import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import CourseCell from "../components/app/CourseCell.jsx";
-import ProgressBar from "../components/app/ProgressBar.jsx";
-import StatGroup from "../components/app/StatGroup.jsx";
 import Badge from "../components/ui/Badge.jsx";
 import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
+import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
-import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
+import StatusBadge from "../components/ui/StatusBadge.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { getAttendanceSummary, getLowestAttendance } from "../utils/attendance.js";
+import { startOfWeek, weekdayIndexes } from "../utils/calendarLayout.js";
 import { describeClash, findClashes } from "../utils/clashes.js";
+import { cx } from "../utils/cx.js";
 import {
   SHORT_DAY_NAMES,
   addDays,
@@ -22,40 +23,59 @@ import {
   formatDayMonth,
   formatLongDate,
   formatTime,
-  formatTimeRange,
   getGreeting,
+  isSameDay,
+  startOfDay,
+  timeToMinutes,
+  toDateKey,
   toTimeKey,
 } from "../utils/date.js";
-import {
-  getClassesOnDate,
-  getExams,
-  getSelectedCourses,
-  getTasksWithCourses,
-  getUpcomingItems,
-} from "../utils/schedule.js";
+import { examTermLabel } from "../utils/examTerms.js";
+import { getClassInstances, getClassesOnDate, getExams, getSelectedCourses, getTasksWithCourses } from "../utils/schedule.js";
 import "../styles/pages/dashboard.css";
 
-const STATUS_BADGES = {
-  cancelled: { label: "Cancelled", variant: "muted" },
-  completed: { label: "Completed", variant: "muted" },
-  live: { label: "In progress", variant: "info" },
-  upcoming: { label: "Upcoming", variant: "neutral" },
-};
+const UPCOMING_LIMIT = 5;
+const ATTENDANCE_LIMIT = 4;
+const RISK_STATUS = { ok: "safe", warning: "warning", critical: "critical" };
 
-function getClassStatus(instance, now) {
+function classStatus(instance, now) {
   if (instance.cancelled) return "cancelled";
-  const startsAt = combineDateTime(instance.dateKey, instance.start);
-  const endsAt = combineDateTime(instance.dateKey, instance.end);
-  if (now >= endsAt) return "completed";
-  if (now >= startsAt) return "live";
-  return "upcoming";
+  if (now >= combineDateTime(instance.dateKey, instance.end)) return "done";
+  if (now >= combineDateTime(instance.dateKey, instance.start)) return "live";
+  return instance.kind === "makeup" ? "makeup" : "upcoming";
+}
+
+function plural(count, singular, pluralForm = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : pluralForm}`;
+}
+
+function daysAway(date, now) {
+  const days = differenceInDays(startOfDay(date), startOfDay(now));
+  if (days <= 0) return { label: "Today", variant: "warning" };
+  if (days === 1) return { label: "Tomorrow", variant: "info" };
+  return { label: `In ${days} days`, variant: "secondary" };
+}
+
+function KpiCard({ icon, label, value, detail, tone }) {
+  return (
+    <div className="kpi-card">
+      <div className={cx("kpi-card__icon", tone && `kpi-card__icon--${tone}`)}>
+        <Icon name={icon} size={20} strokeWidth={2} />
+      </div>
+      <div className="kpi-card__text">
+        <span className="kpi-card__label">{label}</span>
+        <span className="kpi-card__value">{value}</span>
+        {detail && <span className="kpi-card__detail">{detail}</span>}
+      </div>
+    </div>
+  );
 }
 
 function TodayClasses({ classes, marks, now, onToggle }) {
   if (classes.length === 0) {
     return (
-      <EmptyState variant="compact"
-        icon="calendar"
+      <EmptyState
+        variant="compact"
         title="No classes today"
         description="Enjoy the free day, or catch up on assignments."
       />
@@ -64,7 +84,7 @@ function TodayClasses({ classes, marks, now, onToggle }) {
 
   return (
     <div className="data-table-wrapper">
-      <table className="data-table">
+      <table className="data-table dashboard-classes">
         <thead>
           <tr>
             <th scope="col">Time</th>
@@ -78,11 +98,19 @@ function TodayClasses({ classes, marks, now, onToggle }) {
         </thead>
         <tbody>
           {classes.map((instance) => {
-            const status = STATUS_BADGES[getClassStatus(instance, now)];
             const present = marks[instance.id] === "present";
+            const minutes = timeToMinutes(instance.end) - timeToMinutes(instance.start);
+            const pendingQuiz = instance.quizzes?.some((quiz) => !quiz.done);
             return (
-              <tr key={instance.id}>
-                <td className="cell-nowrap">{formatTimeRange(instance.start, instance.end)}</td>
+              <tr key={instance.id} className={cx(instance.cancelled && "dashboard-classes__row--cancelled")}>
+                <td>
+                  <div className="cell-stack">
+                    <span className="cell-strong">{formatTime(instance.start)}</span>
+                    <span className="cell-stack__sub">
+                      until {formatTime(instance.end)} · {minutes} min
+                    </span>
+                  </div>
+                </td>
                 <td>
                   <CourseCell
                     color={instance.course.color}
@@ -90,20 +118,24 @@ function TodayClasses({ classes, marks, now, onToggle }) {
                     meta={instance.kind === "makeup" ? "Makeup class" : `Section ${instance.course.section}`}
                   />
                 </td>
-                <td>{instance.room}</td>
+                <td className="cell-muted">{instance.room || <span className="cell-empty-dash">—</span>}</td>
                 <td>
-                  <Badge variant={status.variant}>{status.label}</Badge>
+                  <span className="cell-badges">
+                    <StatusBadge status={classStatus(instance, now)} />
+                    {pendingQuiz && <StatusBadge status="quiz" />}
+                  </span>
                 </td>
                 <td className="cell-action">
                   {!instance.cancelled && (
-                    <Button
-                      size="sm"
-                      variant={present ? "primary" : "secondary"}
+                    <button
+                      type="button"
+                      className={cx("attendance-toggle", present && "attendance-toggle--on")}
                       aria-pressed={present}
                       onClick={() => onToggle(instance.id, present)}
                     >
+                      <Icon name="check" size={14} strokeWidth={2.5} />
                       {present ? "Present" : "Mark present"}
-                    </Button>
+                    </button>
                   )}
                 </td>
               </tr>
@@ -115,26 +147,78 @@ function TodayClasses({ classes, marks, now, onToggle }) {
   );
 }
 
-function UpcomingList({ items }) {
+function WeekGlance({ days, now }) {
+  return (
+    <div className="week-glance">
+      {days.map((day) => (
+        <div key={day.key} className={cx("week-glance__day", isSameDay(day.date, now) && "week-glance__day--today")}>
+          <div className="week-glance__head">
+            <span className="week-glance__name">{SHORT_DAY_NAMES[day.date.getDay()]}</span>
+            <span className="week-glance__date">{day.date.getDate()}</span>
+          </div>
+          <span className="week-glance__count">{day.classes}</span>
+          <span className="week-glance__label">{day.classes === 1 ? "class" : "classes"}</span>
+          <div className="week-glance__marks">
+            {day.exams > 0 && <Badge variant="default" compact>{plural(day.exams, "exam")}</Badge>}
+            {day.quizzes > 0 && <Badge variant="indigo" compact>{plural(day.quizzes, "quiz", "quizzes")}</Badge>}
+            {day.deadlines > 0 && <Badge variant="warning" compact>{plural(day.deadlines, "deadline")}</Badge>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function UpcomingList({ items, now }) {
   if (items.length === 0) {
-    return (
-      <EmptyState variant="compact" icon="tasks" title="Nothing coming up" description="Exams and deadlines you add will appear here." />
-    );
+    return <EmptyState variant="compact" title="Nothing coming up" description="Exams and deadlines you add will appear here." />;
   }
 
   return (
-    <ul>
-      {items.map((item) => (
-        <li key={item.id} className="upcoming-list__item">
-          <div className="upcoming-list__date">
-            {SHORT_DAY_NAMES[item.date.getDay()]}
-            <span className="upcoming-list__day">{item.date.getDate()}</span>
-          </div>
-          <div className="upcoming-list__text">
-            <span className="upcoming-list__title">{item.title}</span>
-            <span className="upcoming-list__detail">
-              {item.detail}, {formatTime(toTimeKey(item.date))}
+    <ul className="upcoming-list">
+      {items.map((item) => {
+        const when = daysAway(item.date, now);
+        return (
+          <li key={item.id} className="upcoming-list__item">
+            <span className={cx("upcoming-list__icon", `upcoming-list__icon--${item.kind}`)} aria-hidden="true">
+              <Icon name={item.kind === "exam" ? "datesheets" : "tasks"} size={16} strokeWidth={2} />
             </span>
+            <span className="upcoming-list__text">
+              <span className="upcoming-list__title">{item.title}</span>
+              <span className="upcoming-list__detail">
+                {item.subtitle} · {formatDayMonth(item.date)}, {formatTime(toTimeKey(item.date))}
+              </span>
+            </span>
+            <Badge variant={when.variant} compact>
+              {when.label}
+            </Badge>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function AttendanceList({ items }) {
+  return (
+    <ul className="attendance-list">
+      {items.map((item) => (
+        <li key={item.course.code} className="attendance-list__item">
+          <div className="attendance-list__row">
+            <span className="attendance-list__name">{item.course.name}</span>
+            <span className={cx("attendance-list__value", `attendance-list__value--${item.risk}`)}>{item.percentage}%</span>
+          </div>
+          <div className="attendance-list__bar" aria-hidden="true">
+            <span
+              className={`attendance-list__fill attendance-list__fill--${item.risk}`}
+              style={{ width: `${Math.min(100, item.percentage)}%` }}
+            />
+          </div>
+          <div className="attendance-list__row">
+            <span className="attendance-list__meta">
+              {item.attended} of {item.held} attended
+            </span>
+            <StatusBadge status={RISK_STATUS[item.risk]} />
           </div>
         </li>
       ))}
@@ -150,65 +234,93 @@ export default function Dashboard() {
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const todayClasses = useMemo(() => getClassesOnDate(schedule, courses, now), [schedule, courses, now]);
   const clashes = useMemo(() => findClashes(courses), [courses]);
-  const upcoming = useMemo(() => getUpcomingItems(schedule, courses, now), [schedule, courses, now]);
+  const exams = useMemo(() => getExams(schedule, courses), [schedule, courses]);
+  const tasks = useMemo(() => getTasksWithCourses(schedule, courses), [schedule, courses]);
   const attendance = useMemo(
     () => getAttendanceSummary(schedule, courses, schedule.settings.attendanceRequirement),
     [schedule, courses]
   );
 
-  const nextExam = useMemo(
-    () =>
-      getExams(schedule, courses)
-        .filter((exam) => exam.startsAt >= now)
-        .sort((a, b) => a.startsAt - b.startsAt)[0],
-    [schedule, courses, now]
-  );
+  const upcoming = useMemo(() => {
+    const today = startOfDay(now);
+    const examItems = exams.map((exam) => ({
+      id: exam.id,
+      kind: "exam",
+      title: exam.course.name,
+      subtitle: `${examTermLabel(exam.term)} exam`,
+      date: exam.startsAt,
+    }));
+    const taskItems = tasks
+      .filter((task) => !task.done)
+      .map((task) => ({
+        id: task.id,
+        kind: task.type,
+        title: task.title,
+        subtitle: task.course?.name || (task.type === "quiz" ? "Quiz" : "Assignment"),
+        date: task.dueAt,
+      }));
+    return [...examItems, ...taskItems]
+      .filter((item) => item.date >= today)
+      .sort((a, b) => a.date - b.date)
+      .slice(0, UPCOMING_LIMIT);
+  }, [exams, tasks, now]);
 
-  const dueThisWeek = useMemo(() => {
-    const weekEnd = addDays(now, 7);
-    return getTasksWithCourses(schedule, courses).filter(
-      (task) => !task.done && task.dueAt >= now && task.dueAt <= weekEnd
-    );
-  }, [schedule, courses, now]);
+  const week = useMemo(() => {
+    const monday = startOfWeek(now);
+    const days = weekdayIndexes(schedule.settings.showSaturday).map((weekday) => addDays(monday, weekday - 1));
+    const instances = getClassInstances(schedule, courses, days[0], days[days.length - 1]);
+    return days.map((date) => {
+      const key = toDateKey(date);
+      const dayTasks = tasks.filter((task) => !task.done && toDateKey(task.dueAt) === key);
+      return {
+        key,
+        date,
+        classes: instances.filter((instance) => instance.dateKey === key && !instance.cancelled).length,
+        exams: exams.filter((exam) => exam.date === key).length,
+        quizzes: dayTasks.filter((task) => task.type === "quiz").length,
+        deadlines: dayTasks.filter((task) => task.type !== "quiz").length,
+      };
+    });
+  }, [schedule, courses, exams, tasks, now]);
 
+  const nextExam = exams.filter((exam) => exam.startsAt >= now).sort((a, b) => a.startsAt - b.startsAt)[0];
+  const weekEnd = addDays(now, 7);
+  const dueThisWeek = tasks.filter((task) => !task.done && task.dueAt >= now && task.dueAt <= weekEnd);
+  const quizzesThisWeek = dueThisWeek.filter((task) => task.type === "quiz").length;
   const lowest = getLowestAttendance(attendance);
   const activeClasses = todayClasses.filter((instance) => !instance.cancelled);
-  const daysToExam = nextExam ? differenceInDays(nextExam.startsAt, now) : null;
-  const quizzes = dueThisWeek.filter((task) => task.type === "quiz").length;
-
-  const stats = [
-    {
-      label: "Classes today",
-      value: activeClasses.length,
-      detail: activeClasses.length ? `First at ${formatTime(activeClasses[0].start)}` : "No classes scheduled",
-    },
-    {
-      label: "Next exam",
-      value: nextExam ? (daysToExam === 0 ? "Today" : `${daysToExam} ${daysToExam === 1 ? "day" : "days"}`) : "None",
-      detail: nextExam ? `${nextExam.course.name}, ${formatDayMonth(nextExam.startsAt)}` : "Upload a date sheet",
-    },
-    {
-      label: "Due this week",
-      value: dueThisWeek.length,
-      detail: `${dueThisWeek.length - quizzes} ${dueThisWeek.length - quizzes === 1 ? "assignment" : "assignments"}, ${quizzes} ${quizzes === 1 ? "quiz" : "quizzes"}`,
-    },
-    {
-      label: "Lowest attendance",
-      value: lowest ? `${lowest.percentage}%` : "–",
-      detail: lowest ? lowest.course.name : "No courses yet",
-      tone: lowest && lowest.risk !== "ok" ? "warning" : undefined,
-    },
-  ];
-
-  const lowestThree = [...attendance].sort((a, b) => a.percentage - b.percentage).slice(0, 3);
+  const daysToExam = nextExam ? differenceInDays(startOfDay(nextExam.startsAt), startOfDay(now)) : null;
   const firstName = user?.name?.split(" ")[0] || "there";
+  const lowestCourses = [...attendance].sort((a, b) => a.percentage - b.percentage).slice(0, ATTENDANCE_LIMIT);
+
+  const summary = [
+    activeClasses.length
+      ? `${plural(activeClasses.length, "class", "classes")} today, first at ${formatTime(activeClasses[0].start)}.`
+      : "No classes today.",
+    quizzesThisWeek ? `${plural(quizzesThisWeek, "quiz", "quizzes")} this week.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const handleToggle = (id, present) => markAttendance(id, present ? null : "present");
+
+  const header = (actions) => (
+    <header className="dashboard-header">
+      <div className="dashboard-header__text">
+        <span className="dashboard-header__date">{formatLongDate(now)}</span>
+        <h1 className="dashboard-header__title">
+          {getGreeting(now)}, {firstName}
+        </h1>
+        {actions && <p className="dashboard-header__summary">{summary}</p>}
+      </div>
+      {actions && <div className="dashboard-header__actions">{actions}</div>}
+    </header>
+  );
 
   if (courses.length === 0) {
     return (
       <>
-        <PageHeader eyebrow={formatLongDate(now)} title={`${getGreeting(now)}, ${firstName}`} />
+        {header(null)}
         <Panel>
           <EmptyState
             icon="spreadsheet"
@@ -226,19 +338,15 @@ export default function Dashboard() {
   }
 
   return (
-    <>
-      <PageHeader
-        eyebrow={formatLongDate(now)}
-        title={`${getGreeting(now)}, ${firstName}`}
-        actions={
-          <>
-            <Button to="/app/timetable">Upload file</Button>
-            <Button to="/app/tasks" variant="primary">
-              Add task
-            </Button>
-          </>
-        }
-      />
+    <div className="dashboard">
+      {header(
+        <>
+          <Button to="/app/timetable">Upload file</Button>
+          <Button to="/app/tasks" variant="primary">
+            Add task
+          </Button>
+        </>
+      )}
 
       <SemesterNotice />
 
@@ -249,43 +357,79 @@ export default function Dashboard() {
         </Notice>
       )}
 
-      <StatGroup stats={stats} />
+      <div className="kpi-grid">
+        <KpiCard
+          icon="calendar"
+          label="Classes today"
+          value={activeClasses.length}
+          detail={activeClasses.length ? `First at ${formatTime(activeClasses[0].start)}` : "No classes scheduled"}
+        />
+        <KpiCard
+          icon="datesheets"
+          label="Next exam"
+          value={nextExam ? (daysToExam === 0 ? "Today" : `${daysToExam} ${daysToExam === 1 ? "day" : "days"}`) : "None"}
+          detail={nextExam ? `${nextExam.course.name}, ${formatDayMonth(nextExam.startsAt)}` : "Upload a date sheet"}
+        />
+        <KpiCard
+          icon="tasks"
+          label="Due this week"
+          value={dueThisWeek.length}
+          detail={`${plural(dueThisWeek.length - quizzesThisWeek, "assignment")}, ${plural(quizzesThisWeek, "quiz", "quizzes")}`}
+        />
+        <KpiCard
+          icon="attendance"
+          label="Lowest attendance"
+          value={lowest ? `${lowest.percentage}%` : "–"}
+          detail={lowest ? lowest.course.name : "No courses yet"}
+          tone={lowest && lowest.risk !== "ok" ? "warning" : undefined}
+        />
+      </div>
 
-      <div className="page-grid">
-        <Panel
-          className="page-grid__main"
-          title="Today's classes"
-          action={<Link to="/app/calendar">Open calendar</Link>}
-          flush
-        >
-          <TodayClasses classes={todayClasses} marks={schedule.attendance.marks} now={now} onToggle={handleToggle} />
-        </Panel>
+      <div className="dashboard-grid">
+        <div className="dashboard-grid__main">
+          <section className="dash-card">
+            <header className="dash-card__header">
+              <h2 className="dash-card__title">Today&apos;s classes</h2>
+              <Link to="/app/calendar" className="dash-card__link">
+                Open calendar
+              </Link>
+            </header>
+            <TodayClasses classes={todayClasses} marks={schedule.attendance.marks} now={now} onToggle={handleToggle} />
+          </section>
 
-        <div className="page-grid__side">
-          <Panel title="Upcoming" action={<Link to="/app/tasks">View all</Link>} flush>
-            <UpcomingList items={upcoming} />
-          </Panel>
-          <Panel title="Attendance" action={<Link to="/app/attendance">Details</Link>}>
-            <ul className="attendance-mini">
-              {lowestThree.map((item) => (
-                <li key={item.course.code} className="attendance-mini__item">
-                  <div className="attendance-mini__row">
-                    <span>{item.course.name}</span>
-                    <span className={`attendance-mini__value attendance-mini__value--${item.risk}`}>
-                      {item.percentage}%
-                    </span>
-                  </div>
-                  <ProgressBar
-                    value={item.percentage}
-                    label={`${item.course.name} attendance`}
-                    tone={item.risk === "ok" ? "default" : "warning"}
-                  />
-                </li>
-              ))}
-            </ul>
-          </Panel>
+          <section className="dash-card">
+            <header className="dash-card__header">
+              <h2 className="dash-card__title">This week</h2>
+              <Link to="/app/calendar" className="dash-card__link">
+                Week view
+              </Link>
+            </header>
+            <WeekGlance days={week} now={now} />
+          </section>
+        </div>
+
+        <div className="dashboard-grid__side">
+          <section className="dash-card">
+            <header className="dash-card__header">
+              <h2 className="dash-card__title">Upcoming</h2>
+              <Link to="/app/tasks" className="dash-card__link">
+                View all
+              </Link>
+            </header>
+            <UpcomingList items={upcoming} now={now} />
+          </section>
+
+          <section className="dash-card">
+            <header className="dash-card__header">
+              <h2 className="dash-card__title">Attendance</h2>
+              <Link to="/app/attendance" className="dash-card__link">
+                Details
+              </Link>
+            </header>
+            <AttendanceList items={lowestCourses} />
+          </section>
         </div>
       </div>
-    </>
+    </div>
   );
 }

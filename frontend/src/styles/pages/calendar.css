@@ -1107,31 +1107,6 @@
   flex-direction: column;
 }
 
-.lecture-icon-button {
-  display: inline-flex;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: var(--ui-radius-md);
-  background: transparent;
-  color: var(--ui-muted-foreground);
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.lecture-icon-button:hover {
-  background: var(--ui-muted);
-  color: var(--ui-foreground);
-}
-
-.lecture-icon-button--danger:hover {
-  background: #fef2f2;
-  color: var(--ui-danger);
-}
-
 .lecture-link-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
@@ -1243,4 +1218,63 @@
   .lecture-link-form {
     grid-template-columns: 1fr;
   }
+}
+
+.cal-card__footer {
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.cal-card__pill--quiz {
+  background: #eef2ff;
+  color: #4338ca;
+  box-shadow: none;
+}
+
+.cal-card__quiz-dot {
+  display: inline-flex;
+  width: 13px;
+  height: 13px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  border-radius: 3px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 8px;
+  vertical-align: 1px;
+}
+
+.lecture-quizzes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--ui-border);
+  background: rgba(238, 242, 255, 0.45);
+}
+
+.lecture-quiz {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #c7d2fe;
+  border-radius: var(--ui-radius-lg);
+  background: #ffffff;
+}
+
+.lecture-quiz__text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.lecture-quiz__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ui-foreground);
 }

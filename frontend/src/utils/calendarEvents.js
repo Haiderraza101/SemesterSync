@@ -49,6 +49,7 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
     }));
 
   const taskEvents = getTasksWithCourses(schedule, courses)
+    .filter((task) => !task.lectureId)
     .filter((task) => !task.done && (!task.course || visibleCodes.has(task.courseCode)) && inRange(task.dueAt, range))
     .map((task) => ({
       id: task.id,
@@ -122,5 +123,6 @@ export function toCalendarItem(event) {
     place: instance.room,
     section: instance.course.section,
     color: instance.course.color,
+    quizzes: instance.quizzes || [],
   };
 }

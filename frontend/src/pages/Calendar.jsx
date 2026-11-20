@@ -21,7 +21,7 @@ import "../styles/pages/calendar.css";
 const ALL = "all";
 
 export default function Calendar() {
-  const { schedule, toggleCancelled, markAttendance, addMakeup, removeMakeup } = useSchedule();
+  const { schedule, toggleCancelled, markAttendance, addMakeup, removeMakeup, toggleTask } = useSchedule();
   const { notify } = useToast();
   const { showSaturday, defaultView } = schedule.settings;
   const [view, setView] = useState(() => viewFromSetting(defaultView));
@@ -148,6 +148,7 @@ export default function Calendar() {
           event={selectedEvent}
           attendance={selectedEvent ? schedule.attendance.marks[selectedEvent.id] : undefined}
           onToggleCancel={handleToggleCancel}
+          onToggleTask={toggleTask}
           onMarkAttendance={markAttendance}
           onAddMakeup={(instance) => {
             setSelectedId(null);

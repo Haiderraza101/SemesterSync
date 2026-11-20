@@ -1,5 +1,6 @@
 import { examTermLabel } from "../../utils/examTerms.js";
 import Button from "../ui/Button.jsx";
+import StatusBadge from "../ui/StatusBadge.jsx";
 import LectureResources from "./LectureResources.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
 import { formatShortDate, formatTime, formatTimeRange, parseDateKey, toTimeKey } from "../../utils/date.js";
@@ -20,10 +21,33 @@ const VARIANT_STATUS = {
   makeup: "Makeup class",
 };
 
+function LectureQuizzes({ quizzes, onToggleTask }) {
+  if (quizzes.length === 0) return null;
+  return (
+    <div className="lecture-quizzes">
+      <h3 className="lecture-section__title">Quiz in this lecture</h3>
+      {quizzes.map((quiz) => (
+        <div key={quiz.id} className="lecture-quiz">
+          <div className="lecture-quiz__text">
+            <span className="lecture-quiz__title">{quiz.title}</span>
+            <StatusBadge status={quiz.done ? "completed" : "pending"} />
+          </div>
+          {onToggleTask && (
+            <Button size="sm" onClick={() => onToggleTask(quiz.id)}>
+              {quiz.done ? "Mark as pending" : "Mark as done"}
+            </Button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function ClassDetails({
   instance,
   variant,
   attendance,
+  onToggleTask,
   onToggleCancel,
   onMarkAttendance,
   onAddMakeup,
@@ -47,6 +71,7 @@ function ClassDetails({
         <DetailRow label="Section" value={instance.course.section} />
         <DetailRow label="Status" value={VARIANT_STATUS[variant]} />
       </dl>
+      <LectureQuizzes quizzes={instance.quizzes || []} onToggleTask={onToggleTask} />
       <div className="event-details__actions">
         {!instance.cancelled && onMarkAttendance && (
           <Button
