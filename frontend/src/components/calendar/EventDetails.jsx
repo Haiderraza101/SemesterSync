@@ -1,4 +1,5 @@
 import { examTermLabel } from "../../utils/examTerms.js";
+import AttendanceMarker from "../app/AttendanceMarker.jsx";
 import Button from "../ui/Button.jsx";
 import StatusBadge from "../ui/StatusBadge.jsx";
 import LectureResources from "./LectureResources.jsx";
@@ -54,7 +55,6 @@ function ClassDetails({
   onRemoveMakeup,
 }) {
   const isMakeup = instance.kind === "makeup";
-  const present = attendance === "present";
 
   return (
     <>
@@ -74,13 +74,17 @@ function ClassDetails({
       <LectureQuizzes quizzes={instance.quizzes || []} onToggleTask={onToggleTask} />
       <div className="event-details__actions">
         {!instance.cancelled && onMarkAttendance && (
-          <Button
-            variant={present ? "secondary" : "primary"}
-            block
-            onClick={() => onMarkAttendance(instance.id, present ? null : "present")}
-          >
-            {present ? "Marked present · Undo" : "Mark attendance"}
-          </Button>
+          <div className="event-details__attendance">
+            <span className="event-details__attendance-label">Attendance</span>
+            <AttendanceMarker
+              block
+              size="lg"
+              label={`Attendance for ${instance.course.name}`}
+              value={attendance}
+              onChange={(status) => onMarkAttendance(instance.id, status)}
+            />
+            <span className="event-details__attendance-hint">Every 3 lates count as one absence.</span>
+          </div>
         )}
         {!isMakeup && onToggleCancel && (
           <Button block onClick={() => onToggleCancel(instance.id)}>

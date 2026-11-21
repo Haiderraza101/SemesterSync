@@ -51,36 +51,13 @@
 
 .kpi-card {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: var(--color-surface);
-  border-radius: var(--ui-radius-xl);
-  box-shadow: 0 0 0 1px var(--ui-ring-10);
-}
-
-.kpi-card__icon {
-  display: flex;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--ui-radius-lg);
-  background: var(--ui-primary-10);
-  color: var(--ui-primary);
-}
-
-.kpi-card__icon--warning {
-  background: rgba(245, 158, 11, 0.12);
-  color: #d97706;
-}
-
-.kpi-card__text {
-  display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  padding: 20px 24px;
+  background: var(--color-surface);
+  border-radius: var(--ui-radius-xl);
+  box-shadow: 0 0 0 1px rgba(229, 231, 235, 0.8);
 }
 
 .kpi-card__label {
@@ -92,11 +69,20 @@
 }
 
 .kpi-card__value {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   color: var(--ui-foreground);
   font-variant-numeric: tabular-nums;
+}
+
+.kpi-card__value--warning {
+  color: #d97706;
+}
+
+.kpi-card__value--critical {
+  color: #dc2626;
 }
 
 .kpi-card__detail {
@@ -107,52 +93,46 @@
   white-space: nowrap;
 }
 
-.dashboard-grid {
+.dashboard-row {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   align-items: start;
   gap: 24px;
 }
 
-.dashboard-grid__main,
-.dashboard-grid__side {
+.dashboard-row--stretch {
+  align-items: stretch;
+}
+
+.dash-section {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
-.dash-card {
-  overflow: hidden;
-  background: var(--color-surface);
-  border-radius: var(--ui-radius-xl);
-  box-shadow: 0 0 0 1px var(--ui-ring-10);
-}
-
-.dash-card__header {
+.dash-section__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 24px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
 }
 
-.dash-card__title {
+.dash-section__title {
   font-size: 16px;
   font-weight: 600;
   color: var(--ui-foreground);
 }
 
-.dash-card__link {
+.dash-section__link,
+.chart-card__link {
   font-size: 13px;
   font-weight: 500;
   color: var(--ui-primary);
 }
 
-.dash-card .data-table-wrapper {
-  border: 0;
-  border-radius: 0;
+.dash-section .empty-state {
+  min-height: 0;
 }
 
 .dashboard-classes__row--cancelled .cell-strong,
@@ -161,266 +141,364 @@
   text-decoration: line-through;
 }
 
-.attendance-toggle {
-  display: inline-flex;
-  height: 32px;
-  align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-md);
+.chart-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
   background: var(--color-surface);
-  color: #525252;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 150ms ease;
+  border-radius: var(--ui-radius-xl);
+  box-shadow: 0 0 0 1px rgba(229, 231, 235, 0.8);
 }
 
-.attendance-toggle svg {
-  color: #a3a3a3;
-}
-
-.attendance-toggle:hover {
-  background: var(--ui-muted);
-}
-
-.attendance-toggle--on {
-  border-color: #a7f3d0;
-  background: rgba(236, 253, 245, 0.6);
-  color: #059669;
-}
-
-.attendance-toggle--on svg {
-  color: #059669;
-}
-
-.week-glance {
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-}
-
-.week-glance__day {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 2px;
-  padding: 16px 18px 18px;
-  border-right: 1px solid rgba(229, 231, 235, 0.6);
-}
-
-.week-glance__day:last-child {
-  border-right: 0;
-}
-
-.week-glance__day--today {
-  background: var(--color-primary-soft);
-  box-shadow: inset 0 3px 0 var(--ui-primary);
-}
-
-.week-glance__head {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.week-glance__name {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--ui-muted-foreground);
-  text-transform: uppercase;
-}
-
-.week-glance__date {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ui-foreground);
-}
-
-.week-glance__day--today .week-glance__name,
-.week-glance__day--today .week-glance__date {
-  color: var(--ui-primary);
-}
-
-.week-glance__count {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ui-foreground);
-  font-variant-numeric: tabular-nums;
-}
-
-.week-glance__label {
-  font-size: 12px;
-  color: #a3a3a3;
-}
-
-.week-glance__marks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 10px;
-}
-
-.week-glance__marks .badge {
-  height: 22px;
-  font-size: 11px;
-}
-
-.upcoming-list,
-.attendance-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.upcoming-list__item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.4);
-  transition: background-color 150ms ease;
-}
-
-.upcoming-list__item:nth-child(even) {
-  background: var(--ui-muted-30);
-}
-
-.upcoming-list__item:hover {
-  background: var(--ui-muted-50);
-}
-
-.upcoming-list__item:last-child {
-  border-bottom: 0;
-}
-
-.upcoming-list__icon {
-  display: flex;
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(229, 229, 229, 0.5);
-  border-radius: var(--ui-radius-lg);
-  background: #f5f5f5;
-  color: #737373;
-}
-
-.upcoming-list__icon--exam {
-  border-color: #171717;
-  background: #171717;
-  color: #ffffff;
-}
-
-.upcoming-list__icon--quiz {
-  border-color: #c7d2fe;
-  background: #eef2ff;
-  color: #4338ca;
-}
-
-.upcoming-list__text {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  line-height: 1.3;
-}
-
-.upcoming-list__title {
-  overflow: hidden;
-  font-size: 14px;
-  font-weight: 500;
-  color: #171717;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.upcoming-list__detail {
-  overflow: hidden;
-  font-size: 12px;
-  color: #a3a3a3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.attendance-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.attendance-list__item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 24px;
-  border-bottom: 1px solid rgba(229, 231, 235, 0.4);
-}
-
-.attendance-list__item:last-child {
-  border-bottom: 0;
-}
-
-.attendance-list__row {
+.chart-card__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 16px 32px 12px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
 }
 
-.attendance-list__name {
-  overflow: hidden;
-  font-size: 14px;
+.chart-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.chart-card__controls {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.chart-card__spacer {
+  flex: 1;
+}
+
+.chart-card__tabs {
+  padding: 0 32px;
+}
+
+.chart-card__plot {
+  flex: 1;
+  min-height: 300px;
+  height: 300px;
+  padding: 24px 16px 16px 8px;
+}
+
+.chart-card__body {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.chart-metrics {
+  display: flex;
+  overflow-x: auto;
+}
+
+.chart-metric {
+  position: relative;
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 32px 20px;
+  border: 0;
+  border-right: 1px solid rgba(229, 231, 235, 0.8);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.chart-metric:hover {
+  background: var(--ui-muted-30);
+}
+
+.chart-metric--active,
+.chart-metric--active:hover {
+  background: transparent;
+}
+
+.chart-metric--active::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--ui-primary);
+  content: "";
+}
+
+.chart-metric__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
   font-weight: 500;
-  color: #171717;
+  color: var(--ui-muted-foreground);
+}
+
+.chart-metric--active .chart-metric__label {
+  color: var(--ui-foreground);
+}
+
+.chart-metric__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ui-primary);
+}
+
+.chart-metric__value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ui-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-metric__detail {
+  font-size: 12px;
+  color: #a3a3a3;
+}
+
+.chart-tabs {
+  display: inline-flex;
+  height: 40px;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--ui-radius-lg);
+  background: rgba(243, 244, 246, 0.8);
+}
+
+.chart-tabs__tab {
+  height: 100%;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--ui-radius-md);
+  background: transparent;
+  color: var(--ui-muted-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.chart-tabs__tab:hover {
+  color: var(--ui-foreground);
+}
+
+.chart-tabs__tab--active {
+  background: #ffffff;
+  color: var(--ui-foreground);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.chart-tooltip {
+  min-width: 200px;
+  overflow: hidden;
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  border-radius: var(--ui-radius-md);
+  background: #ffffff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.chart-tooltip__header {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(3, 7, 18, 0.8);
+}
+
+.chart-tooltip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.chart-tooltip__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.chart-tooltip__value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-tooltip__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.chart-tooltip__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ui-muted-foreground);
+}
+
+.half-donut {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.half-donut__canvas {
+  position: relative;
+}
+
+.half-donut__canvas .recharts-sector,
+.half-donut__canvas .recharts-layer,
+.chart-card__plot .recharts-surface {
+  outline: none;
+}
+
+.half-donut__segment {
+  transition: opacity 300ms ease;
+  cursor: pointer;
+}
+
+.half-donut__center {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 4px;
+  pointer-events: none;
+}
+
+.half-donut__value {
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ui-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.half-donut__label {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #a3a3a3;
+}
+
+.gauge-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin-top: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(229, 231, 235, 0.6);
+}
+
+.gauge-summary__text {
+  font-size: 13px;
+  color: var(--ui-muted-foreground);
+}
+
+.chart-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chart-list--spaced {
+  margin-top: 28px;
+}
+
+.chart-list__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--ui-radius-xl);
+  cursor: default;
+  transition: background-color 200ms ease;
+}
+
+.chart-list__item:nth-child(even) {
+  background: rgba(243, 244, 246, 0.4);
+}
+
+.chart-list__item:hover,
+.chart-list__item--active,
+.chart-list__item--active:nth-child(even) {
+  background: rgba(243, 244, 246, 0.9);
+}
+
+.chart-list__name {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-list__dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.chart-list__text {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.attendance-list__value {
-  font-size: 14px;
-  font-weight: 700;
-  color: #059669;
+.chart-list__values {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
   font-variant-numeric: tabular-nums;
 }
 
-.attendance-list__value--warning {
+.chart-list__divider {
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.chart-list__pct {
+  width: 48px;
+  text-align: right;
+}
+
+.chart-list__pct--warning {
   color: #d97706;
 }
 
-.attendance-list__value--critical {
+.chart-list__pct--critical {
   color: #dc2626;
-}
-
-.attendance-list__bar {
-  overflow: hidden;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--ui-muted);
-}
-
-.attendance-list__fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #10b981;
-}
-
-.attendance-list__fill--warning {
-  background: #f59e0b;
-}
-
-.attendance-list__fill--critical {
-  background: #ef4444;
-}
-
-.attendance-list__meta {
-  font-size: 12px;
-  color: #a3a3a3;
 }
 
 @media (max-width: 1180px) {
@@ -428,8 +506,47 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dashboard-grid {
+  .dashboard-row {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .chart-card__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-metric {
+    min-width: 0;
+    flex: 1;
+    padding: 12px 16px 16px;
+  }
+
+  .chart-card__tabs {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(229, 231, 235, 0.8);
+  }
+
+  .chart-tabs {
+    display: flex;
+  }
+
+  .chart-tabs__tab {
+    flex: 1;
+  }
+
+  .chart-card__header {
+    padding: 14px 16px 12px;
+  }
+
+  .chart-card__plot {
+    height: 240px;
+    padding: 16px 8px 8px 0;
+  }
+
+  .chart-card__body {
+    padding: 20px 16px;
   }
 }
 
@@ -442,15 +559,7 @@
     font-size: 22px;
   }
 
-  .week-glance {
-    grid-auto-columns: minmax(96px, 1fr);
-    overflow-x: auto;
-  }
-
-  .upcoming-list__item,
-  .attendance-list__item,
-  .dash-card__header {
-    padding-left: 16px;
-    padding-right: 16px;
+  .chart-metric__value {
+    font-size: 20px;
   }
 }

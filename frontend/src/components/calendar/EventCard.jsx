@@ -42,7 +42,7 @@ export default function EventCard({ item, style, height, selected, onSelect, com
           selected && "cal-card--selected",
           hovered && "cal-card--hovered"
         )}
-        style={{ backgroundColor: item.color, ...style }}
+        style={{ "--card-color": item.color, ...style }}
         aria-label={`${item.title}, ${timeRange}, ${item.status}`}
         aria-pressed={selected}
         onClick={() => {
@@ -92,7 +92,7 @@ export default function EventCard({ item, style, height, selected, onSelect, com
         offset={8}
         closeOnOutside={false}
         className="cal-hovercard"
-        style={{ backgroundColor: item.color }}
+        style={{ "--card-color": item.color }}
         role="tooltip"
       >
         <div className="cal-hovercard__header">

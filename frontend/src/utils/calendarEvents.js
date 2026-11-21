@@ -62,8 +62,8 @@ export function buildCalendarEvents({ schedule, courses, range, clashingSlots, h
   return [...classEvents, ...examEvents, ...taskEvents];
 }
 
-export const EXAM_COLOR = "#1f2933";
-export const TASK_COLOR = "#8a2c22";
+export const EXAM_COLOR = "#475569";
+export const TASK_COLOR = "#e34948";
 
 const STATUS_LABELS = {
   class: "Class",

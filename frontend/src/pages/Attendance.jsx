@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import SemesterNotice from "../components/app/SemesterNotice.jsx";
+import AttendanceMarker from "../components/app/AttendanceMarker.jsx";
 import CourseCell from "../components/app/CourseCell.jsx";
 import ProgressBar from "../components/app/ProgressBar.jsx";
 import StatusBadge from "../components/ui/StatusBadge.jsx";
@@ -7,17 +8,11 @@ import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
-import SegmentedControl from "../components/ui/SegmentedControl.jsx";
 import SelectField from "../components/ui/SelectField.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
-import { ATTENDANCE_OPTIONS, getAttendanceSummary } from "../utils/attendance.js";
+import { ATTENDANCE_OPTIONS, LATES_PER_ABSENCE, getAttendanceSummary } from "../utils/attendance.js";
 import { formatLongDate, formatTimeRange } from "../utils/date.js";
 import { getClassesOnDate, getSelectedCourses } from "../utils/schedule.js";
-
-const MARK_OPTIONS = [
-  { value: "present", label: "Present" },
-  { value: "absent", label: "Absent" },
-];
 
 const RISK_STATUS = {
   ok: "safe",
@@ -39,11 +34,10 @@ function TodayMarking({ classes, marks, onMark }) {
             name={instance.course.name}
             meta={`${formatTimeRange(instance.start, instance.end)}, ${instance.room}`}
           />
-          <SegmentedControl
+          <AttendanceMarker
             label={`Attendance for ${instance.course.name}`}
-            options={MARK_OPTIONS}
             value={marks[instance.id]}
-            onChange={(status) => onMark(instance.id, marks[instance.id] === status ? null : status)}
+            onChange={(status) => onMark(instance.id, status)}
           />
         </li>
       ))}
@@ -113,6 +107,9 @@ export default function Attendance() {
                       Attended
                     </th>
                     <th scope="col" className="cell-numeric">
+                      Late
+                    </th>
+                    <th scope="col" className="cell-numeric">
                       Absent
                     </th>
                     <th scope="col">Attendance</th>
@@ -131,7 +128,11 @@ export default function Attendance() {
                       </td>
                       <td className="cell-numeric cell-muted">{item.held}</td>
                       <td className="cell-numeric cell-muted">{item.attended}</td>
-                      <td className="cell-numeric cell-muted">{item.absent}</td>
+                      <td className="cell-numeric cell-muted">{item.late}</td>
+                      <td className="cell-numeric cell-muted">
+                        {item.absent}
+                        {item.lateAbsences > 0 && <span className="attendance-table__note"> incl. {item.lateAbsences} from lates</span>}
+                      </td>
                       <td>
                         <div className="attendance-table__meter">
                           <ProgressBar
@@ -162,7 +163,7 @@ export default function Attendance() {
           </Panel>
           <p className="text-muted">
             Can still miss is the number of classes you can skip for the rest of the semester and stay at or above{" "}
-            {requirement}%.
+            {requirement}%. Every {LATES_PER_ABSENCE} lates count as one absence.
           </p>
         </>
       )}

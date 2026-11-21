@@ -1407,3 +1407,80 @@
   background: #fef2f2;
   color: var(--ui-danger);
 }
+
+.mark-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--ui-radius-lg);
+  background: rgba(243, 244, 246, 0.9);
+}
+
+.mark-picker--block {
+  display: flex;
+}
+
+.mark-picker__option {
+  display: inline-flex;
+  height: 28px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--ui-radius-md);
+  background: transparent;
+  color: var(--ui-muted-foreground);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.mark-picker--lg .mark-picker__option {
+  height: 36px;
+}
+
+.mark-picker__option svg {
+  color: #a3a3a3;
+}
+
+.mark-picker__option:hover {
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ui-foreground);
+}
+
+.mark-picker__option--present,
+.mark-picker__option--present:hover {
+  background: #ecfdf5;
+  box-shadow: 0 0 0 1px #a7f3d0;
+  color: #047857;
+}
+
+.mark-picker__option--late,
+.mark-picker__option--late:hover {
+  background: #fffbeb;
+  box-shadow: 0 0 0 1px #fde68a;
+  color: #b45309;
+}
+
+.mark-picker__option--absent,
+.mark-picker__option--absent:hover {
+  background: #fef2f2;
+  box-shadow: 0 0 0 1px #fecaca;
+  color: #b91c1c;
+}
+
+.mark-picker__option--present svg,
+.mark-picker__option--late svg,
+.mark-picker__option--absent svg {
+  color: currentColor;
+}
+
+.attendance-table__note {
+  font-size: 12px;
+  color: #a3a3a3;
+}

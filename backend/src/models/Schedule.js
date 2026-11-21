@@ -72,7 +72,7 @@ const scheduleSchema = new mongoose.Schema(
     tasks: { type: [taskSchema], default: [] },
     attendance: {
       baseline: { type: mongoose.Schema.Types.Mixed, default: {} },
-      marks: { type: Map, of: { type: String, enum: ["present", "absent"] }, default: {} },
+      marks: { type: Map, of: { type: String, enum: ["present", "late", "absent"] }, default: {} },
     },
     settings: { type: settingsSchema, default: () => ({}) },
   },

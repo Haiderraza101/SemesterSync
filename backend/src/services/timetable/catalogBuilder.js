@@ -3,7 +3,7 @@ import { formatMinutes } from "./timeText.js";
 
 export const CATALOG_VERSION = 2;
 
-export const COURSE_COLORS = ["#2f5f98", "#9a6b2f", "#3d7a74", "#5b6672", "#7b8fa6", "#1f3a5c", "#9aa5b1"];
+export const COURSE_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6"];
 
 function increment(counter, value) {
   if (value) counter.set(value, (counter.get(value) || 0) + 1);

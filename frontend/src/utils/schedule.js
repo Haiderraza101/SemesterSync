@@ -1,5 +1,6 @@
 import { EXAM_TERM_KEYS, examTermLabel } from "./examTerms.js";
 import { addDays, combineDateTime, parseDateKey, startOfDay, toDateKey } from "./date.js";
+import { assignCourseColors } from "./courseColors.js";
 
 export function getCourseIndex(catalog) {
   return new Map((catalog?.courses || []).map((course) => [course.code, course]));
@@ -22,7 +23,9 @@ export function toSelectedCourse(course, section) {
 
 export function getSelectedCourses(schedule) {
   const index = getCourseIndex(schedule.catalog);
-  return schedule.selections.map(({ code, section }) => toSelectedCourse(index.get(code), section)).filter(Boolean);
+  const courses = schedule.selections.map(({ code, section }) => toSelectedCourse(index.get(code), section)).filter(Boolean);
+  const colors = assignCourseColors(courses);
+  return courses.map((course) => ({ ...course, color: colors.get(course.code) }));
 }
 
 export function getInstanceId(code, dateKey, start) {
