@@ -1,11 +1,13 @@
 import rateLimit from "express-rate-limit";
+import { isProduction } from "../config/env.js";
 
 const MINUTE_MS = 60 * 1000;
+const LOCAL_MULTIPLIER = 10;
 
 function createLimiter({ minutes, limit, message, skipSuccessfulRequests = false }) {
   return rateLimit({
     windowMs: minutes * MINUTE_MS,
-    limit,
+    limit: isProduction ? limit : limit * LOCAL_MULTIPLIER,
     skipSuccessfulRequests,
     standardHeaders: "draft-7",
     legacyHeaders: false,

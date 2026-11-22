@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import AuthField from "../components/app/AuthField.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
 import Icon from "../components/ui/Icon.jsx";
@@ -72,11 +72,6 @@ export default function Login() {
           value={values.password}
           onChange={handleChange}
           error={errors.password}
-          labelAction={
-            <Link to="/forgot-password" className="auth-field__link">
-              Forgot password?
-            </Link>
-          }
         />
         <Checkbox label="Keep me logged in" name="remember" checked={values.remember} onChange={handleChange} />
 

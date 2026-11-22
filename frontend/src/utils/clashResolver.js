@@ -3,6 +3,11 @@ import { SHORT_DAY_NAMES, formatTime } from "./date.js";
 import { inSemester, normalizeSection } from "./sectionFilters.js";
 
 const MAX_NODES = 250000;
+const PROGRAM_PATTERN = /^([A-Z]+)/;
+
+function programOf(sectionName) {
+  return PROGRAM_PATTERN.exec(normalizeSection(sectionName))?.[1] || "";
+}
 const MAX_SOLUTIONS = 2000;
 
 function sectionRank(sectionName, user) {
@@ -16,8 +21,9 @@ export function describeSlots(slots) {
 }
 
 function sectionCandidates(course, currentSection, user) {
+  const program = programOf(currentSection);
   return Object.entries(course.sections)
-    .filter(([, details]) => details.slots?.length)
+    .filter(([section, details]) => details.slots?.length && programOf(section) === program)
     .map(([section, details]) => ({
       kind: section === currentSection ? "keep" : "move",
       from: course.code,
@@ -31,11 +37,12 @@ function sectionCandidates(course, currentSection, user) {
 }
 
 function electiveCandidates(course, catalog, draft, excluded, user) {
+  const program = programOf(draft[course.code].section);
   return catalog.courses
     .filter((other) => other.code !== course.code && !draft[other.code]?.included && !excluded.has(other.code))
     .flatMap((other) =>
       Object.entries(other.sections)
-        .filter(([section, details]) => details.type === "elective" && details.slots?.length)
+        .filter(([section, details]) => details.type === "elective" && details.slots?.length && programOf(section) === program)
         .filter(([section]) => !user.semesterKey || inSemester(section, user.semesterKey))
         .map(([section, details]) => ({
           kind: "swap",
