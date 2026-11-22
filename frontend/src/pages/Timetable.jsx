@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ClashBanner from "../components/app/ClashBanner.jsx";
 import FileDropzone from "../components/app/FileDropzone.jsx";
 import FileSummary from "../components/app/FileSummary.jsx";
 import SectionFilters from "../components/app/SectionFilters.jsx";
 import SectionTable from "../components/app/SectionTable.jsx";
 import Stepper from "../components/app/Stepper.jsx";
 import Button from "../components/ui/Button.jsx";
+import KpiCard, { KpiGrid } from "../components/ui/KpiCard.jsx";
 import Notice from "../components/ui/Notice.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
@@ -13,8 +15,10 @@ import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
 import { scheduleService } from "../services/scheduleService.js";
-import { describeClash, findClashes, getClashingSlotKeys } from "../utils/clashes.js";
+import { findClashes, getClashingSlotKeys, groupClashes } from "../utils/clashes.js";
+import { assignCourseColors } from "../utils/courseColors.js";
 import { getErrorMessage } from "../utils/errors.js";
+import { SHORT_DAY_NAMES, timeToMinutes } from "../utils/date.js";
 import { formatFileSize, validateSpreadsheet } from "../utils/files.js";
 import { toSelectedCourse } from "../utils/schedule.js";
 import {
@@ -72,9 +76,30 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
     [catalog, draft]
   );
 
-  const clashes = useMemo(() => findClashes(draftCourses), [draftCourses]);
+  const courseColors = useMemo(() => assignCourseColors(draftCourses), [draftCourses]);
+  const coloredDraftCourses = useMemo(
+    () => draftCourses.map((course) => ({ ...course, color: courseColors.get(course.code) })),
+    [draftCourses, courseColors]
+  );
+
+  const clashes = useMemo(() => findClashes(coloredDraftCourses), [coloredDraftCourses]);
   const clashingSlots = useMemo(() => getClashingSlotKeys(clashes), [clashes]);
   const classesPerWeek = draftCourses.reduce((total, course) => total + course.slots.length, 0);
+  const minutesPerWeek = draftCourses.reduce(
+    (total, course) => total + course.slots.reduce((sum, slot) => sum + timeToMinutes(slot.end) - timeToMinutes(slot.start), 0),
+    0
+  );
+  const typeCounts = catalog.courses
+    .filter((course) => draft[course.code].included)
+    .reduce((counts, course) => {
+      const type = course.sections[draft[course.code].section]?.type || "core";
+      return { ...counts, [type]: (counts[type] || 0) + 1 };
+    }, {});
+  const busiestDay = draftCourses
+    .flatMap((course) => course.slots.map((slot) => slot.day))
+    .reduce((counts, day) => counts.set(day, (counts.get(day) || 0) + 1), new Map());
+  const [busyDay, busyCount] = [...busiestDay.entries()].sort((a, b) => b[1] - a[1])[0] || [];
+  const clashPairs = groupClashes(clashes).length;
 
   const sectionOptions = useMemo(
     () =>
@@ -124,21 +149,47 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
 
   return (
     <>
-      {clashes.length > 0 ? (
-        <Notice
-          variant="warning"
-          title={
-            clashes.length === 1
-              ? "1 clash between selected sections"
-              : `${clashes.length} clashes between selected sections`
+      <KpiGrid>
+        <KpiCard
+          label="Courses selected"
+          value={draftCourses.length}
+          detail={
+            draftCourses.length
+              ? [
+                  `${typeCounts.core || 0} core`,
+                  typeCounts.elective && `${typeCounts.elective} elective`,
+                  typeCounts.repeat && `${typeCounts.repeat} repeat`,
+                ]
+                  .filter(Boolean)
+                  .join(", ")
+              : "Tick the courses you are taking"
           }
-        >
-          <ul className="clash-list">
-            {clashes.map((clash) => (
-              <li key={clash.id}>{describeClash(clash)}</li>
-            ))}
-          </ul>
-        </Notice>
+        />
+        <KpiCard
+          label="Classes per week"
+          value={classesPerWeek}
+          detail={busyDay !== undefined ? `Busiest day: ${SHORT_DAY_NAMES[busyDay]} with ${busyCount}` : "No classes yet"}
+        />
+        <KpiCard
+          label="Hours in class"
+          value={Math.round((minutesPerWeek / 60) * 10) / 10}
+          unit="h / week"
+          detail={classesPerWeek ? `${Math.round(minutesPerWeek / classesPerWeek)} min per class on average` : "No classes yet"}
+        />
+        <KpiCard
+          label="Clashes"
+          value={clashPairs}
+          detail={clashPairs ? "Change a section to fix them" : "No overlapping classes"}
+          tone={clashPairs ? "critical" : "success"}
+        />
+      </KpiGrid>
+
+      {clashes.length > 0 ? (
+        <ClashBanner
+          clashes={clashes}
+          showAction={false}
+          text="Choose a different section for one course in each pair below, or untick a course you are not taking."
+        />
       ) : (
         draftCourses.length > 0 && <Notice variant="success" title="No clashes between the selected sections." />
       )}
@@ -179,6 +230,7 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
         </div>
         <SectionTable
           courses={visibleCourses}
+          courseColors={courseColors}
           draft={draft}
           sectionOptions={sectionOptions}
           clashingSlots={clashingSlots}

@@ -44,3 +44,15 @@ export function describeClash(clash) {
   const [first, second] = clash.courses;
   return `${DAY_NAMES[clash.day]} at ${formatTime(clash.start)}: ${first.name} (${first.section}) and ${second.name} (${second.section})`;
 }
+
+export function groupClashes(clashes) {
+  const groups = new Map();
+  clashes.forEach((clash) => {
+    const [first, second] = clash.courses;
+    const key = `${first.code}|${first.section}~${second.code}|${second.section}`;
+    const group = groups.get(key) || { id: key, courses: clash.courses, times: [] };
+    group.times.push({ day: clash.day, start: clash.start });
+    groups.set(key, group);
+  });
+  return [...groups.values()];
+}

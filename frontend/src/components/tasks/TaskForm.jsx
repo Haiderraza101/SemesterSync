@@ -9,7 +9,6 @@ import { useForm } from "../../hooks/useForm.js";
 import { useSchedule } from "../../hooks/useSchedule.js";
 import { formatShortDate, formatTimeRange, parseDateKey } from "../../utils/date.js";
 import { getUpcomingLectures } from "../../utils/schedule.js";
-import { TASK_REMINDER_OPTIONS } from "../../utils/reminders.js";
 import { validateTask } from "../../utils/validation.js";
 
 const TYPE_OPTIONS = [
@@ -25,7 +24,6 @@ export default function TaskForm({ courses, onSubmit }) {
       type: "assignment",
       date: "",
       time: "23:59",
-      reminder: "1d",
       lectureId: "",
     }),
     [courses]
@@ -65,7 +63,6 @@ export default function TaskForm({ courses, onSubmit }) {
       courseCode: values.courseCode,
       type: values.type,
       due: linked ? `${chosenLecture.dateKey}T${chosenLecture.start}` : `${values.date}T${values.time}`,
-      reminder: values.reminder,
       done: false,
       ...(linked && { lectureId: chosenLecture.id }),
     });
@@ -73,7 +70,7 @@ export default function TaskForm({ courses, onSubmit }) {
   };
 
   return (
-    <Panel as="div" title="New item">
+    <Panel as="div" title="Add an assignment or quiz" description="It appears on your calendar and dashboard.">
       <form className="form-stack" onSubmit={handleSubmit} noValidate>
         <TextField
           label="Title"
@@ -142,13 +139,6 @@ export default function TaskForm({ courses, onSubmit }) {
           />
         </div>
         )}
-        <SelectField
-          label="Reminder"
-          name="reminder"
-          options={TASK_REMINDER_OPTIONS}
-          value={values.reminder}
-          onChange={handleChange}
-        />
         <Button type="submit" variant="primary" block>
           {isQuiz ? "Add quiz" : "Add assignment"}
         </Button>

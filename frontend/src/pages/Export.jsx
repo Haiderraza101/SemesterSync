@@ -144,7 +144,7 @@ export default function Export() {
             />
           </div>
           <div className="page-grid__side">
-            <Panel as="div" title="Options">
+            <Panel as="div" title="Download" description="Choose a format, then download your weekly timetable.">
               <div className="form-stack">
                 <fieldset>
                   <legend className="field__label export-options__legend">Format</legend>
@@ -167,6 +167,26 @@ export default function Export() {
                   {exporting ? "Preparing file…" : `Download ${format.toUpperCase()}`}
                 </Button>
               </div>
+            </Panel>
+            <Panel as="div" title="In this timetable" flush>
+              <dl className="export-facts">
+                <div>
+                  <dt>Courses</dt>
+                  <dd>{courses.length}</dd>
+                </div>
+                <div>
+                  <dt>Classes per week</dt>
+                  <dd>{courses.reduce((total, course) => total + course.slots.length, 0)}</dd>
+                </div>
+                <div>
+                  <dt>Days</dt>
+                  <dd>{days.length === 6 ? "Mon to Sat" : "Mon to Fri"}</dd>
+                </div>
+                <div>
+                  <dt>Semester</dt>
+                  <dd>{semesterName || "Not set"}</dd>
+                </div>
+              </dl>
             </Panel>
           </div>
         </div>

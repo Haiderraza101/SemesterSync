@@ -48,10 +48,10 @@ export function getAttendanceSummary(schedule, courses, requirement = 80) {
     const canMiss = Math.max(0, allowedAbsences - absent);
     const percentage = held === 0 ? 100 : Math.round((attended / held) * 100);
 
-    return { course, held, attended, absent, late, lateAbsences, total, percentage, canMiss, risk: getRisk(canMiss) };
+    return { course, held, attended, absent, late, lateAbsences, total, percentage, canMiss, risk: held === 0 ? "ok" : getRisk(canMiss) };
   });
 }
 
 export function getLowestAttendance(summary) {
-  return summary.reduce((lowest, item) => (!lowest || item.percentage < lowest.percentage ? item : lowest), null);
+  return summary.filter((item) => item.held > 0).reduce((lowest, item) => (!lowest || item.percentage < lowest.percentage ? item : lowest), null);
 }

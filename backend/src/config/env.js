@@ -28,10 +28,6 @@ export const env = {
   clientUrl: clientOrigins[0],
   clientOrigins,
   timezone: process.env.APP_TIMEZONE || "Asia/Karachi",
-  notifications: {
-    enabled: process.env.NOTIFICATIONS_ENABLED !== "false",
-    maxCatchUpMinutes: readNumber("NOTIFICATIONS_CATCH_UP_MINUTES", 15),
-  },
   auth: {
     accessTokenSecret: process.env.JWT_SECRET,
     accessTokenTtl: process.env.JWT_ACCESS_EXPIRES_IN || "15m",

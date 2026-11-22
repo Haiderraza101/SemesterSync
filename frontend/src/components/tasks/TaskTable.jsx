@@ -5,6 +5,7 @@ import Icon from "../ui/Icon.jsx";
 import StatusBadge from "../ui/StatusBadge.jsx";
 import { cx } from "../../utils/cx.js";
 import { formatShortDate, formatTime, toTimeKey } from "../../utils/date.js";
+import { daysAway } from "../../utils/relative.js";
 
 function getStatus(task, now) {
   if (task.done) return "completed";
@@ -18,15 +19,15 @@ export default function TaskTable({ tasks, now, onToggle, onDelete }) {
       <EmptyState
         variant="compact"
         icon="tasks"
-        title="Nothing here yet"
-        description="Add assignments and quizzes with the form to track them."
+        title="No assignments or quizzes yet"
+        description="Add one with the form. It shows up on your calendar and dashboard straight away."
       />
     );
   }
 
   return (
     <div className="data-table-wrapper">
-      <table className="data-table task-table">
+      <table className="data-table data-table--zebra task-table">
         <thead>
           <tr>
             <th scope="col">
@@ -69,6 +70,7 @@ export default function TaskTable({ tasks, now, onToggle, onDelete }) {
                   <span className="cell-stack__main">{formatShortDate(task.dueAt)}</span>
                   <span className="cell-stack__sub">
                     {task.lectureId ? `In lecture · ${formatTime(toTimeKey(task.dueAt))}` : formatTime(toTimeKey(task.dueAt))}
+                    {!task.done && ` · ${daysAway(task.dueAt, now).label.toLowerCase()}`}
                   </span>
                 </div>
               </td>

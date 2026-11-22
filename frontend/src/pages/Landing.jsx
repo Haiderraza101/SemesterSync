@@ -8,12 +8,12 @@ import "../styles/pages/landing.css";
 const PREVIEW_STEPS = [
   { title: "Upload", text: "The timetable Excel file, exactly as the university shares it." },
   { title: "Choose", text: "Your section, electives and repeat courses, with clash checks." },
-  { title: "Follow", text: "Calendar, attendance, exams and email reminders all semester." },
+  { title: "Follow", text: "Calendar, attendance, exams and deadlines all semester." },
 ];
 
 const FEATURES = [
   { title: "Timetable upload", text: "Import the Excel timetable and add your sections as weekly classes." },
-  { title: "Date sheets", text: "Add both midterms and the final with reminders before each paper." },
+  { title: "Date sheets", text: "Add both midterms and the final, with a countdown to each paper." },
   { title: "Clash detection", text: "Get a warning when two selected sections overlap." },
   { title: "Assignments and quizzes", text: "Track due dates alongside your classes." },
   { title: "Attendance tracker", text: "See how many classes you can still miss in each course." },
@@ -23,7 +23,7 @@ const FEATURES = [
 const STEPS = [
   { title: "Upload the file", text: "Use the timetable or date sheet exactly as the university shares it." },
   { title: "Select your sections", text: "Pick a section for each course and check for clashes." },
-  { title: "Stay on schedule", text: "Get reminders, a morning summary and an exportable timetable." },
+  { title: "Stay on schedule", text: "Follow your week on the dashboard and export a printable timetable." },
 ];
 
 function SchedulePreview() {
@@ -85,7 +85,7 @@ export default function Landing() {
             <h1 className="landing-hero__title">Your timetable, date sheets and deadlines in one calendar.</h1>
             <p className="landing-hero__lead">
               Upload the Excel files your university shares, select your courses and sections, and SemesterSync builds
-              your calendar with reminders.
+              your calendar for the whole semester.
             </p>
             <div className="landing-hero__actions">
               <Button to={primaryAction.to} variant="primary" size="lg">

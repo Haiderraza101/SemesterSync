@@ -34,7 +34,6 @@ const taskSchema = new mongoose.Schema(
     courseCode: { type: String, uppercase: true },
     type: { type: String, enum: ["assignment", "quiz"], default: "assignment" },
     due: { type: String, required: true },
-    reminder: { type: String, enum: ["1d", "3h", "none"], default: "1d" },
     done: { type: Boolean, default: false },
     lectureId: { type: String, maxlength: 120 },
   },
@@ -43,10 +42,6 @@ const taskSchema = new mongoose.Schema(
 
 const settingsSchema = new mongoose.Schema(
   {
-    morningSummary: { type: Boolean, default: true },
-    summaryTime: { type: String, default: "07:00", match: TIME_PATTERN },
-    classReminder: { type: String, enum: ["15m", "30m", "off"], default: "15m" },
-    examReminder: { type: String, enum: ["1d", "2d", "1w"], default: "1d" },
     defaultView: { type: String, enum: ["timeGridDay", "timeGridWeek", "dayGridMonth"], default: "timeGridWeek" },
     showSaturday: { type: Boolean, default: false },
     attendanceRequirement: { type: Number, enum: [75, 80], default: 80 },

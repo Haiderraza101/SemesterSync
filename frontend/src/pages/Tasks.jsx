@@ -2,12 +2,18 @@ import { useMemo, useState } from "react";
 import TaskForm from "../components/tasks/TaskForm.jsx";
 import TaskTable from "../components/tasks/TaskTable.jsx";
 import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
+import KpiCard, { KpiGrid } from "../components/ui/KpiCard.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import Tabs from "../components/ui/Tabs.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
+import { addDays } from "../utils/date.js";
 import { getSelectedCourses, getTasksWithCourses } from "../utils/schedule.js";
+
+function plural(count, singular, pluralForm = `${singular}s`) {
+  return `${count} ${count === 1 ? singular : pluralForm}`;
+}
 
 const FILTERS = {
   all: () => true,
@@ -39,6 +45,11 @@ export default function Tasks() {
   ];
 
   const visibleTasks = tasks.filter(FILTERS[filter]);
+  const open = tasks.filter((task) => !task.done);
+  const overdue = open.filter((task) => task.dueAt < now);
+  const dueSoon = open.filter((task) => task.dueAt >= now && task.dueAt <= addDays(now, 7));
+  const completed = tasks.length - open.length;
+  const nextDue = open.filter((task) => task.dueAt >= now)[0];
 
   const handleAdd = (task) => {
     addTask(task);
@@ -55,10 +66,38 @@ export default function Tasks() {
     <>
       <PageHeader
         title="Assignments and quizzes"
-        description="Add deadlines by hand. Each one appears on your calendar with a reminder."
+        description="Track every assignment and quiz. Each one appears on your calendar and dashboard."
       >
         <Tabs label="Filter items" tabs={tabs} value={filter} onChange={setFilter} />
       </PageHeader>
+
+      <KpiGrid>
+        <KpiCard
+          label="Still to do"
+          value={open.length}
+          detail={`${plural(open.filter((task) => task.type === "quiz").length, "quiz", "quizzes")}, ${plural(open.filter((task) => task.type !== "quiz").length, "assignment")}`}
+        />
+        <KpiCard
+          label="Due in the next 7 days"
+          value={dueSoon.length}
+          detail={nextDue ? `Next: ${nextDue.title}` : "Nothing due soon"}
+          tone={dueSoon.length >= 3 ? "warning" : undefined}
+        />
+        <KpiCard
+          label="Overdue"
+          value={overdue.length}
+          detail={overdue.length ? `Oldest: ${overdue[0].title}` : "You are all caught up"}
+          tone={overdue.length ? "critical" : "success"}
+        />
+        <KpiCard
+          label="Completed"
+          value={completed}
+          unit={`of ${tasks.length}`}
+          progress={tasks.length ? (completed / tasks.length) * 100 : 0}
+          tone="success"
+          detail={tasks.length ? `${Math.round((completed / tasks.length) * 100)}% done` : "Nothing added yet"}
+        />
+      </KpiGrid>
 
       <div className="page-grid">
         <Panel className="page-grid__main" flush>

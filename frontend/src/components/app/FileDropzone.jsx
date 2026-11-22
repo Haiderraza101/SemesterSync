@@ -29,7 +29,9 @@ export default function FileDropzone({ label, hint, busy = false, busyLabel = "R
       onDragLeave={() => setDragging(false)}
       onDrop={handleDrop}
     >
-      <Icon name="upload" size={22} className="dropzone__icon" />
+      <span className="dropzone__icon" aria-hidden="true">
+        <Icon name="upload" size={20} strokeWidth={2} />
+      </span>
       {busy ? (
         <p className="dropzone__title" role="status">
           {busyLabel}

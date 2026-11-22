@@ -31,6 +31,12 @@ function buildSharedTasks(schedule) {
     .map(({ title, courseCode, type, due }) => ({ title, courseCode: courseCode || "", type, due }));
 }
 
+const SHARE_STEPS = [
+  { title: "Generate a code", detail: "Pick what to include, then create your code." },
+  { title: "Send it to classmates", detail: "Share the code or the link in your class group." },
+  { title: "They import it", detail: "Their calendar fills with the same sections in seconds." },
+];
+
 const IMPORT_MODES = [
   { value: "replace", label: "Replace my current schedule" },
   { value: "merge", label: "Add to my current schedule" },
@@ -102,7 +108,11 @@ function ShareCodePanel() {
   };
 
   return (
-    <Panel title="Your schedule code" className="share-layout__panel">
+    <Panel
+      title="Your schedule code"
+      description="Classmates enter this code to copy your courses and sections."
+      className="share-layout__panel"
+    >
       <div className="share-panel__body">
         {loadingCode ? (
           <p className="text-muted">Loading your share code…</p>
@@ -124,22 +134,34 @@ function ShareCodePanel() {
             </p>
           </>
         ) : (
-          <p className="text-secondary">Create a code that classmates can enter to copy your courses and sections.</p>
+          <div className="share-empty">
+            <span className="share-empty__code">XXXX-XXXX</span>
+            <span className="text-muted">Generate a code to start sharing. You can turn it off at any time.</span>
+          </div>
         )}
 
         <fieldset className="share-panel__options">
           <legend className="field__label">Included in the code</legend>
-          <Checkbox label={`Courses and sections (${schedule.selections.length})`} checked readOnly disabled />
-          <Checkbox
-            label={`Exams (${sharedExams.length})`}
-            checked={include.exams}
-            onChange={() => setInclude((current) => ({ ...current, exams: !current.exams }))}
-          />
-          <Checkbox
-            label={`Assignments and quizzes (${sharedTasks.length})`}
-            checked={include.tasks}
-            onChange={() => setInclude((current) => ({ ...current, tasks: !current.tasks }))}
-          />
+          <div className="share-option">
+            <Checkbox label="Courses and sections" checked readOnly disabled />
+            <span className="share-option__count">{schedule.selections.length}</span>
+          </div>
+          <div className="share-option">
+            <Checkbox
+              label="Exams from your date sheets"
+              checked={include.exams}
+              onChange={() => setInclude((current) => ({ ...current, exams: !current.exams }))}
+            />
+            <span className="share-option__count">{sharedExams.length}</span>
+          </div>
+          <div className="share-option">
+            <Checkbox
+              label="Open assignments and quizzes"
+              checked={include.tasks}
+              onChange={() => setInclude((current) => ({ ...current, tasks: !current.tasks }))}
+            />
+            <span className="share-option__count">{sharedTasks.length}</span>
+          </div>
         </fieldset>
         <p className="text-muted share-panel__note">
           Choices apply when you generate a code. Attendance is never shared.
@@ -219,7 +241,11 @@ function ImportPanel() {
   };
 
   return (
-    <Panel title="Import a schedule" className="share-layout__panel">
+    <Panel
+      title="Import a schedule"
+      description="Got a code from a classmate? Look it up to preview their schedule first."
+      className="share-layout__panel"
+    >
       <div className="share-panel__body">
         <form className="share-lookup" onSubmit={handleLookup} noValidate>
           <label htmlFor="import-code" className="field__label">
@@ -254,7 +280,7 @@ function ImportPanel() {
                   {sharedTasks.length > 0 && ` · ${sharedTasks.length} tasks`}
                 </span>
               </div>
-              <table className="data-table">
+              <table className="data-table data-table--zebra">
                 <tbody>
                   {lookup.selections.map((selection) => (
                     <tr key={selection.code}>
@@ -309,6 +335,17 @@ export default function Share() {
         title="Share code"
         description="Share your schedule with classmates, or copy someone else's into your calendar."
       />
+      <ol className="share-steps">
+        {SHARE_STEPS.map((step, index) => (
+          <li key={step.title} className="share-step">
+            <span className="share-step__number">{index + 1}</span>
+            <span className="share-step__text">
+              <span className="share-step__title">{step.title}</span>
+              <span className="share-step__detail">{step.detail}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
       <div className="share-layout">
         <ShareCodePanel />
         <ImportPanel />

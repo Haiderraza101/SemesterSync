@@ -1,0 +1,13 @@
+.exam-table__same-day {
+  font-size: 12px;
+  font-weight: 500;
+  color: #d97706;
+}
+
+.exam-table__row--off td {
+  opacity: 0.55;
+}
+
+.exam-table__row--off td:first-child {
+  opacity: 1;
+}

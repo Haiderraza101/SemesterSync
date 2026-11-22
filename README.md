@@ -1,6 +1,6 @@
 # SemesterSync: Semester Schedule Manager
 
-SemesterSync helps university students keep their class timetable, exam date sheets and deadlines in one place. Upload the university timetable or date sheet Excel file, select your courses and sections, and everything is placed on a calendar with reminders.
+SemesterSync helps university students keep their class timetable, exam date sheets and deadlines in one place. Upload the university timetable or date sheet Excel file, select your courses and sections, and everything is placed on one calendar with a dashboard, attendance tracking and deadlines.
 
 **Section:** BCS 7A
 **Author:** Haider (23L-0634)
@@ -18,13 +18,13 @@ SemesterSync helps university students keep their class timetable, exam date she
 2. Calendar with day, week and month views
 3. Timetable Excel upload with course and section selection
 4. Date sheet upload for midterm and final exams
-5. Assignments and quizzes with reminders
+5. Assignments and quizzes linked to lectures
 6. Clash detection
 7. Colour coding per course with room numbers
 8. Class cancellation and makeup classes
 9. Share code to copy a schedule
-10. Attendance tracker
-11. Morning summary email
+10. Attendance tracker with present, late and absent marks
+11. Dashboard with workload and attendance charts
 12. Export timetable as PDF or image
 
 ## Project Structure
@@ -74,7 +74,7 @@ SemesterSync helps university students keep their class timetable, exam date she
 | `/app/attendance` | Attendance tracker |
 | `/app/share` | Share code generation and import |
 | `/app/export` | Timetable export as PDF or PNG |
-| `/app/settings` | Profile, notifications, calendar and account settings |
+| `/app/settings` | Profile, semester, calendar and account settings |
 
 All data comes from the Express API. There is no sample or demo data: a new account starts empty until a timetable is uploaded.
 
@@ -133,18 +133,7 @@ The selected schedule is saved to MongoDB through `/schedule` and loads again on
 
 ### Semester dates
 
-The semester name is detected from the timetable title (for example "Fall 2026"). The first and last teaching day are set in Settings and saved with the schedule. Classes, attendance totals and reminders only run between those dates.
-
-### Notifications
-
-`backend/src/jobs/notificationScheduler.js` runs every minute in `APP_TIMEZONE` (default `Asia/Karachi`) and emails each user:
-
-- the morning summary at their chosen time (today's classes, exams, and tasks due today or tomorrow)
-- class reminders 15 or 30 minutes before each class, skipping cancelled classes and including makeup classes
-- task reminders 1 day or 3 hours before the due time
-- exam reminders 1 day, 2 days or 1 week before each paper
-
-Every notification is recorded in the `notificationlogs` collection so it is sent once, and a failed email is retried on the next run. Set `NOTIFICATIONS_ENABLED=false` to turn the scheduler off.
+The semester name is detected from the timetable title (for example "Fall 2026"). The first and last teaching day are set in Settings and saved with the schedule. Classes and attendance totals only count between those dates.
 
 ## Getting Started
 

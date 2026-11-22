@@ -7,7 +7,15 @@ import { cx } from "../../utils/cx.js";
 import { getSlotKey } from "../../utils/clashes.js";
 import { SHORT_DAY_NAMES, formatTime } from "../../utils/date.js";
 
-export default function SectionTable({ courses, draft, sectionOptions, clashingSlots, onToggle, onSectionChange }) {
+export default function SectionTable({
+  courses,
+  courseColors,
+  draft,
+  sectionOptions,
+  clashingSlots,
+  onToggle,
+  onSectionChange,
+}) {
   if (courses.length === 0) {
     return <EmptyState variant="compact" icon="search" title="No courses match your search and filters" />;
   }
@@ -45,7 +53,7 @@ export default function SectionTable({ courses, draft, sectionOptions, clashingS
                 </td>
                 <td>
                   <CourseCell
-                    color={course.color}
+                    color={courseColors?.get(course.code) || course.color}
                     name={course.name}
                     meta={course.kind === "lab" ? `${course.code} · Lab` : course.code}
                   />

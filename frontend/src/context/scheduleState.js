@@ -3,10 +3,6 @@ import { EXAM_TERM_KEYS } from "../utils/examTerms.js";
 export const SCHEDULE_VERSION = 1;
 
 export const DEFAULT_SETTINGS = {
-  morningSummary: true,
-  summaryTime: "07:00",
-  classReminder: "15m",
-  examReminder: "1d",
   defaultView: "timeGridWeek",
   showSaturday: false,
   attendanceRequirement: 80,
@@ -40,7 +36,7 @@ function mergeSharedExams(dateSheets, exams = []) {
     const incoming = exams.filter((exam) => exam.term === term).map(({ term: examTerm, ...exam }) => exam);
     if (incoming.length === 0) return;
     const merged = new Map((next[term]?.exams || []).map((exam) => [exam.code, exam]));
-    incoming.forEach((exam) => merged.set(exam.code, { reminder: "1d", ...merged.get(exam.code), ...exam }));
+    incoming.forEach((exam) => merged.set(exam.code, { ...merged.get(exam.code), ...exam }));
     next[term] = { fileName: next[term]?.fileName || "Shared schedule", exams: [...merged.values()] };
   });
   return next;
@@ -50,7 +46,7 @@ function mergeSharedTasks(tasks, incoming = []) {
   const existing = new Set(tasks.map((task) => `${task.title}|${task.courseCode}|${task.due}`));
   const added = incoming
     .filter((task) => !existing.has(`${task.title}|${task.courseCode}|${task.due}`))
-    .map((task, index) => ({ ...task, id: `task-${Date.now()}-${index}`, reminder: "1d", done: false }));
+    .map((task, index) => ({ ...task, id: `task-${Date.now()}-${index}`, done: false }));
   return [...tasks, ...added];
 }
 

@@ -16,14 +16,14 @@ const INITIAL_VALUES = { email: "", password: "", remember: true };
 const LOGIN_FEATURES = [
   "Your timetable read straight from the university Excel file",
   "Clash warnings before you commit to a section",
-  "Reminders and a morning summary by email",
+  "Attendance tracking with present, late and absent marks",
 ];
 
 function LoginAside() {
   return (
     <>
       <h2 className="auth-split__headline">Classes, exams and deadlines in one calendar.</h2>
-      <p className="auth-split__lead">Your schedule, attendance and reminders, kept in sync for the whole semester.</p>
+      <p className="auth-split__lead">Your schedule, attendance and deadlines, kept in sync for the whole semester.</p>
       <ul className="steps-list">
         {LOGIN_FEATURES.map((feature) => (
           <li key={feature} className="steps-list__item">

@@ -13,7 +13,9 @@ export default function Notice({ variant = "info", title, action, className, chi
 
   return (
     <div className={cx("notice", `notice--${variant}`, className)} role={isUrgent ? "alert" : "status"}>
-      <Icon name={ICONS[variant]} size={16} className="notice__icon" />
+      <span className="notice__icon" aria-hidden="true">
+        <Icon name={ICONS[variant]} size={16} strokeWidth={2} />
+      </span>
       <div className="notice__content">
         {title && <strong className="notice__title">{title}</strong>}
         {children && <div className="notice__text">{children}</div>}

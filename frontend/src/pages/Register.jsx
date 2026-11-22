@@ -22,7 +22,7 @@ const INITIAL_VALUES = {
 const STEPS = [
   "Upload the timetable Excel file from your university",
   "Select your courses and sections",
-  "Get reminders and a daily morning summary",
+  "Track classes, exams, deadlines and attendance in one place",
 ];
 
 function RegisterAside() {

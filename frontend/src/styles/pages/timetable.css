@@ -78,12 +78,6 @@
   color: var(--color-text-muted);
 }
 
-.clash-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .section-filters {
   display: flex;
   flex: 1 1 auto;

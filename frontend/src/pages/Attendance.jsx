@@ -6,11 +6,13 @@ import ProgressBar from "../components/app/ProgressBar.jsx";
 import StatusBadge from "../components/ui/StatusBadge.jsx";
 import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
+import KpiCard, { KpiGrid } from "../components/ui/KpiCard.jsx";
 import PageHeader from "../components/ui/PageHeader.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import SelectField from "../components/ui/SelectField.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { ATTENDANCE_OPTIONS, LATES_PER_ABSENCE, getAttendanceSummary } from "../utils/attendance.js";
+import { getOverallAttendance } from "../utils/dashboardStats.js";
 import { formatLongDate, formatTimeRange } from "../utils/date.js";
 import { getClassesOnDate, getSelectedCourses } from "../utils/schedule.js";
 
@@ -52,6 +54,12 @@ export default function Attendance() {
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const summary = useMemo(() => getAttendanceSummary(schedule, courses, requirement), [schedule, courses, requirement]);
+  const overall = useMemo(() => getOverallAttendance(summary), [summary]);
+  const lates = summary.reduce((total, item) => total + item.late, 0);
+  const lateAbsences = summary.reduce((total, item) => total + item.lateAbsences, 0);
+  const atRisk = summary.filter((item) => item.risk !== "ok");
+  const overallTone =
+    overall.percentage === null ? undefined : overall.percentage < requirement ? "critical" : overall.percentage < requirement + 5 ? "warning" : "success";
   const todayClasses = useMemo(
     () => getClassesOnDate(schedule, courses, now).filter((instance) => !instance.cancelled),
     [schedule, courses, now]
@@ -90,13 +98,46 @@ export default function Attendance() {
         </Panel>
       ) : (
         <>
-          <Panel title={`Mark today, ${formatLongDate(now)}`} flush>
+          <KpiGrid>
+            <KpiCard
+              label="Overall attendance"
+              value={overall.percentage === null ? "–" : `${overall.percentage}%`}
+              progress={overall.percentage ?? 0}
+              tone={overallTone}
+              detail={`${requirement}% required`}
+            />
+            <KpiCard
+              label="Classes attended"
+              value={overall.attended}
+              unit={`of ${overall.held}`}
+              detail={overall.held ? `${overall.held - overall.attended} missed so far` : "No classes recorded yet"}
+            />
+            <KpiCard
+              label="Late marks"
+              value={lates}
+              detail={lateAbsences ? `Counted as ${lateAbsences} ${lateAbsences === 1 ? "absence" : "absences"}` : `Every ${LATES_PER_ABSENCE} lates count as one absence`}
+              tone={lateAbsences ? "warning" : undefined}
+            />
+            <KpiCard
+              label="Courses at risk"
+              value={atRisk.length}
+              unit={`of ${summary.length}`}
+              detail={atRisk.length ? atRisk.map((item) => item.course.name).join(", ") : "Every course is on track"}
+              tone={atRisk.length ? "warning" : "success"}
+            />
+          </KpiGrid>
+
+          <Panel title="Mark today" description={formatLongDate(now)} flush>
             <TodayMarking classes={todayClasses} marks={schedule.attendance.marks} onMark={markAttendance} />
           </Panel>
 
-          <Panel flush>
+          <Panel
+            title="By course"
+            description={`Can still miss is how many more classes you can skip and stay at or above ${requirement}%. Every ${LATES_PER_ABSENCE} lates count as one absence.`}
+            flush
+          >
             <div className="data-table-wrapper">
-              <table className="data-table attendance-table">
+              <table className="data-table data-table--zebra attendance-table">
                 <thead>
                   <tr>
                     <th scope="col">Course</th>
@@ -161,10 +202,6 @@ export default function Attendance() {
               </table>
             </div>
           </Panel>
-          <p className="text-muted">
-            Can still miss is the number of classes you can skip for the rest of the semester and stay at or above{" "}
-            {requirement}%. Every {LATES_PER_ABSENCE} lates count as one absence.
-          </p>
         </>
       )}
     </>

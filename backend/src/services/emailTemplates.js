@@ -1,5 +1,3 @@
-import { formatTime } from "./notifications/scheduleCalendar.js";
-
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -52,59 +50,5 @@ export function passwordChangedEmail({ name, resetUrl }) {
     `If this was not you, <a href="${escapeHtml(resetUrl)}">reset your password</a> right away.`,
   ]);
 
-  return { subject, text, html };
-}
-
-const DATE_LABEL = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" });
-
-function list(items) {
-  return `<ul style="margin:0 0 16px;padding-left:20px">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
-}
-
-function summarySections({ classes, exams, tasks }) {
-  return [
-    {
-      title: "Classes",
-      items: classes.map(
-        (item) =>
-          `${formatTime(item.start)} to ${formatTime(item.end)}: ${item.name}${item.room ? `, ${item.room}` : ""}${item.makeup ? " (makeup)" : ""}`
-      ),
-    },
-    {
-      title: "Exams",
-      items: exams.map((exam) => `${formatTime(exam.start)}: ${exam.name}${exam.venue ? `, ${exam.venue}` : ""}`),
-    },
-    {
-      title: "Due today or tomorrow",
-      items: tasks.map((task) => `${task.title}${task.courseName ? ` (${task.courseName})` : ""}`),
-    },
-  ].filter((section) => section.items.length > 0);
-}
-
-export function morningSummaryEmail({ name, day, classes, exams, tasks }) {
-  const dateLabel = DATE_LABEL.format(day);
-  const subject = `Your day: ${dateLabel}`;
-  const sections = summarySections({ classes, exams, tasks });
-
-  const text = [
-    `Hi ${name},`,
-    "",
-    `Here is your schedule for ${dateLabel}.`,
-    ...sections.flatMap((section) => ["", `${section.title}:`, ...section.items.map((item) => `- ${item}`)]),
-  ].join("\n");
-
-  const html = layout([
-    `Hi ${escapeHtml(name)},`,
-    `Here is your schedule for ${escapeHtml(dateLabel)}.`,
-    ...sections.map((section) => `<strong>${escapeHtml(section.title)}</strong>${list(section.items)}`),
-  ]);
-
-  return { subject, text, html };
-}
-
-export function remindersEmail({ name, items }) {
-  const subject = items.length === 1 ? `Reminder: ${items[0]}` : `${items.length} reminders from SemesterSync`;
-  const text = [`Hi ${name},`, "", ...items.map((item) => `- ${item}`)].join("\n");
-  const html = layout([`Hi ${escapeHtml(name)},`, list(items)]);
   return { subject, text, html };
 }

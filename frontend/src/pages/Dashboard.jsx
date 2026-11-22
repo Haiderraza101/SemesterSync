@@ -5,17 +5,18 @@ import CourseHoursChart from "../components/charts/CourseHoursChart.jsx";
 import WorkloadChart from "../components/charts/WorkloadChart.jsx";
 import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import AttendanceMarker from "../components/app/AttendanceMarker.jsx";
+import ClashBanner from "../components/app/ClashBanner.jsx";
 import CourseCell from "../components/app/CourseCell.jsx";
 import Badge from "../components/ui/Badge.jsx";
 import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
-import Notice from "../components/ui/Notice.jsx";
+import KpiCard, { KpiGrid } from "../components/ui/KpiCard.jsx";
 import Panel from "../components/ui/Panel.jsx";
 import StatusBadge from "../components/ui/StatusBadge.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { getAttendanceSummary, getLowestAttendance } from "../utils/attendance.js";
-import { describeClash, findClashes } from "../utils/clashes.js";
+import { findClashes } from "../utils/clashes.js";
 import { cx } from "../utils/cx.js";
 import { getDailyWorkload, getHoursByCourse, getOverallAttendance, getWeeklyWorkload } from "../utils/dashboardStats.js";
 import {
@@ -31,6 +32,7 @@ import {
   toTimeKey,
 } from "../utils/date.js";
 import { examTermLabel } from "../utils/examTerms.js";
+import { daysAway } from "../utils/relative.js";
 import { getClassesOnDate, getExams, getSelectedCourses, getTasksWithCourses } from "../utils/schedule.js";
 import "../styles/pages/dashboard.css";
 
@@ -45,23 +47,6 @@ function classStatus(instance, now) {
 
 function plural(count, singular, pluralForm = `${singular}s`) {
   return `${count} ${count === 1 ? singular : pluralForm}`;
-}
-
-function daysAway(date, now) {
-  const days = differenceInDays(startOfDay(date), startOfDay(now));
-  if (days <= 0) return { label: "Today", variant: "warning" };
-  if (days === 1) return { label: "Tomorrow", variant: "info" };
-  return { label: `In ${days} days`, variant: "secondary" };
-}
-
-function KpiCard({ label, value, detail, tone }) {
-  return (
-    <div className="kpi-card">
-      <span className="kpi-card__label">{label}</span>
-      <span className={cx("kpi-card__value", tone && `kpi-card__value--${tone}`)}>{value}</span>
-      {detail && <span className="kpi-card__detail">{detail}</span>}
-    </div>
-  );
 }
 
 function TableSection({ title, link, children }) {
@@ -269,23 +254,22 @@ export default function Dashboard() {
     .filter(Boolean)
     .join(" ");
 
-  const header = (actions) => (
+  const header = (showSummary) => (
     <header className="dashboard-header">
       <div className="dashboard-header__text">
         <span className="dashboard-header__date">{formatLongDate(now)}</span>
         <h1 className="dashboard-header__title">
           {getGreeting(now)}, {firstName}
         </h1>
-        {actions && <p className="dashboard-header__summary">{summary}</p>}
+        {showSummary && <p className="dashboard-header__summary">{summary}</p>}
       </div>
-      {actions && <div className="dashboard-header__actions">{actions}</div>}
     </header>
   );
 
   if (courses.length === 0) {
     return (
       <>
-        {header(null)}
+        {header(false)}
         <Panel>
           <EmptyState
             icon="spreadsheet"
@@ -304,25 +288,13 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      {header(
-        <>
-          <Button to="/app/timetable">Upload file</Button>
-          <Button to="/app/tasks" variant="primary">
-            Add task
-          </Button>
-        </>
-      )}
+      {header(true)}
 
       <SemesterNotice />
 
-      {clashes.length > 0 && (
-        <Notice variant="warning" title="Schedule clash." action={<Link to="/app/timetable">Resolve</Link>}>
-          {describeClash(clashes[0])}
-          {clashes.length > 1 && ` and ${clashes.length - 1} more.`}
-        </Notice>
-      )}
+      {clashes.length > 0 && <ClashBanner clashes={clashes} />}
 
-      <div className="kpi-grid">
+      <KpiGrid>
         <KpiCard
           label="Classes today"
           value={activeClasses.length}
@@ -341,10 +313,10 @@ export default function Dashboard() {
         <KpiCard
           label="Lowest attendance"
           value={lowest ? `${lowest.percentage}%` : "–"}
-          detail={lowest ? lowest.course.name : "No courses yet"}
+          detail={lowest ? lowest.course.name : "No classes recorded yet"}
           tone={lowest && lowest.risk !== "ok" ? lowest.risk : undefined}
         />
-      </div>
+      </KpiGrid>
 
       <div className="dashboard-row dashboard-row--stretch">
         <WorkloadChart weekly={weekly} daily={daily} metrics={workloadMetrics} />

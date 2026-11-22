@@ -4,7 +4,6 @@ import ChangePasswordModal from "../components/settings/ChangePasswordModal.jsx"
 import ProfileForm from "../components/settings/ProfileForm.jsx";
 import SettingRow from "../components/settings/SettingRow.jsx";
 import Button from "../components/ui/Button.jsx";
-import Checkbox from "../components/ui/Checkbox.jsx";
 import ConfirmDialog from "../components/ui/ConfirmDialog.jsx";
 import DatePicker from "../components/ui/DatePicker.jsx";
 import Notice from "../components/ui/Notice.jsx";
@@ -17,21 +16,25 @@ import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
 import { authService } from "../services/authService.js";
 import { getErrorMessage } from "../utils/errors.js";
-import { CLASS_REMINDER_OPTIONS, EXAM_REMINDER_OPTIONS } from "../utils/reminders.js";
 import "../styles/pages/settings.css";
-
-const SUMMARY_TIME_OPTIONS = [
-  { value: "06:30", label: "6:30 AM" },
-  { value: "07:00", label: "7:00 AM" },
-  { value: "07:30", label: "7:30 AM" },
-  { value: "08:00", label: "8:00 AM" },
-];
 
 const VIEW_OPTIONS = [
   { value: "timeGridWeek", label: "Week" },
   { value: "timeGridDay", label: "Day" },
   { value: "dayGridMonth", label: "Month" },
 ];
+
+function SettingsSection({ title, description, children }) {
+  return (
+    <section className="settings-section">
+      <div className="settings-section__intro">
+        <h2 className="settings-section__title">{title}</h2>
+        <p className="settings-section__description">{description}</p>
+      </div>
+      <div className="settings-section__content">{children}</div>
+    </section>
+  );
+}
 
 function SettingSelect({ id, options, value, onChange }) {
   return <Select id={id} options={options} value={value} onChange={onChange} />;
@@ -72,11 +75,10 @@ function SemesterSettings({ settings, onChange }) {
   return (
     <form onSubmit={save} noValidate>
       <Panel
-        title="Semester"
         flush
         footer={
           <>
-            <span className="toolbar__meta">Classes, attendance and reminders only run between these dates.</span>
+            <span className="toolbar__meta">Classes and attendance only count between these dates.</span>
             <Button type="submit" variant="primary" disabled={!changed}>
               Save semester
             </Button>
@@ -115,56 +117,9 @@ function SemesterSettings({ settings, onChange }) {
   );
 }
 
-function NotificationSettings({ settings, onChange }) {
-  return (
-    <Panel title="Notifications" flush>
-      <SettingRow
-        label="Morning summary email"
-        description="Today's classes, exams and deadlines, emailed to your account address every morning."
-      >
-        <Switch
-          label="Morning summary email"
-          checked={settings.morningSummary}
-          onChange={(value) => onChange({ morningSummary: value })}
-        />
-      </SettingRow>
-      {settings.morningSummary && (
-        <SettingRow label="Send at" htmlFor="summary-time">
-          <SettingSelect
-            id="summary-time"
-            options={SUMMARY_TIME_OPTIONS}
-            value={settings.summaryTime}
-            onChange={(value) => onChange({ summaryTime: value })}
-          />
-        </SettingRow>
-      )}
-      <SettingRow label="Class reminder" htmlFor="class-reminder">
-        <SettingSelect
-          id="class-reminder"
-          options={CLASS_REMINDER_OPTIONS}
-          value={settings.classReminder}
-          onChange={(value) => onChange({ classReminder: value })}
-        />
-      </SettingRow>
-      <SettingRow
-        label="Exam reminder"
-        description="Used as the default when you upload a date sheet."
-        htmlFor="exam-reminder"
-      >
-        <SettingSelect
-          id="exam-reminder"
-          options={EXAM_REMINDER_OPTIONS}
-          value={settings.examReminder}
-          onChange={(value) => onChange({ examReminder: value })}
-        />
-      </SettingRow>
-    </Panel>
-  );
-}
-
 function CalendarSettings({ settings, onChange }) {
   return (
-    <Panel title="Calendar" flush>
+    <Panel flush>
       <SettingRow label="Default view" htmlFor="default-view">
         <SettingSelect
           id="default-view"
@@ -174,11 +129,10 @@ function CalendarSettings({ settings, onChange }) {
         />
       </SettingRow>
       <SettingRow label="Show Saturday" description="Turn on if you have weekend classes.">
-        <Checkbox
+        <Switch
           label="Show Saturday"
-          hideLabel
           checked={settings.showSaturday}
-          onChange={() => onChange({ showSaturday: !settings.showSaturday })}
+          onChange={(value) => onChange({ showSaturday: value })}
         />
       </SettingRow>
     </Panel>
@@ -226,7 +180,7 @@ function AccountSettings() {
   };
 
   return (
-    <Panel title="Account" flush>
+    <Panel flush>
       <SettingRow label="Password" description="Change the password you use to log in.">
         <Button onClick={() => setPasswordOpen(true)}>Change password</Button>
       </SettingRow>
@@ -259,12 +213,22 @@ export default function Settings() {
 
   return (
     <div className="settings-page">
-      <PageHeader title="Settings" description="Manage your profile, notifications and calendar preferences." />
-      <ProfileForm />
-      <SemesterSettings settings={schedule.settings} onChange={updateSettings} />
-      <NotificationSettings settings={schedule.settings} onChange={updateSettings} />
-      <CalendarSettings settings={schedule.settings} onChange={updateSettings} />
-      <AccountSettings />
+      <PageHeader title="Settings" description="Manage your profile, semester and calendar preferences." />
+      <SettingsSection title="Profile" description="Your name, email, roll number and section. The section is used to suggest your courses.">
+        <ProfileForm />
+      </SettingsSection>
+      <SettingsSection
+        title="Semester"
+        description="Classes repeat every week between the first and last teaching day. Attendance limits use these dates."
+      >
+        <SemesterSettings settings={schedule.settings} onChange={updateSettings} />
+      </SettingsSection>
+      <SettingsSection title="Calendar" description="How the calendar opens and which days it shows.">
+        <CalendarSettings settings={schedule.settings} onChange={updateSettings} />
+      </SettingsSection>
+      <SettingsSection title="Account" description="Password, signed-in devices and deleting your account.">
+        <AccountSettings />
+      </SettingsSection>
     </div>
   );
 }

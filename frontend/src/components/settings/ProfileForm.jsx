@@ -39,7 +39,6 @@ export default function ProfileForm() {
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Panel
-        title="Profile"
         footer={
           <>
             <span />
