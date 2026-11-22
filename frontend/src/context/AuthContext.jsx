@@ -70,6 +70,21 @@ export function AuthProvider({ children }) {
     [setUser]
   );
 
+  const uploadAvatar = useCallback(
+    async (file) => {
+      const user = await authService.uploadAvatar(file);
+      setUser(user);
+      return user;
+    },
+    [setUser]
+  );
+
+  const removeAvatar = useCallback(async () => {
+    const user = await authService.removeAvatar();
+    setUser(user);
+    return user;
+  }, [setUser]);
+
   const value = useMemo(
     () => ({
       user: state.user,
@@ -82,8 +97,10 @@ export function AuthProvider({ children }) {
       logoutEverywhere,
       clearSession,
       updateProfile,
+      uploadAvatar,
+      removeAvatar,
     }),
-    [state, login, register, logout, logoutEverywhere, clearSession, updateProfile]
+    [state, login, register, logout, logoutEverywhere, clearSession, updateProfile, uploadAvatar, removeAvatar]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -73,7 +73,7 @@
 .chart-card__link {
   font-size: 13px;
   font-weight: 500;
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
 }
 
 .dash-section .empty-state {

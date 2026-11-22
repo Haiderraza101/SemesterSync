@@ -72,20 +72,6 @@
   border-top: 1px solid var(--color-border);
 }
 
-.sidebar__avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--color-primary-soft);
-  color: var(--color-primary-text);
-  font-size: var(--text-sm);
-  font-weight: 600;
-}
-
 .sidebar__user-text {
   display: flex;
   flex-direction: column;
@@ -283,7 +269,7 @@
   margin-bottom: 8px;
   border-radius: var(--ui-radius-lg);
   background: var(--ui-primary-10);
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
 }
 
 .dropzone__title {
@@ -291,13 +277,31 @@
   font-weight: 500;
 }
 
-.dropzone__browse {
-  color: var(--color-primary);
-  cursor: pointer;
+.dropzone__or {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
 }
 
-.dropzone__browse:hover {
-  text-decoration: underline;
+.dropzone__button {
+  gap: 8px;
+  margin: 4px 0 6px;
+  padding: 0 22px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(63, 136, 197, 0.22);
+}
+
+.dropzone__button:focus-within,
+.dropzone:focus-within .dropzone__button {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: 2px;
+}
+
+.dropzone--busy .dropzone__button {
+  display: none;
 }
 
 .dropzone__hint {
@@ -364,7 +368,7 @@
 .stepper__step--done::after {
   content: "✓";
   margin-left: 6px;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .stepper__step--current {

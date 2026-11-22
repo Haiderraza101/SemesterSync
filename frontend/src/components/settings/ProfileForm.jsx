@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AvatarPicker from "../app/AvatarPicker.jsx";
 import Button from "../ui/Button.jsx";
 import Panel from "../ui/Panel.jsx";
 import TextField from "../ui/TextField.jsx";
@@ -9,9 +10,22 @@ import { getErrorMessage } from "../../utils/errors.js";
 import { validateProfile } from "../../utils/validation.js";
 
 export default function ProfileForm() {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, uploadAvatar, removeAvatar } = useAuth();
   const { notify } = useToast();
   const [saving, setSaving] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+
+  const changeAvatar = async (action, message) => {
+    setAvatarBusy(true);
+    try {
+      await action();
+      notify(message);
+    } catch (error) {
+      notify(getErrorMessage(error), "danger");
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
   const { values, errors, handleChange, validate } = useForm(
     { name: user.name, email: user.email, rollNumber: user.rollNumber, section: user.section },
     validateProfile
@@ -48,6 +62,13 @@ export default function ProfileForm() {
           </>
         }
       >
+        <AvatarPicker
+          name={values.name}
+          avatar={user.avatar}
+          busy={avatarBusy}
+          onChange={(file) => file && changeAvatar(() => uploadAvatar(file), "Profile picture updated.")}
+          onRemove={() => changeAvatar(removeAvatar, "Profile picture removed.")}
+        />
         <div className="profile-form">
           <TextField
             label="Full name"

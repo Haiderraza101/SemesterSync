@@ -103,7 +103,7 @@ export function toCalendarItem(event) {
       end: event.end,
       title: task.title,
       shortTitle: task.title,
-      status: task.type === "quiz" ? "Quiz" : "Deadline",
+      status: task.type === "quiz" ? "Quiz" : task.type === "evaluation" ? "Evaluation" : "Deadline",
       place: task.course?.name || "",
       color: TASK_COLOR,
     };

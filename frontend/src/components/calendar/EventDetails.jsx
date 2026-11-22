@@ -1,4 +1,5 @@
 import { examTermLabel } from "../../utils/examTerms.js";
+import { taskTypeLabel } from "../../utils/taskTypes.js";
 import AttendanceMarker from "../app/AttendanceMarker.jsx";
 import Button from "../ui/Button.jsx";
 import StatusBadge from "../ui/StatusBadge.jsx";
@@ -124,7 +125,7 @@ function TaskDetails({ task }) {
   return (
     <>
       <div className="event-details__header">
-        <span className="event-details__kind">{task.type === "quiz" ? "Quiz" : "Assignment"}</span>
+        <span className="event-details__kind">{taskTypeLabel(task.type)}</span>
         <h2 className="event-details__title">{task.title}</h2>
       </div>
       <dl className="detail-list">

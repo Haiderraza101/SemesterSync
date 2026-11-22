@@ -85,7 +85,7 @@
 }
 
 .cal-date-button svg {
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .cal-date-button:hover,
@@ -147,7 +147,7 @@
 
 .cal-nav__icons {
   display: inline-flex;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
 }
 
 .cal-nav__icon-second {
@@ -412,7 +412,7 @@
   border: 1px solid #f3f4f6;
   border-radius: var(--ui-radius-md);
   background: rgba(249, 250, 251, 0.5);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   cursor: pointer;
   transition: background-color 150ms ease;
 }
@@ -449,7 +449,7 @@
   border: 0;
   border-top: 1px solid #f3f4f6;
   background: rgba(255, 255, 255, 0.95);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   cursor: pointer;
   backdrop-filter: blur(4px);
   transition: background-color 150ms ease;
@@ -794,7 +794,7 @@
   padding: 2px 4px;
   border: 0;
   background: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1079,7 +1079,7 @@
 }
 
 .lecture-link__anchor:hover .lecture-link__title {
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
   text-decoration: underline;
 }
 
@@ -1108,7 +1108,7 @@
   justify-content: center;
   border-radius: var(--ui-radius-md);
   background: var(--color-primary-soft);
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
 }
 
 .lecture-file__text {
@@ -1140,7 +1140,7 @@
 }
 
 .lecture-drop strong {
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
   font-weight: 600;
 }
 
@@ -1306,4 +1306,251 @@
 .event-details__attendance-hint {
   font-size: 12px;
   color: #a3a3a3;
+}
+
+.cal-grid__slot--button {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.cal-grid__slot--button:not(.cal-grid__slot--line) {
+  border-top: 0;
+}
+
+.cal-grid__slot--button::after {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  content: attr(data-label);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary-text);
+  opacity: 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.cal-grid__slot--button:hover,
+.cal-grid__slot--button:focus-visible {
+  background: rgba(63, 136, 197, 0.08);
+  outline: none;
+}
+
+.cal-grid__slot--button:hover::after,
+.cal-grid__slot--button:focus-visible::after,
+.cal-grid__slot--active::after {
+  opacity: 1;
+}
+
+.cal-grid__slot--active,
+.cal-grid__slot--active:hover {
+  background: rgba(63, 136, 197, 0.16);
+  box-shadow: inset 3px 0 0 var(--ui-primary);
+}
+
+.cal-month__cell-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.cal-month__add {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--color-primary-text);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease, background-color 120ms ease;
+}
+
+.cal-month__cell:hover .cal-month__add,
+.cal-month__add:focus-visible {
+  opacity: 1;
+}
+
+.cal-month__add:hover {
+  background: var(--ui-primary-10);
+}
+
+@media (hover: none) {
+  .cal-month__add {
+    opacity: 1;
+  }
+}
+
+.add-event {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 24px 0;
+}
+
+.add-event__slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(63, 136, 197, 0.18);
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(63, 136, 197, 0.08), rgba(63, 136, 197, 0.02));
+}
+
+.add-event__slot-icon {
+  display: inline-flex;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--ui-primary);
+  color: #ffffff;
+}
+
+.add-event__slot-day {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.add-event__slot-time {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ui-muted-foreground);
+}
+
+.add-event__kinds {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.add-event__legend {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.add-event__kind-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.add-event__kind {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.add-event__kind:hover {
+  border-color: #cbd5e1;
+  background: #fafafa;
+}
+
+.add-event__kind--active,
+.add-event__kind--active:hover {
+  border-color: var(--ui-primary);
+  background: rgba(63, 136, 197, 0.05);
+  box-shadow: 0 0 0 3px var(--ui-primary-10);
+}
+
+.add-event__kind-icon {
+  display: inline-flex;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.add-event__kind--makeup .add-event__kind-icon {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.add-event__kind--assignment .add-event__kind-icon {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.add-event__kind--quiz .add-event__kind-icon {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+.add-event__kind--evaluation .add-event__kind-icon {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.add-event__kind-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.add-event__kind-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ui-foreground);
+}
+
+.add-event__kind-hint {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--ui-muted-foreground);
+}
+
+.add-event__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.add-event__note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-muted-foreground);
+}
+
+.add-event__footer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: auto -24px 0;
+  padding: 14px 24px;
+  border-top: 1px solid var(--ui-border);
+  background: #ffffff;
 }

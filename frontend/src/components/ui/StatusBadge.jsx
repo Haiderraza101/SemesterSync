@@ -15,6 +15,7 @@ export const STATUSES = {
   critical: { label: "Critical", variant: "destructive", icon: "alert" },
   exam: { label: "Exam", variant: "default", icon: "datesheets" },
   assignment: { label: "Assignment", variant: "teal", icon: "tasks" },
+  evaluation: { label: "Evaluation", variant: "purple", icon: "shield-check" },
   elective: { label: "Elective", variant: "purple", icon: "plus" },
   repeat: { label: "Repeat", variant: "warning", icon: "alert" },
   core: { label: "Core", variant: "secondary", icon: "check" },

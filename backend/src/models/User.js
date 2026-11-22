@@ -47,6 +47,7 @@ const userSchema = new mongoose.Schema(
     failedLoginAttempts: { type: Number, default: 0, select: false },
     lockUntil: { type: Date, select: false },
     lastLoginAt: Date,
+    avatarFileId: { type: mongoose.Schema.Types.ObjectId },
   },
   {
     timestamps: true,
@@ -56,6 +57,7 @@ const userSchema = new mongoose.Schema(
         PUBLIC_FIELDS.forEach((field) => {
           if (ret[field] !== undefined) result[field] = ret[field];
         });
+        result.avatar = ret.avatarFileId ? ret.avatarFileId.toString() : null;
         return result;
       },
     },

@@ -4,6 +4,8 @@ import Icon from "../components/ui/Icon.jsx";
 export const ToastContext = createContext(null);
 
 const TOAST_DURATION = 4000;
+const TOAST_ICONS = { success: "check", danger: "alert", warning: "alert", info: "info" };
+const TOAST_TITLES = { success: "Done", danger: "Something went wrong", warning: "Heads up", info: "Notice" };
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -14,7 +16,7 @@ export function ToastProvider({ children }) {
   }, []);
 
   const notify = useCallback(
-    (message, variant = "info") => {
+    (message, variant = "success") => {
       const id = nextId.current++;
       setToasts((current) => [...current, { id, message, variant }]);
       window.setTimeout(() => dismiss(id), TOAST_DURATION);
@@ -29,11 +31,18 @@ export function ToastProvider({ children }) {
       {children}
       <div className="toast-region" role="status" aria-live="polite">
         {toasts.map((toast) => (
-          <div key={toast.id} className={`toast toast--${toast.variant}`}>
-            <span className="toast__message">{toast.message}</span>
+          <div key={toast.id} className={`toast toast--${toast.variant}`} role={toast.variant === "danger" ? "alert" : undefined}>
+            <span className="toast__icon" aria-hidden="true">
+              <Icon name={TOAST_ICONS[toast.variant] || "info"} size={14} strokeWidth={2.5} />
+            </span>
+            <div className="toast__body">
+              <span className="toast__title">{TOAST_TITLES[toast.variant] || "Notice"}</span>
+              <span className="toast__message">{toast.message}</span>
+            </div>
             <button type="button" className="toast__close" aria-label="Dismiss" onClick={() => dismiss(toast.id)}>
               <Icon name="close" size={14} />
             </button>
+            <span className="toast__timer" style={{ animationDuration: `${TOAST_DURATION}ms` }} aria-hidden="true" />
           </div>
         ))}
       </div>

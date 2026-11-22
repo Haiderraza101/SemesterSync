@@ -22,3 +22,7 @@ export const changePasswordSchema = z
     message: "Choose a password different from your current one.",
     path: ["newPassword"],
   });
+
+export const avatarParamsSchema = z.object({
+  fileId: z.string().regex(/^[a-f0-9]{24}$/i, "Invalid picture id."),
+});

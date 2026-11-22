@@ -50,6 +50,22 @@ function mergeSharedTasks(tasks, incoming = []) {
   return [...tasks, ...added];
 }
 
+function mergeSharedMakeups(makeups, incoming = []) {
+  const existing = new Set(makeups.map((makeup) => `${makeup.code}|${makeup.date}|${makeup.start}`));
+  const ids = new Set(makeups.map((makeup) => makeup.id));
+  const added = incoming
+    .filter((makeup) => !existing.has(`${makeup.code}|${makeup.date}|${makeup.start}`))
+    .map((makeup, index) => ({
+      ...makeup,
+      id: makeup.id && !ids.has(makeup.id) ? makeup.id : `makeup_${makeup.code}_${Date.now()}_${index}`,
+    }));
+  return [...makeups, ...added];
+}
+
+function mergeCancelled(cancelled, incoming = []) {
+  return [...new Set([...cancelled, ...incoming])];
+}
+
 function mergeSelections(current, incoming) {
   const merged = new Map(current.map((selection) => [selection.code, selection]));
   incoming.forEach((selection) => merged.set(selection.code, selection));
@@ -78,6 +94,8 @@ export function scheduleReducer(state, action) {
         selections: action.mode === "merge" ? mergeSelections(state.selections, action.selections) : action.selections,
         dateSheets: mergeSharedExams(state.dateSheets, action.exams),
         tasks: mergeSharedTasks(state.tasks, action.tasks),
+        makeups: mergeSharedMakeups(state.makeups, action.makeups),
+        cancelled: mergeCancelled(state.cancelled, action.cancelled),
       };
     case "class/toggleCancel":
       return { ...state, cancelled: toggleInList(state.cancelled, action.id) };

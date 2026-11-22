@@ -2,11 +2,12 @@ import { useMemo } from "react";
 import { getMonthWeeks, groupByDay } from "../../utils/calendarLayout.js";
 import { cx } from "../../utils/cx.js";
 import { SHORT_DAY_NAMES, isSameDay, toDateKey } from "../../utils/date.js";
+import Icon from "../ui/Icon.jsx";
 import EventCard from "./EventCard.jsx";
 
 const MAX_VISIBLE = 3;
 
-export default function MonthGrid({ month, weekdays, items, selectedId, onSelect, onOpenDay }) {
+export default function MonthGrid({ month, weekdays, items, selectedId, onSelect, onOpenDay, onAddDay }) {
   const weeks = useMemo(() => getMonthWeeks(month), [month]);
   const itemsByDay = useMemo(() => groupByDay(items), [items]);
   const today = new Date();
@@ -32,14 +33,26 @@ export default function MonthGrid({ month, weekdays, items, selectedId, onSelect
                 const outside = day.getMonth() !== month.getMonth();
                 return (
                   <div key={toDateKey(day)} className={cx("cal-month__cell", outside && "cal-month__cell--outside")}>
-                    <button
-                      type="button"
-                      className={cx("cal-month__date", isSameDay(day, today) && "cal-month__date--today")}
-                      aria-label={`Open ${day.toDateString()} in day view`}
-                      onClick={() => onOpenDay(day)}
-                    >
-                      {day.getDate()}
-                    </button>
+                    <div className="cal-month__cell-head">
+                      <button
+                        type="button"
+                        className={cx("cal-month__date", isSameDay(day, today) && "cal-month__date--today")}
+                        aria-label={`Open ${day.toDateString()} in day view`}
+                        onClick={() => onOpenDay(day)}
+                      >
+                        {day.getDate()}
+                      </button>
+                      {onAddDay && (
+                        <button
+                          type="button"
+                          className="cal-month__add"
+                          aria-label={`Add something on ${day.toDateString()}`}
+                          onClick={() => onAddDay(day)}
+                        >
+                          <Icon name="plus" size={14} strokeWidth={2.5} />
+                        </button>
+                      )}
+                    </div>
                     <div className="cal-month__items">
                       {dayItems.slice(0, MAX_VISIBLE).map((item) => (
                         <EventCard

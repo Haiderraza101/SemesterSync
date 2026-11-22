@@ -12,7 +12,7 @@ import {
   overlapCount,
 } from "../../utils/calendarLayout.js";
 import { cx } from "../../utils/cx.js";
-import { isSameDay, toDateKey } from "../../utils/date.js";
+import { formatTime, isSameDay, minutesToTime, toDateKey } from "../../utils/date.js";
 import Icon from "../ui/Icon.jsx";
 import EventCard from "./EventCard.jsx";
 
@@ -59,7 +59,10 @@ function TimeColumn({ hours }) {
   );
 }
 
-function DayColumn({ day, items, hours, startHour, selectedId, onSelect, now }) {
+const SLOT_LABEL = new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" });
+
+function DayColumn({ day, items, hours, startHour, selectedId, onSelect, now, onSlotClick, activeSlot }) {
+  const dateKey = toDateKey(day);
   const layout = useMemo(() => layoutOverlaps(items), [items]);
   const showNow = isSameDay(day, now);
   const nowOffset = ((minutesOfDay(now) - startHour * 60) * HOUR_HEIGHT) / 60;
@@ -68,9 +71,27 @@ function DayColumn({ day, items, hours, startHour, selectedId, onSelect, now }) 
     <div className={cx("cal-grid__column", showNow && "cal-grid__column--today")}>
       {hours.map((hour) => (
         <div key={hour} className="cal-grid__hour" style={{ height: HOUR_HEIGHT }}>
-          {QUARTERS.map((minute) => (
-            <div key={minute} className={cx("cal-grid__slot", minute % 30 === 0 && "cal-grid__slot--line")} />
-          ))}
+          {QUARTERS.map((minute) => {
+            const time = minutesToTime(hour * 60 + minute);
+            const label = formatTime(time);
+            return onSlotClick ? (
+              <button
+                key={minute}
+                type="button"
+                className={cx(
+                  "cal-grid__slot",
+                  "cal-grid__slot--button",
+                  minute % 30 === 0 && "cal-grid__slot--line",
+                  activeSlot?.dateKey === dateKey && activeSlot?.time === time && "cal-grid__slot--active"
+                )}
+                data-label={`+ ${label}`}
+                aria-label={`Add something on ${SLOT_LABEL.format(day)} at ${label}`}
+                onClick={() => onSlotClick({ dateKey, time })}
+              />
+            ) : (
+              <div key={minute} className={cx("cal-grid__slot", minute % 30 === 0 && "cal-grid__slot--line")} />
+            );
+          })}
         </div>
       ))}
       {items.map((item) => {
@@ -108,7 +129,7 @@ function columnTemplate(days, itemsByDay) {
   return `80px ${columns.join(" ")}`;
 }
 
-function GridBody({ days, itemsByDay, hours, startHour, selectedId, onSelect, now, corner, fit = false }) {
+function GridBody({ days, itemsByDay, hours, startHour, selectedId, onSelect, now, corner, fit = false, onSlotClick, activeSlot }) {
   const template = fit ? `80px repeat(${days.length}, minmax(0, 1fr))` : columnTemplate(days, itemsByDay);
   return (
     <div className="cal-grid__table">
@@ -130,6 +151,8 @@ function GridBody({ days, itemsByDay, hours, startHour, selectedId, onSelect, no
             selectedId={selectedId}
             onSelect={onSelect}
             now={now}
+            onSlotClick={onSlotClick}
+            activeSlot={activeSlot}
           />
         ))}
       </div>
@@ -211,14 +234,14 @@ function ChunkCard({ days, expanded, onToggle, collapsedHeight, hours: allHours,
   );
 }
 
-export default function TimeGrid({ days, items, selectedId, onSelect }) {
+export default function TimeGrid({ days, items, selectedId, onSelect, onSlotClick, activeSlot }) {
   const width = useWindowWidth();
   const now = useNow();
   const [expanded, setExpanded] = useState(() => new Set());
   const itemsByDay = useMemo(() => groupByDay(items), [items]);
   const { startHour, endHour } = useMemo(() => hourBounds(items), [items]);
   const hours = useMemo(() => Array.from({ length: endHour - startHour }, (_, index) => startHour + index), [startHour, endHour]);
-  const gridProps = { itemsByDay, hours, startHour, selectedId, onSelect, now };
+  const gridProps = { itemsByDay, hours, startHour, selectedId, onSelect, now, onSlotClick, activeSlot };
 
   if (width >= DESKTOP_MIN_WIDTH) {
     return <DesktopGrid days={days} {...gridProps} />;

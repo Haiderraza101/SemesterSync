@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import AuthSplitLayout from "../layouts/AuthSplitLayout.jsx";
-import Button from "../components/ui/Button.jsx";
+import { useNavigate } from "react-router-dom";
+import AuthField from "../components/app/AuthField.jsx";
+import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
-import TextField from "../components/ui/TextField.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useForm } from "../hooks/useForm.js";
+import AuthLayout from "../layouts/AuthLayout.jsx";
+import { cx } from "../utils/cx.js";
 import { getErrorMessage, getFieldErrors } from "../utils/errors.js";
 import { validateRegister } from "../utils/validation.js";
 import "../styles/pages/auth.css";
@@ -19,25 +20,26 @@ const INITIAL_VALUES = {
   confirmPassword: "",
 };
 
-const STEPS = [
-  "Upload the timetable Excel file from your university",
-  "Select your courses and sections",
-  "Track classes, exams, deadlines and attendance in one place",
+const PASSWORD_CHECKS = [
+  { label: "8 or more characters", test: (value) => value.length >= 8 },
+  { label: "A letter", test: (value) => /[A-Za-z]/.test(value) },
+  { label: "A number", test: (value) => /\d/.test(value) },
 ];
 
-function RegisterAside() {
+function PasswordChecks({ password }) {
+  if (!password) return null;
   return (
-    <>
-      <h2 className="auth-split__headline">Set up your semester in a few minutes.</h2>
-      <ol className="steps-list">
-        {STEPS.map((step, index) => (
-          <li key={step} className="steps-list__item">
-            <span className="steps-list__number">{index + 1}</span>
-            <span>{step}</span>
+    <ul className="password-checks">
+      {PASSWORD_CHECKS.map((check) => {
+        const passed = check.test(password);
+        return (
+          <li key={check.label} className={cx("password-checks__item", passed && "password-checks__item--ok")}>
+            <Icon name={passed ? "check" : "close"} size={12} strokeWidth={2.5} />
+            {check.label}
           </li>
-        ))}
-      </ol>
-    </>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -72,82 +74,90 @@ export default function Register() {
   };
 
   return (
-    <AuthSplitLayout aside={<RegisterAside />} footer="Web Programming project · BCS 7A">
+    <AuthLayout
+      eyebrow="Get started"
+      title="Create your SemesterSync account"
+      subtitle="Set up your semester in a few minutes: upload your timetable and pick your sections."
+      switchText="Already have an account?"
+      switchLink={{ to: "/login", label: "Log in" }}
+      footer="Your roll number and section are used to suggest your courses."
+      wide
+    >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="auth-form__header">
-          <h1>Create an account</h1>
-          <p className="auth-form__subtitle">All fields are required.</p>
-        </div>
-
         {formError && <Notice variant="danger" title={formError} />}
 
-        <TextField
+        <AuthField
           label="Full name"
           name="name"
+          icon="user"
           autoComplete="name"
           placeholder="Your full name"
           value={values.name}
           onChange={handleChange}
           error={errors.name}
+          autoFocus
         />
         <div className="auth-form__row">
-          <TextField
+          <AuthField
             label="Roll number"
             name="rollNumber"
-            placeholder="e.g. 23L-1234"
+            icon="hash"
+            placeholder="23L-1234"
             value={values.rollNumber}
             onChange={handleChange}
             error={errors.rollNumber}
           />
-          <TextField
+          <AuthField
             label="Section"
             name="section"
-            placeholder="e.g. BCS-7A"
+            icon="users"
+            placeholder="BCS-7A"
             value={values.section}
             onChange={handleChange}
             error={errors.section}
           />
         </div>
-        <TextField
+        <AuthField
           label="Email"
           name="email"
           type="email"
+          icon="mail"
           autoComplete="email"
           placeholder="you@university.edu.pk"
           value={values.email}
           onChange={handleChange}
           error={errors.email}
         />
-        <TextField
+        <AuthField
           label="Password"
           name="password"
           type="password"
+          icon="lock"
           autoComplete="new-password"
           placeholder="At least 8 characters"
           value={values.password}
           onChange={handleChange}
           error={errors.password}
-          hint="Use 8 or more characters with a letter and a number."
-        />
-        <TextField
+        >
+          <PasswordChecks password={values.password} />
+        </AuthField>
+        <AuthField
           label="Confirm password"
           name="confirmPassword"
           type="password"
+          icon="lock"
           autoComplete="new-password"
-          placeholder="Re-enter password"
+          placeholder="Re-enter your password"
           value={values.confirmPassword}
           onChange={handleChange}
           error={errors.confirmPassword}
         />
 
-        <Button type="submit" variant="primary" size="lg" block disabled={submitting}>
+        <button type="submit" className="btn btn--primary btn--lg btn--block auth-submit" disabled={submitting}>
           {submitting ? "Creating account…" : "Create account"}
-        </Button>
-
-        <p className="auth-form__footer">
-          Already have an account? <Link to="/login">Log in</Link>
-        </p>
+          {!submitting && <Icon name="arrow-right" size={16} strokeWidth={2} />}
+        </button>
       </form>
-    </AuthSplitLayout>
+    </AuthLayout>
   );
 }

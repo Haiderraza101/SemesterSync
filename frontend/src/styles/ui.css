@@ -11,8 +11,8 @@
   --ui-overlay: rgba(0, 0, 0, 0.1);
   --ui-primary: var(--color-primary);
   --ui-primary-foreground: #ffffff;
-  --ui-primary-10: rgba(47, 95, 152, 0.1);
-  --ui-primary-20: rgba(47, 95, 152, 0.2);
+  --ui-primary-10: rgba(63, 136, 197, 0.1);
+  --ui-primary-20: rgba(63, 136, 197, 0.2);
   --ui-danger: #dc2626;
   --ui-danger-hover: #b91c1c;
   --ui-radius-sm: 6px;
@@ -142,13 +142,18 @@
 
 .data-table th {
   padding: 18px 24px;
-  border-bottom: 1px solid var(--ui-border);
-  background: var(--ui-muted-50);
+  border-bottom: 1px solid var(--ui-primary);
+  background: var(--ui-primary);
   font-size: 13px;
   font-weight: 600;
-  color: var(--ui-foreground);
+  color: #ffffff;
   text-align: left;
   white-space: nowrap;
+}
+
+.data-table th .checkbox__box,
+.data-table th input[type="checkbox"] {
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .data-table td {
@@ -1065,7 +1070,7 @@
   border: 1px solid var(--color-primary-border);
   border-radius: var(--ui-radius-md);
   background: var(--color-surface);
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   cursor: pointer;
 }
 
@@ -1097,7 +1102,7 @@
   margin-bottom: 8px;
   font-size: 12px;
   font-weight: 300;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-align: center;
 }
 

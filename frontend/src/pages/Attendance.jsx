@@ -84,18 +84,16 @@ export default function Attendance() {
       <SemesterNotice />
 
       {courses.length === 0 ? (
-        <Panel>
-          <EmptyState
-            icon="attendance"
-            title="No courses to track"
-            description="Select your sections on the timetable page to start tracking attendance."
-            action={
-              <Button to="/app/timetable" variant="primary">
-                Go to timetable
-              </Button>
-            }
-          />
-        </Panel>
+        <EmptyState
+          icon="attendance"
+          title="No courses to track"
+          description="Select your sections on the timetable page to start tracking attendance."
+          action={
+            <Button to="/app/timetable" variant="primary">
+              Go to timetable
+            </Button>
+          }
+        />
       ) : (
         <>
           <KpiGrid>

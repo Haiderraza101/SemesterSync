@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import SemesterNotice from "../components/app/SemesterNotice.jsx";
 import CalendarHeader from "../components/calendar/CalendarHeader.jsx";
+import AddEventPanel from "../components/calendar/AddEventPanel.jsx";
 import CalendarLegend from "../components/calendar/CalendarLegend.jsx";
 import CourseFilter from "../components/calendar/CourseFilter.jsx";
 import EventDetails from "../components/calendar/EventDetails.jsx";
@@ -14,7 +15,7 @@ import { useToast } from "../hooks/useToast.js";
 import { buildCalendarEvents, toCalendarItem } from "../utils/calendarEvents.js";
 import { formatTitle, getRange, getVisibleDays, viewFromSetting, weekdayIndexes } from "../utils/calendarLayout.js";
 import { findClashes, getClashingSlotKeys } from "../utils/clashes.js";
-import { startOfDay } from "../utils/date.js";
+import { minutesToTime, startOfDay, toDateKey } from "../utils/date.js";
 import { getSelectedCourses } from "../utils/schedule.js";
 import "../styles/pages/calendar.css";
 
@@ -31,6 +32,18 @@ export default function Calendar() {
   const [focusCode, setFocusCode] = useState(ALL);
   const [kind, setKind] = useState(ALL);
   const [makeupFor, setMakeupFor] = useState(null);
+  const [newSlot, setNewSlot] = useState(null);
+
+  const openSlot = (slot) => {
+    setSelectedId(null);
+    setNewSlot(slot);
+  };
+
+  const openNextHour = () => {
+    const now = new Date();
+    const hour = Math.min(Math.max(now.getHours() + 1, 8), 20);
+    openSlot({ dateKey: toDateKey(now), time: minutesToTime(hour * 60) });
+  };
 
   const courses = useMemo(() => getSelectedCourses(schedule), [schedule]);
   const clashingSlots = useMemo(() => getClashingSlotKeys(findClashes(courses)), [courses]);
@@ -113,8 +126,8 @@ export default function Calendar() {
         onFocusChange={setFocusCode}
         onKindChange={setKind}
         actions={
-          <Button to="/app/tasks" variant="primary" className="cal-header__action">
-            Add task
+          <Button variant="primary" className="cal-header__action" onClick={openNextHour}>
+            Add
           </Button>
         }
       />
@@ -128,6 +141,7 @@ export default function Calendar() {
               selectedId={selectedId}
               onSelect={setSelectedId}
               onOpenDay={openDay}
+              onAddDay={(day) => openSlot({ dateKey: toDateKey(day), time: "09:00" })}
             />
           ) : (
             <TimeGrid
@@ -135,6 +149,8 @@ export default function Calendar() {
               items={items}
               selectedId={selectedId}
               onSelect={setSelectedId}
+              onSlotClick={openSlot}
+              activeSlot={newSlot}
             />
           )}
         </div>
@@ -156,6 +172,17 @@ export default function Calendar() {
           }}
           onRemoveMakeup={handleRemoveMakeup}
         />
+      </Sheet>
+      <Sheet open={Boolean(newSlot)} title="Add to calendar" onClose={() => setNewSlot(null)}>
+        {newSlot && (
+          <AddEventPanel
+            key={`${newSlot.dateKey}-${newSlot.time}`}
+            slot={newSlot}
+            courses={courses}
+            onDone={() => setNewSlot(null)}
+            onCancel={() => setNewSlot(null)}
+          />
+        )}
       </Sheet>
       <MakeupModal instance={makeupFor} onSubmit={handleMakeupSubmit} onClose={() => setMakeupFor(null)} />
     </>

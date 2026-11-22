@@ -1,42 +1,17 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import AuthSplitLayout from "../layouts/AuthSplitLayout.jsx";
-import Button from "../components/ui/Button.jsx";
+import AuthField from "../components/app/AuthField.jsx";
 import Checkbox from "../components/ui/Checkbox.jsx";
+import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
-import TextField from "../components/ui/TextField.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useForm } from "../hooks/useForm.js";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 import { getErrorMessage } from "../utils/errors.js";
 import { validateLogin } from "../utils/validation.js";
 import "../styles/pages/auth.css";
 
 const INITIAL_VALUES = { email: "", password: "", remember: true };
-
-const LOGIN_FEATURES = [
-  "Your timetable read straight from the university Excel file",
-  "Clash warnings before you commit to a section",
-  "Attendance tracking with present, late and absent marks",
-];
-
-function LoginAside() {
-  return (
-    <>
-      <h2 className="auth-split__headline">Classes, exams and deadlines in one calendar.</h2>
-      <p className="auth-split__lead">Your schedule, attendance and deadlines, kept in sync for the whole semester.</p>
-      <ul className="steps-list">
-        {LOGIN_FEATURES.map((feature) => (
-          <li key={feature} className="steps-list__item">
-            <span className="steps-list__number" aria-hidden="true">
-              ✓
-            </span>
-            <span>{feature}</span>
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
 
 export default function Login() {
   const { login } = useAuth();
@@ -63,47 +38,53 @@ export default function Login() {
   };
 
   return (
-    <AuthSplitLayout aside={<LoginAside />}>
+    <AuthLayout
+      eyebrow="Welcome back"
+      title="Log in to SemesterSync"
+      subtitle="Pick up where you left off: your classes, exams and deadlines."
+      switchText="New to SemesterSync?"
+      switchLink={{ to: "/register", label: "Create account" }}
+      footer="Your schedule and attendance stay private to your account."
+    >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="auth-form__header">
-          <h1>Log in</h1>
-          <p className="auth-form__subtitle">Enter your details to access your schedule.</p>
-        </div>
-
         {notice && !formError && <Notice variant="success" title={notice} />}
         {formError && <Notice variant="danger" title={formError} />}
 
-        <TextField
+        <AuthField
           label="Email"
           name="email"
           type="email"
+          icon="mail"
           autoComplete="email"
           placeholder="you@university.edu.pk"
           value={values.email}
           onChange={handleChange}
           error={errors.email}
+          autoFocus
         />
-        <TextField
+        <AuthField
           label="Password"
           name="password"
           type="password"
+          icon="lock"
           autoComplete="current-password"
-          placeholder="Your password"
+          placeholder="Enter your password"
           value={values.password}
           onChange={handleChange}
           error={errors.password}
-          labelAction={<Link to="/forgot-password">Forgot password?</Link>}
+          labelAction={
+            <Link to="/forgot-password" className="auth-field__link">
+              Forgot password?
+            </Link>
+          }
         />
         <Checkbox label="Keep me logged in" name="remember" checked={values.remember} onChange={handleChange} />
 
-        <Button type="submit" variant="primary" size="lg" block disabled={submitting}>
+        <button type="submit" className="btn btn--primary btn--lg btn--block auth-submit" disabled={submitting}>
           {submitting ? "Logging in…" : "Log in"}
-        </Button>
-
-        <p className="auth-form__footer">
-          Don&apos;t have an account? <Link to="/register">Create one</Link>
-        </p>
+          {!submitting && <Icon name="arrow-right" size={16} strokeWidth={2} />}
+        </button>
       </form>
-    </AuthSplitLayout>
+    </AuthLayout>
   );
 }

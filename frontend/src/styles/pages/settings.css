@@ -91,6 +91,10 @@
   width: 200px;
 }
 
+.settings-section .avatar-picker {
+  margin-bottom: 18px;
+}
+
 .profile-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));

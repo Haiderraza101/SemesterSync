@@ -66,6 +66,18 @@ export const authService = {
     tokenStore.clear();
   },
 
+  async uploadAvatar(file) {
+    const form = new FormData();
+    form.append("avatar", file);
+    const { data } = await api.post("/users/me/avatar", form, { headers: { "Content-Type": "multipart/form-data" } });
+    return data.user;
+  },
+
+  async removeAvatar() {
+    const { data } = await api.delete("/users/me/avatar");
+    return data.user;
+  },
+
   async updateProfile(profile) {
     const { data } = await api.put("/users/me", profile);
     return data.user;

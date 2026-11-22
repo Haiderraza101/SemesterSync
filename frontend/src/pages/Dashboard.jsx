@@ -11,7 +11,6 @@ import Badge from "../components/ui/Badge.jsx";
 import Button from "../components/ui/Button.jsx";
 import EmptyState from "../components/ui/EmptyState.jsx";
 import KpiCard, { KpiGrid } from "../components/ui/KpiCard.jsx";
-import Panel from "../components/ui/Panel.jsx";
 import StatusBadge from "../components/ui/StatusBadge.jsx";
 import { useAuth } from "../hooks/useAuth.js";
 import { useSchedule } from "../hooks/useSchedule.js";
@@ -218,7 +217,7 @@ export default function Dashboard() {
       .filter((task) => !task.done)
       .map((task) => ({
         id: task.id,
-        kind: task.type === "quiz" ? "quiz" : "assignment",
+        kind: task.type || "assignment",
         title: task.title,
         subtitle: task.course?.name || "No course",
         color: task.course?.color || "#9ca3af",
@@ -270,18 +269,16 @@ export default function Dashboard() {
     return (
       <>
         {header(false)}
-        <Panel>
-          <EmptyState
-            icon="spreadsheet"
-            title="Add your timetable to get started"
-            description="Upload the timetable Excel file and select your sections. Your classes will appear here."
-            action={
-              <Button to="/app/timetable" variant="primary">
-                Upload timetable
-              </Button>
-            }
-          />
-        </Panel>
+        <EmptyState
+          icon="spreadsheet"
+          title="Add your timetable to get started"
+          description="Upload the timetable Excel file and select your sections. Your classes will appear here."
+          action={
+            <Button to="/app/timetable" variant="primary">
+              Upload timetable
+            </Button>
+          }
+        />
       </>
     );
   }
@@ -308,7 +305,7 @@ export default function Dashboard() {
         <KpiCard
           label="Due this week"
           value={dueThisWeek.length}
-          detail={`${plural(dueThisWeek.length - quizzesThisWeek, "assignment")}, ${plural(quizzesThisWeek, "quiz", "quizzes")}`}
+          detail={`${plural(dueThisWeek.length - quizzesThisWeek, "deadline")}, ${plural(quizzesThisWeek, "quiz", "quizzes")}`}
         />
         <KpiCard
           label="Lowest attendance"

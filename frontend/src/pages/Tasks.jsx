@@ -9,6 +9,7 @@ import Tabs from "../components/ui/Tabs.jsx";
 import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
 import { addDays } from "../utils/date.js";
+import { countByType } from "../utils/taskTypes.js";
 import { getSelectedCourses, getTasksWithCourses } from "../utils/schedule.js";
 
 function plural(count, singular, pluralForm = `${singular}s`) {
@@ -19,6 +20,7 @@ const FILTERS = {
   all: () => true,
   assignment: (task) => task.type === "assignment",
   quiz: (task) => task.type === "quiz",
+  evaluation: (task) => task.type === "evaluation",
 };
 
 export default function Tasks() {
@@ -42,10 +44,12 @@ export default function Tasks() {
     { value: "all", label: "All", count: tasks.length },
     { value: "assignment", label: "Assignments", count: tasks.filter(FILTERS.assignment).length },
     { value: "quiz", label: "Quizzes", count: tasks.filter(FILTERS.quiz).length },
+    { value: "evaluation", label: "Evaluations", count: tasks.filter(FILTERS.evaluation).length },
   ];
 
   const visibleTasks = tasks.filter(FILTERS[filter]);
   const open = tasks.filter((task) => !task.done);
+  const openCounts = countByType(open);
   const overdue = open.filter((task) => task.dueAt < now);
   const dueSoon = open.filter((task) => task.dueAt >= now && task.dueAt <= addDays(now, 7));
   const completed = tasks.length - open.length;
@@ -65,7 +69,7 @@ export default function Tasks() {
   return (
     <>
       <PageHeader
-        title="Assignments and quizzes"
+        title="Assignments, quizzes and evaluations"
         description="Track every assignment and quiz. Each one appears on your calendar and dashboard."
       >
         <Tabs label="Filter items" tabs={tabs} value={filter} onChange={setFilter} />
@@ -75,7 +79,13 @@ export default function Tasks() {
         <KpiCard
           label="Still to do"
           value={open.length}
-          detail={`${plural(open.filter((task) => task.type === "quiz").length, "quiz", "quizzes")}, ${plural(open.filter((task) => task.type !== "quiz").length, "assignment")}`}
+          detail={[
+            plural(openCounts.assignment, "assignment"),
+            plural(openCounts.quiz, "quiz", "quizzes"),
+            openCounts.evaluation ? plural(openCounts.evaluation, "evaluation") : "",
+          ]
+            .filter(Boolean)
+            .join(", ")}
         />
         <KpiCard
           label="Due in the next 7 days"

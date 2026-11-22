@@ -188,7 +188,7 @@ export default function DateSheets() {
       const sheet = await scheduleService.parseDateSheet(file, term);
       if (sheet.detectedTerm && sheet.detectedTerm !== term) {
         setTerm(sheet.detectedTerm);
-        notify(`This file is the ${examTermLabel(sheet.detectedTerm)} date sheet, so it was opened under that tab.`);
+        notify(`This file is the ${examTermLabel(sheet.detectedTerm)} date sheet, so it was opened under that tab.`, "info");
       }
       const exams = sheet.exams
         .filter((exam) => courseIndex.has(exam.code))
@@ -227,18 +227,16 @@ export default function DateSheets() {
       </PageHeader>
 
       {courses.length === 0 ? (
-        <Panel>
-          <EmptyState
-            icon="spreadsheet"
-            title="Add your timetable first"
-            description="Exams are matched to your registered courses, so select your sections before uploading a date sheet."
-            action={
-              <Button to="/app/timetable" variant="primary">
-                Go to timetable
-              </Button>
-            }
-          />
-        </Panel>
+        <EmptyState
+          icon="spreadsheet"
+          title="Add your timetable first"
+          description="Exams are matched to your registered courses, so select your sections before uploading a date sheet."
+          action={
+            <Button to="/app/timetable" variant="primary">
+              Go to timetable
+            </Button>
+          }
+        />
       ) : (
         <>
           <ExamSummary exams={allExams} termExams={allExams.filter((exam) => exam.term === term)} now={now} />

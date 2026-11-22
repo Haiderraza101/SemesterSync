@@ -101,3 +101,8 @@ export function getGreeting(date = new Date()) {
   if (hour < 17) return "Good afternoon";
   return "Good evening";
 }
+
+export function minutesToTime(minutes) {
+  const clamped = Math.max(0, Math.min(23 * 60 + 59, minutes));
+  return `${pad(Math.floor(clamped / 60))}:${pad(clamped % 60)}`;
+}

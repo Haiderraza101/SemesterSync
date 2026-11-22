@@ -1,18 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import Avatar from "../ui/Avatar.jsx";
 import Icon from "../ui/Icon.jsx";
 import Logo from "../ui/Logo.jsx";
 import { useAuth } from "../../hooks/useAuth.js";
 import { cx } from "../../utils/cx.js";
 import { NAV_ITEMS } from "./navigation.js";
-
-function getInitials(name = "") {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join("");
-}
 
 export default function Sidebar({ id, open = false, onNavigate }) {
   const { user, logout } = useAuth();
@@ -45,9 +37,7 @@ export default function Sidebar({ id, open = false, onNavigate }) {
       </nav>
       {user && (
         <div className="sidebar__user">
-          <span className="sidebar__avatar" aria-hidden="true">
-            {getInitials(user.name)}
-          </span>
+          <Avatar name={user.name} avatar={user.avatar} size={36} className="sidebar__avatar" />
           <div className="sidebar__user-text">
             <span className="sidebar__user-name">{user.name}</span>
             <span className="sidebar__user-meta">

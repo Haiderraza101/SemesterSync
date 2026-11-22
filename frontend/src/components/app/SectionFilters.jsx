@@ -10,7 +10,7 @@ function FilterSelect({ label, value, options, onChange }) {
   );
 }
 
-export default function SectionFilters({ query, onQueryChange, filters, onFiltersChange, user, batches }) {
+export default function SectionFilters({ query, onQueryChange, filters, onFiltersChange, onReset, canReset, user, batches }) {
   const scopeOptions = [
     ...(user.key ? [{ value: SCOPES.section, label: `My section (${user.label})` }] : []),
     ...(user.semesterKey ? [{ value: SCOPES.semester, label: `My semester (${user.semesterLabel})` }] : []),
@@ -36,6 +36,12 @@ export default function SectionFilters({ query, onQueryChange, filters, onFilter
       <FilterSelect label="Course type" value={filters.type} options={TYPE_OPTIONS} onChange={(type) => update({ type })} />
       {batches.length > 0 && (
         <FilterSelect label="Batch" value={filters.batch} options={batchOptions} onChange={(batch) => update({ batch })} />
+      )}
+      {canReset && (
+        <button type="button" className="filter-reset" onClick={onReset}>
+          <Icon name="close" size={14} strokeWidth={2.25} />
+          Reset filters
+        </button>
       )}
     </div>
   );

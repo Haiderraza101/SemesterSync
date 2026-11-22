@@ -35,7 +35,7 @@ export function parseUserSection(section) {
   return { key, label: section, semesterKey: `${match[1]}${match[2]}`, semesterLabel: `${match[1]}-${match[2]}` };
 }
 
-function inSemester(sectionName, semesterKey) {
+export function inSemester(sectionName, semesterKey) {
   const key = normalizeSection(sectionName);
   return Boolean(semesterKey) && key.startsWith(semesterKey) && /^[A-Z]/.test(key.slice(semesterKey.length));
 }

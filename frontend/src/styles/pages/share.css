@@ -31,7 +31,7 @@
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-lg);
   background: linear-gradient(180deg, #f9fafb, #ffffff);
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
   font-family: var(--font-mono);
   font-size: 1.25rem;
   font-weight: 600;
@@ -125,7 +125,7 @@
   justify-content: center;
   border-radius: 999px;
   background: var(--ui-primary-10);
-  color: var(--ui-primary);
+  color: var(--color-primary-text);
   font-size: 13px;
   font-weight: 600;
 }
@@ -173,7 +173,7 @@
   padding: 0;
   border: 0;
   background: none;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   font-size: inherit;
   text-align: left;
 }

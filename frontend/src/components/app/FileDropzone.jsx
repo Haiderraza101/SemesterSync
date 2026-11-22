@@ -38,12 +38,12 @@ export default function FileDropzone({ label, hint, busy = false, busyLabel = "R
         </p>
       ) : (
         <>
-          <p className="dropzone__title">
-            {label}, or{" "}
-            <label htmlFor={inputId} className="dropzone__browse">
-              browse
-            </label>
-          </p>
+          <p className="dropzone__title">{label}</p>
+          <p className="dropzone__or">or</p>
+          <label htmlFor={inputId} className="btn btn--primary btn--lg dropzone__button">
+            <Icon name="upload" size={16} strokeWidth={2} />
+            Choose Excel file
+          </label>
           {hint && <p className="dropzone__hint">{hint}</p>}
         </>
       )}

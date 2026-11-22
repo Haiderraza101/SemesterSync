@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import ClashBanner from "../components/app/ClashBanner.jsx";
+import ClashFixes from "../components/app/ClashFixes.jsx";
 import FileDropzone from "../components/app/FileDropzone.jsx";
 import FileSummary from "../components/app/FileSummary.jsx";
 import SectionFilters from "../components/app/SectionFilters.jsx";
@@ -16,6 +17,7 @@ import { useSchedule } from "../hooks/useSchedule.js";
 import { useToast } from "../hooks/useToast.js";
 import { scheduleService } from "../services/scheduleService.js";
 import { findClashes, getClashingSlotKeys, groupClashes } from "../utils/clashes.js";
+import { applyClashFix, findClashFixes } from "../utils/clashResolver.js";
 import { assignCourseColors } from "../utils/courseColors.js";
 import { getErrorMessage } from "../utils/errors.js";
 import { SHORT_DAY_NAMES, timeToMinutes } from "../utils/date.js";
@@ -57,7 +59,18 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
   const [draft, setDraft] = useState(() => createDraft(catalog, selections, user));
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState(() => initialFilters(catalog, user));
+  const [searchParams] = useSearchParams();
+  const [showFixes, setShowFixes] = useState(() => searchParams.get("fix") === "1");
+  const { notify } = useToast();
   const batches = useMemo(() => getBatchOptions(catalog), [catalog]);
+  const defaultFilters = useMemo(() => initialFilters(catalog, user), [catalog, user]);
+  const filtersChanged =
+    query.trim() !== "" ||
+    Object.keys(defaultFilters).some((key) => filters[key] !== defaultFilters[key]);
+  const resetFilters = () => {
+    setQuery("");
+    setFilters(defaultFilters);
+  };
 
   const myCoreCourses = useMemo(
     () =>
@@ -100,6 +113,16 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
     .reduce((counts, day) => counts.set(day, (counts.get(day) || 0) + 1), new Map());
   const [busyDay, busyCount] = [...busiestDay.entries()].sort((a, b) => b[1] - a[1])[0] || [];
   const clashPairs = groupClashes(clashes).length;
+  const fixes = useMemo(
+    () => (showFixes && clashes.length > 0 ? findClashFixes({ catalog, draft, user }) : null),
+    [showFixes, clashes.length, catalog, draft, user]
+  );
+
+  const applyFix = (option) => {
+    setDraft((current) => applyClashFix(current, option));
+    setShowFixes(false);
+    notify("Fix applied. Your selected sections no longer clash. Add them to your calendar to save.");
+  };
 
   const sectionOptions = useMemo(
     () =>
@@ -142,6 +165,16 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
       return next;
     });
   };
+
+  const deselectAll = () => {
+    setDraft((current) =>
+      Object.fromEntries(Object.entries(current).map(([code, entry]) => [code, { ...entry, included: false }]))
+    );
+  };
+
+  const allCoreSelected =
+    myCoreCourses.length > 0 &&
+    myCoreCourses.every((course) => draft[course.code].included && draft[course.code].section === findUserSection(course, user));
 
   const handleSave = () => {
     onSave(draftCourses.map((course) => ({ code: course.code, section: course.section })));
@@ -187,9 +220,15 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
       {clashes.length > 0 ? (
         <ClashBanner
           clashes={clashes}
-          showAction={false}
-          text="Choose a different section for one course in each pair below, or untick a course you are not taking."
-        />
+          text="Pick a fix below, choose another section yourself, or untick a course you are not taking."
+          action={
+            <Button size="sm" variant={showFixes ? "secondary" : "primary"} onClick={() => setShowFixes((value) => !value)}>
+              {showFixes ? "Hide fixes" : "See ways to fix"}
+            </Button>
+          }
+        >
+          {fixes && <ClashFixes result={fixes} courseColors={courseColors} onApply={applyFix} />}
+        </ClashBanner>
       ) : (
         draftCourses.length > 0 && <Notice variant="success" title="No clashes between the selected sections." />
       )}
@@ -200,7 +239,7 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
           <>
             <span className="toolbar__meta">Classes repeat weekly until the last teaching day of the semester.</span>
             <div className="page-header__actions">
-              <Button onClick={() => setDraft(createDraft(catalog, selections, user))}>Reset</Button>
+              <Button onClick={() => setDraft(createDraft(catalog, selections, user))}>Reset selection</Button>
               <Button variant="primary" disabled={draftCourses.length === 0} onClick={handleSave}>
                 Add {draftCourses.length} {draftCourses.length === 1 ? "course" : "courses"} to calendar
               </Button>
@@ -214,13 +253,20 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
             onQueryChange={setQuery}
             filters={filters}
             onFiltersChange={setFilters}
+            onReset={resetFilters}
+            canReset={filtersChanged}
             user={user}
             batches={batches}
           />
           <div className="toolbar__actions">
-            {myCoreCourses.length > 0 && (
+            {myCoreCourses.length > 0 && !allCoreSelected && (
               <Button size="sm" onClick={selectMyCoreCourses}>
                 Select my {myCoreCourses.length} core courses
+              </Button>
+            )}
+            {draftCourses.length > 0 && (
+              <Button size="sm" onClick={deselectAll}>
+                Deselect all
               </Button>
             )}
             <span className="toolbar__meta">
@@ -231,6 +277,7 @@ function SectionPicker({ catalog, selections, userSection, onSave }) {
         <SectionTable
           courses={visibleCourses}
           courseColors={courseColors}
+          onResetFilters={filtersChanged ? resetFilters : undefined}
           draft={draft}
           sectionOptions={sectionOptions}
           clashingSlots={clashingSlots}

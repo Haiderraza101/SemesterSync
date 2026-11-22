@@ -26,7 +26,7 @@ function ClashCourse({ course }) {
 
 const DEFAULT_TEXT = "You can only attend one class at a time. Pick another section for one of the courses on the timetable page.";
 
-export default function ClashBanner({ clashes, text = DEFAULT_TEXT, showAction = true }) {
+export default function ClashBanner({ clashes, text = DEFAULT_TEXT, action, children }) {
   const [expanded, setExpanded] = useState(false);
   const groups = groupClashes(clashes);
   const visible = expanded ? groups : groups.slice(0, VISIBLE_ROWS);
@@ -44,10 +44,12 @@ export default function ClashBanner({ clashes, text = DEFAULT_TEXT, showAction =
           </h2>
           <p className="clash-banner__text">{text}</p>
         </div>
-        {showAction && (
-          <Button size="sm" to="/app/timetable" className="clash-banner__action">
+        {action === undefined ? (
+          <Button size="sm" to="/app/timetable?fix=1" className="clash-banner__action">
             Resolve in timetable
           </Button>
+        ) : (
+          action && <div className="clash-banner__action">{action}</div>
         )}
       </header>
       <ul className="clash-banner__list">
@@ -68,6 +70,7 @@ export default function ClashBanner({ clashes, text = DEFAULT_TEXT, showAction =
           <Icon name={expanded ? "chevron-up" : "chevron-down"} size={14} strokeWidth={2} />
         </button>
       )}
+      {children}
     </section>
   );
 }

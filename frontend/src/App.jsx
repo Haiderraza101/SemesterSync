@@ -2,12 +2,12 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AppLayout from "./layouts/AppLayout.jsx";
 import ProtectedRoute from "./components/routing/ProtectedRoute.jsx";
+import RootRedirect from "./components/routing/RootRedirect.jsx";
 import GuestRoute from "./components/routing/GuestRoute.jsx";
 import DocumentTitle from "./components/routing/DocumentTitle.jsx";
 import ErrorBoundary from "./components/routing/ErrorBoundary.jsx";
 import PageLoader from "./components/ui/PageLoader.jsx";
 
-const Landing = lazy(() => import("./pages/Landing.jsx"));
 const Login = lazy(() => import("./pages/Login.jsx"));
 const Register = lazy(() => import("./pages/Register.jsx"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword.jsx"));
@@ -30,7 +30,7 @@ export default function App() {
       <DocumentTitle />
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<RootRedirect />} />
           <Route element={<GuestRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />

@@ -27,6 +27,27 @@ const ORIENTATION_OPTIONS = [
   { value: "portrait", label: "A4 portrait" },
 ];
 
+function hexToRgb(hex) {
+  const value = hex.replace("#", "");
+  const full = value.length === 3 ? value.split("").map((part) => part + part).join("") : value;
+  return [0, 2, 4].map((index) => parseInt(full.slice(index, index + 2), 16));
+}
+
+function mixColor(color, base, amount) {
+  const from = hexToRgb(color || "#3f88c5");
+  const to = hexToRgb(base);
+  const mixed = from.map((channel, index) => Math.round(channel * amount + to[index] * (1 - amount)));
+  return `#${mixed.map((channel) => channel.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function cardStyle(color, shaded) {
+  return {
+    background: shaded ? mixColor(color, "#ffffff", 0.11) : "#ffffff",
+    borderColor: mixColor(color, "#ffffff", 0.26),
+    borderLeftColor: color,
+  };
+}
+
 function TimetablePreview({ previewRef, user, semesterName, rows, days, showRooms, shaded }) {
   return (
     <div ref={previewRef} className="export-sheet">
@@ -57,10 +78,10 @@ function TimetablePreview({ previewRef, user, semesterName, rows, days, showRoom
             <tr key={row.key}>
               <th scope="row">{formatShortTimeRange(row.start, row.end)}</th>
               {row.cells.map((cell) => (
-                <td key={cell.day} className={cx(shaded && cell.courses.length > 0 && "export-sheet__cell--filled")}>
+                <td key={cell.day} className={cx(cell.courses.length === 0 && "export-sheet__cell--empty")}>
                   {cell.courses.map((course) => (
-                    <div key={course.code} className="export-sheet__entry">
-                      <strong>{course.name}</strong>
+                    <div key={course.code} className="export-sheet__entry" style={cardStyle(course.color, shaded)}>
+                      <strong style={{ color: mixColor(course.color, "#111827", 0.45) }}>{course.name}</strong>
                       {showRooms && <span>{course.room}</span>}
                     </div>
                   ))}
@@ -118,18 +139,16 @@ export default function Export() {
       />
 
       {courses.length === 0 ? (
-        <Panel>
-          <EmptyState
-            icon="export"
-            title="Nothing to export yet"
-            description="Select your sections on the timetable page first."
-            action={
-              <Button to="/app/timetable" variant="primary">
-                Go to timetable
-              </Button>
-            }
-          />
-        </Panel>
+        <EmptyState
+          icon="export"
+          title="Nothing to export yet"
+          description="Select your sections on the timetable page first."
+          action={
+            <Button to="/app/timetable" variant="primary">
+              Go to timetable
+            </Button>
+          }
+        />
       ) : (
         <div className="page-grid">
           <div className="page-grid__main export-stage">
@@ -161,7 +180,7 @@ export default function Export() {
                 <fieldset className="option-group">
                   <legend className="field__label export-options__legend">Include</legend>
                   <Checkbox label="Room numbers" checked={showRooms} onChange={() => setShowRooms((value) => !value)} />
-                  <Checkbox label="Shade class cells" checked={shaded} onChange={() => setShaded((value) => !value)} />
+                  <Checkbox label="Colour class cards" checked={shaded} onChange={() => setShaded((value) => !value)} />
                 </fieldset>
                 <Button variant="primary" block disabled={exporting} onClick={handleDownload}>
                   {exporting ? "Preparing file…" : `Download ${format.toUpperCase()}`}

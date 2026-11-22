@@ -63,7 +63,7 @@ export default function TaskTable({ tasks, now, onToggle, onDelete }) {
                 </div>
               </td>
               <td>
-                <StatusBadge status={task.type === "quiz" ? "quiz" : "assignment"} />
+                <StatusBadge status={task.type || "assignment"} />
               </td>
               <td>
                 <div className="cell-stack">

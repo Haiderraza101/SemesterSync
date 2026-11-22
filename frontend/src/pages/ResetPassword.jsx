@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import AuthField from "../components/app/AuthField.jsx";
 import Button from "../components/ui/Button.jsx";
-import Logo from "../components/ui/Logo.jsx";
+import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
 import PageLoader from "../components/ui/PageLoader.jsx";
-import TextField from "../components/ui/TextField.jsx";
 import { useForm } from "../hooks/useForm.js";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 import { authService } from "../services/authService.js";
 import { getErrorCode, getErrorMessage, getFieldErrors } from "../utils/errors.js";
 import { validateResetPassword } from "../utils/validation.js";
@@ -20,17 +21,20 @@ function isInvalidTokenError(error) {
 
 function InvalidLink() {
   return (
-    <>
-      <div className="auth-form__header">
-        <h1>Link expired</h1>
-        <p className="auth-card__text">
-          This reset link is invalid, has already been used or has expired. Request a new one to continue.
-        </p>
+    <div className="auth-form">
+      <div className="auth-status auth-status--danger">
+        <span className="auth-status__icon" aria-hidden="true">
+          <Icon name="alert" size={20} strokeWidth={2} />
+        </span>
+        <div>
+          <p className="auth-status__title">This link cannot be used</p>
+          <p className="auth-status__text">It is invalid, has already been used or has expired.</p>
+        </div>
       </div>
       <Button to="/forgot-password" variant="primary" size="lg" block>
         Request a new link
       </Button>
-    </>
+    </div>
   );
 }
 
@@ -62,35 +66,35 @@ function ResetForm({ token, onInvalid }) {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit} noValidate>
-      <div className="auth-form__header">
-        <h1>Choose a new password</h1>
-        <p className="auth-card__text">You will be logged out of every device once your password is reset.</p>
-      </div>
       {formError && <Notice variant="danger" title={formError} />}
-      <TextField
+      <AuthField
         label="New password"
         name="password"
         type="password"
+        icon="lock"
         autoComplete="new-password"
         placeholder="At least 8 characters"
         value={values.password}
         onChange={handleChange}
         error={errors.password}
         hint="Use 8 or more characters with a letter and a number."
+        autoFocus
       />
-      <TextField
+      <AuthField
         label="Confirm new password"
         name="confirmPassword"
         type="password"
+        icon="lock"
         autoComplete="new-password"
-        placeholder="Re-enter password"
+        placeholder="Re-enter your password"
         value={values.confirmPassword}
         onChange={handleChange}
         error={errors.confirmPassword}
       />
-      <Button type="submit" variant="primary" size="lg" block disabled={submitting}>
+      <button type="submit" className="btn btn--primary btn--lg btn--block auth-submit" disabled={submitting}>
         {submitting ? "Resetting…" : "Reset password"}
-      </Button>
+        {!submitting && <Icon name="arrow-right" size={16} strokeWidth={2} />}
+      </button>
     </form>
   );
 }
@@ -112,19 +116,17 @@ export default function ResetPassword() {
 
   if (status === "checking") return <PageLoader />;
 
+  const invalid = status === "invalid";
+
   return (
-    <div className="auth-card-page">
-      <Logo />
-      <div className="auth-card">
-        {status === "invalid" ? (
-          <InvalidLink />
-        ) : (
-          <ResetForm token={token} onInvalid={() => setStatus("invalid")} />
-        )}
-        <div className="auth-form__footer">
-          <Link to="/login">Back to log in</Link>
-        </div>
-      </div>
-    </div>
+    <AuthLayout
+      eyebrow="Account recovery"
+      title={invalid ? "Link expired" : "Choose a new password"}
+      subtitle={invalid ? "Request a new reset link to continue." : "You will be logged out of every device once your password is reset."}
+      switchText="Remembered it?"
+      switchLink={{ to: "/login", label: "Log in" }}
+    >
+      {invalid ? <InvalidLink /> : <ResetForm token={token} onInvalid={() => setStatus("invalid")} />}
+    </AuthLayout>
   );
 }

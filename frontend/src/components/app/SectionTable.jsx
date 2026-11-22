@@ -1,3 +1,4 @@
+import Button from "../ui/Button.jsx";
 import Checkbox from "../ui/Checkbox.jsx";
 import CourseCell from "./CourseCell.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
@@ -10,6 +11,7 @@ import { SHORT_DAY_NAMES, formatTime } from "../../utils/date.js";
 export default function SectionTable({
   courses,
   courseColors,
+  onResetFilters,
   draft,
   sectionOptions,
   clashingSlots,
@@ -17,7 +19,14 @@ export default function SectionTable({
   onSectionChange,
 }) {
   if (courses.length === 0) {
-    return <EmptyState variant="compact" icon="search" title="No courses match your search and filters" />;
+    return (
+      <EmptyState
+        variant="compact"
+        icon="search"
+        title="No courses match your search and filters"
+        action={onResetFilters && <Button onClick={onResetFilters}>Reset filters</Button>}
+      />
+    );
   }
 
   return (

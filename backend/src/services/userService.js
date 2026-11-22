@@ -2,6 +2,7 @@ import Schedule from "../models/Schedule.js";
 import ShareCode from "../models/ShareCode.js";
 import User from "../models/User.js";
 import AppError from "../utils/AppError.js";
+import { deleteUserAvatar } from "./avatarService.js";
 import { deleteUserLectures } from "./lectureService.js";
 import { deleteUserSessions } from "./sessionService.js";
 
@@ -31,6 +32,7 @@ export async function deleteAccount(user) {
     ShareCode.deleteMany({ owner: user._id }),
     deleteUserSessions(user._id),
     deleteUserLectures(user._id),
+    deleteUserAvatar(user),
   ]);
   await user.deleteOne();
 }

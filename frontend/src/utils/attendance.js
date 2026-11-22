@@ -1,13 +1,15 @@
 import { getClassInstances, getSemesterRange } from "./schedule.js";
 
 export const LATES_PER_ABSENCE = 3;
+export const ESTIMATED_TEACHING_WEEKS = 16;
 
 export const ATTENDANCE_OPTIONS = [
   { value: 80, label: "80%" },
   { value: 75, label: "75%" },
 ];
 
-function getRisk(canMiss) {
+function getRisk(canMiss, absent) {
+  if (absent === 0) return "ok";
   if (canMiss === 0) return "critical";
   if (canMiss <= 3) return "warning";
   return "ok";
@@ -23,6 +25,8 @@ export function getAttendanceSummary(schedule, courses, requirement = 80) {
       .forEach((instance) => {
         plannedByCourse.set(instance.course.code, (plannedByCourse.get(instance.course.code) || 0) + 1);
       });
+  } else {
+    courses.forEach((course) => plannedByCourse.set(course.code, course.slots.length * ESTIMATED_TEACHING_WEEKS));
   }
 
   const marksByCourse = new Map();
@@ -48,7 +52,7 @@ export function getAttendanceSummary(schedule, courses, requirement = 80) {
     const canMiss = Math.max(0, allowedAbsences - absent);
     const percentage = held === 0 ? 100 : Math.round((attended / held) * 100);
 
-    return { course, held, attended, absent, late, lateAbsences, total, percentage, canMiss, risk: held === 0 ? "ok" : getRisk(canMiss) };
+    return { course, held, attended, absent, late, lateAbsences, total, percentage, canMiss, risk: getRisk(canMiss, absent) };
   });
 }
 

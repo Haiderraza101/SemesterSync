@@ -1,9 +1,9 @@
 :root {
-  --color-primary: #2f5f98;
-  --color-primary-hover: #24507f;
-  --color-primary-soft: #ebf1f8;
-  --color-primary-border: #d6e1ee;
-  --color-primary-text: #24507f;
+  --color-primary: #3f88c5;
+  --color-primary-hover: #3374ab;
+  --color-primary-soft: #ebf3fa;
+  --color-primary-border: #cfe1f1;
+  --color-primary-text: #2f6fa6;
 
   --color-text: #1f2933;
   --color-text-secondary: #3e4c59;
@@ -53,5 +53,5 @@
   --control-height-lg: 40px;
   --sidebar-width: 232px;
   --content-max-width: 1440px;
-  --focus-ring: 0 0 0 3px rgba(47, 95, 152, 0.25);
+  --focus-ring: 0 0 0 3px rgba(63, 136, 197, 0.25);
 }

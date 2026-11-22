@@ -32,7 +32,7 @@ const taskSchema = new mongoose.Schema(
     id: { type: String, required: true },
     title: { type: String, required: true, trim: true, maxlength: 120 },
     courseCode: { type: String, uppercase: true },
-    type: { type: String, enum: ["assignment", "quiz"], default: "assignment" },
+    type: { type: String, enum: ["assignment", "quiz", "evaluation"], default: "assignment" },
     due: { type: String, required: true },
     done: { type: Boolean, default: false },
     lectureId: { type: String, maxlength: 120 },

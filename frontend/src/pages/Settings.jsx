@@ -171,7 +171,7 @@ function AccountSettings() {
       await authService.deleteAccount();
       resetSchedule();
       clearSession();
-      navigate("/", { replace: true });
+      navigate("/login", { replace: true });
     } catch (error) {
       notify(getErrorMessage(error), "danger");
       setDeleting(false);

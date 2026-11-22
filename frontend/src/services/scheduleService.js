@@ -32,7 +32,7 @@ export const scheduleService = {
 
   async getMyShareCode() {
     const { data } = await api.get("/share");
-    return data.code;
+    return data;
   },
 
   async createShareCode(content) {

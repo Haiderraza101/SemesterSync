@@ -37,7 +37,15 @@ export function ScheduleProvider({ userId, children }) {
       setCatalog: (catalog) => dispatch({ type: "catalog/set", catalog }),
       setSelections: (selections) => dispatch({ type: "selections/set", selections }),
       importSchedule: (selections, mode, extras = {}) =>
-        dispatch({ type: "schedule/import", selections, mode, exams: extras.exams, tasks: extras.tasks }),
+        dispatch({
+          type: "schedule/import",
+          selections,
+          mode,
+          exams: extras.exams,
+          tasks: extras.tasks,
+          makeups: extras.makeups,
+          cancelled: extras.cancelled,
+        }),
       toggleCancelled: (id) => dispatch({ type: "class/toggleCancel", id }),
       addMakeup: (makeup) => dispatch({ type: "makeup/add", makeup }),
       removeMakeup: (id) => dispatch({ type: "makeup/remove", id }),

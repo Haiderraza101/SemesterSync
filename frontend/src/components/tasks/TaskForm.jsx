@@ -9,12 +9,10 @@ import { useForm } from "../../hooks/useForm.js";
 import { useSchedule } from "../../hooks/useSchedule.js";
 import { formatShortDate, formatTimeRange, parseDateKey } from "../../utils/date.js";
 import { getUpcomingLectures } from "../../utils/schedule.js";
+import { TASK_TYPES, taskTypeLabel } from "../../utils/taskTypes.js";
 import { validateTask } from "../../utils/validation.js";
 
-const TYPE_OPTIONS = [
-  { value: "assignment", label: "Assignment" },
-  { value: "quiz", label: "Quiz" },
-];
+const TYPE_OPTIONS = TASK_TYPES;
 
 export default function TaskForm({ courses, onSubmit }) {
   const initialValues = useMemo(
@@ -70,12 +68,12 @@ export default function TaskForm({ courses, onSubmit }) {
   };
 
   return (
-    <Panel as="div" title="Add an assignment or quiz" description="It appears on your calendar and dashboard.">
+    <Panel as="div" title="Add a deadline" description="It appears on your calendar and dashboard.">
       <form className="form-stack" onSubmit={handleSubmit} noValidate>
         <TextField
           label="Title"
           name="title"
-          placeholder={isQuiz ? "Quiz 3" : "Assignment 5"}
+          placeholder={TASK_TYPES.find((item) => item.value === values.type)?.placeholder}
           value={values.title}
           onChange={handleChange}
           error={errors.title}
@@ -140,7 +138,7 @@ export default function TaskForm({ courses, onSubmit }) {
         </div>
         )}
         <Button type="submit" variant="primary" block>
-          {isQuiz ? "Add quiz" : "Add assignment"}
+          Add {taskTypeLabel(values.type).toLowerCase()}
         </Button>
       </form>
     </Panel>

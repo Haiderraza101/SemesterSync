@@ -3,7 +3,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ReferenceLine, Res
 import ChartCard, { ChartMetrics, ChartTabs } from "./ChartCard.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
 
-const SERIES_COLOR = "#2f5f98";
+const SERIES_COLOR = "#3f88c5";
 const GRID_COLOR = "#e2e8f0";
 const AXIS_TICK = { fontSize: 11, fill: "#6b7280", fontWeight: 500 };
 

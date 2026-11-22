@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Button from "../components/ui/Button.jsx";
-import Logo from "../components/ui/Logo.jsx";
+import AuthField from "../components/app/AuthField.jsx";
+import Icon from "../components/ui/Icon.jsx";
 import Notice from "../components/ui/Notice.jsx";
-import TextField from "../components/ui/TextField.jsx";
+import AuthLayout from "../layouts/AuthLayout.jsx";
 import { authService } from "../services/authService.js";
 import { getErrorMessage } from "../utils/errors.js";
 import { isValidEmail } from "../utils/validation.js";
@@ -35,58 +34,64 @@ export default function ForgotPassword() {
     }
   };
 
-  const handleReset = () => {
-    setSent(false);
-    setEmail("");
-  };
-
   return (
-    <div className="auth-card-page">
-      <Logo />
-      <div className="auth-card">
-        {sent ? (
-          <>
-            <div className="auth-form__header">
-              <h1>Check your email</h1>
-              <p className="auth-card__text">
-                If an account exists for {email.trim()}, a reset link has been sent. The link expires in 30 minutes.
-              </p>
+    <AuthLayout
+      eyebrow="Account recovery"
+      title={sent ? "Check your email" : "Reset your password"}
+      subtitle={
+        sent
+          ? "If an account exists for that address, a reset link is on its way."
+          : "Enter the email you signed up with and we will send you a link to set a new password."
+      }
+      switchText="Remembered it?"
+      switchLink={{ to: "/login", label: "Log in" }}
+    >
+      {sent ? (
+        <div className="auth-form">
+          <div className="auth-status">
+            <span className="auth-status__icon" aria-hidden="true">
+              <Icon name="mail" size={20} strokeWidth={2} />
+            </span>
+            <div>
+              <p className="auth-status__title">Link sent to {email.trim()}</p>
+              <p className="auth-status__text">It expires in 30 minutes. Check your spam folder if it does not arrive.</p>
             </div>
-            <Button size="lg" block onClick={handleReset}>
-              Use a different email
-            </Button>
-          </>
-        ) : (
-          <form className="auth-form" onSubmit={handleSubmit} noValidate>
-            <div className="auth-form__header">
-              <h1>Reset your password</h1>
-              <p className="auth-card__text">
-                Enter the email you signed up with. We will send you a link to set a new password.
-              </p>
-            </div>
-            {formError && <Notice variant="danger" title={formError} />}
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@university.edu.pk"
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value);
-                setError("");
-              }}
-              error={error}
-            />
-            <Button type="submit" variant="primary" size="lg" block disabled={submitting}>
-              {submitting ? "Sending…" : "Send reset link"}
-            </Button>
-          </form>
-        )}
-        <div className="auth-form__footer">
-          <Link to="/login">Back to log in</Link>
+          </div>
+          <button
+            type="button"
+            className="btn btn--secondary btn--lg btn--block"
+            onClick={() => {
+              setSent(false);
+              setEmail("");
+            }}
+          >
+            Use a different email
+          </button>
         </div>
-      </div>
-    </div>
+      ) : (
+        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+          {formError && <Notice variant="danger" title={formError} />}
+          <AuthField
+            label="Email"
+            name="email"
+            type="email"
+            icon="mail"
+            autoComplete="email"
+            placeholder="you@university.edu.pk"
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setError("");
+            }}
+            error={error}
+            autoFocus
+          />
+          <button type="submit" className="btn btn--primary btn--lg btn--block auth-submit" disabled={submitting}>
+            {submitting ? "Sending…" : "Send reset link"}
+            {!submitting && <Icon name="arrow-right" size={16} strokeWidth={2} />}
+          </button>
+        </form>
+      )}
+    </AuthLayout>
   );
 }
